@@ -5,8 +5,8 @@
 		var $result;
 		var $queries;
 		var $debug;
-		var $errorTo = "tylerhall@gmail.com";
-		var $errorFrom = "errors@website.com";
+		var $errorTo = "email@domain.com";
+		var $errorFrom = "errors@domain.com";
 
 		function Database($host, $user, $password, $dbname, $debug = true)
 		{
