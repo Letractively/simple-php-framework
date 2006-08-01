@@ -74,4 +74,50 @@
 			return $out;
 		}
 	}
+
+	// Creates a random, simple math problem to be used as a CAPTCHA instead of the standard, hard-to-read distorted images.
+	// By no means is this method 100% foolproof. Far from it. However it's a faily easy way to weed out bots and still remain
+	// accessible to all users.
+	// Returns the question as a string and stores the answer in $_SESSION['captcha_answer']
+	function math_captcha()
+	{
+		$num1  = rand(1, 10);
+		$num2  = rand(1, 10);
+		$op    = rand(1, 3);
+
+		$words   =  array( array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10), array("zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten") );
+
+		if($op == 1)
+		{
+			$answer   = $num1 + $num2;
+			$num1     = $words[rand(0, 1)][$num1];
+			$num2     = $words[rand(0, 1)][$num2];
+			$question = (rand(1, 2) == 1) ? "What is $num1 plus $num2?" : "What does $num1 + $num2 equal?";
+		}
+		elseif($op == 2)
+		{
+			$answer  = $num1 * $num2;
+			$num1     = $words[rand(0, 1)][$num1];
+			$num2     = $words[rand(0, 1)][$num2];
+			$question = (rand(1, 2) == 1) ? "What is $num1 times $num2?" : "What does $num1 * $num2 equal?";
+		}
+		elseif($op == 3)
+		{
+			if($num1 < $num2)
+			{
+				$temp = $num1;
+				$num1 = $num2;
+				$num2 = $temp;
+			}
+			$answer   = $num1 - $num2;
+			$num1     = $words[rand(0, 1)][$num1];
+			$num2     = $words[rand(0, 1)][$num2];
+			$question = (rand(1, 2) == 1) ? "What is $num1 minus $num2?" : "What does $num1 - $num2 equal?";
+		}
+		
+		$_SESSION['captcha_question'] = $question;
+		$_SESSION['captcha_answer']   = $answer;
+
+		return $question;
+	}
 ?>
