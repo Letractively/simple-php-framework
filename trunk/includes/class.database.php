@@ -50,7 +50,11 @@
 				$msg .= "The following query took $delta to complete:\n\n";
 				$msg .= $this->lastQuery() . "\n\n";
 				$msg .= $this->queries() . "\n\n";
+				
 				mail($this->errorTo, "Long Query " . $_SERVER['PHP_SELF'], $msg, "From: {$this->errorFrom}");
+				
+				// global $rsslog;
+				// $rsslog->log("Long Query " . $_SERVER['PHP_SELF'], $msg);
 			}
 			
 			return $db->result;
@@ -94,6 +98,8 @@
 					$msg .= "POST VARIABLES\n==============\n" . var_export($_POST, true) . "\n\n";
 					$msg .= "GET VARIABLES\n=============\n"   . var_export($_GET, true)  . "\n\n";
 					mail($this->errorTo, $_SERVER['PHP_SELF'], $msg, "From: {$this->errorFrom}");
+					// global $rsslog;
+					// $rsslog->log("DB Error" . $_SERVER['PHP_SELF'], $msg);
 					break;
 			}
 			
