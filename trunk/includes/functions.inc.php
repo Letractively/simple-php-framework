@@ -42,8 +42,9 @@
 	}
 
 	// Redirects user to $url
-	function redirect($url = "/")
+	function redirect($url = "")
 	{
+		if($url == "") $url = $_SERVER['PHP_SELF'];
 		header("Location: $url");
 		exit();
 	}
@@ -63,7 +64,7 @@
 	}
 
 	// Returns the first $num words of $str
-	function maxwords($str, $num)
+	function max_words($str, $num)
 	{
 		$words = explode(" ", $str);
 		if(count($words) < $num)
@@ -75,49 +76,116 @@
 		}
 	}
 
-	// Creates a random, simple math problem to be used as a CAPTCHA instead of the standard, hard-to-read distorted images.
-	// By no means is this method 100% foolproof. Far from it. However it's a faily easy way to weed out bots and still remain
-	// accessible to all users.
-	// Returns the question as a string and stores the answer in $_SESSION['captcha_answer']
-	function math_captcha()
+	// Serves an external document for download as an HTTP attachment.
+	function download_document($filename, $path = "", $mimetype = "application/octet-stream")
 	{
-		$num1  = rand(1, 10);
-		$num2  = rand(1, 10);
-		$op    = rand(1, 3);
+		header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
+		header("Content-Disposition: attachment; filename = $filename");
+		header("Content-Length: " . filesize($pathto . $filename));
+		header("Content-Type: $mimetype");
+		echo file_get_contents($pathto . $filename);
+	}
+	
+	// Creates a thumbnail from an existing image.
+	// $filename is the original filename, while $tmpname is the actual
+	// filesystem name (for example, the temporary filename used in a PHP upload).
+	// Returns an image resource which you can then output to the browser, or
+	// save to a file using imagejpg(), imagepng(), etc.
+	function resize_image($filename, $tmpname, $xmax, $ymax)
+	{
+		$ext = explode(".", $filename);
+		$ext = $ext[count($ext)-1];
 
-		$words   =  array( array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10), array("zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten") );
+		if($ext == "jpg" || $ext == "jpeg")
+			$im = imagecreatefromjpeg($tmpname);
+		elseif($ext == "png")
+			$im = imagecreatefrompng($tmpname);
+		elseif($ext == "gif")
+			$im = imagecreatefromgif($tmpname);
 
-		if($op == 1)
-		{
-			$answer   = $num1 + $num2;
-			$num1     = $words[rand(0, 1)][$num1];
-			$num2     = $words[rand(0, 1)][$num2];
-			$question = (rand(1, 2) == 1) ? "What is $num1 plus $num2?" : "What does $num1 + $num2 equal?";
+		$x = imagesx($im);
+		$y = imagesy($im);
+
+		if($x <= $xmax && $y <= $ymax)
+			return $im;
+
+		if($x >= $y) {
+			$newx = $xmax;
+			$newy = $newx * $y / $x;
 		}
-		elseif($op == 2)
-		{
-			$answer  = $num1 * $num2;
-			$num1     = $words[rand(0, 1)][$num1];
-			$num2     = $words[rand(0, 1)][$num2];
-			$question = (rand(1, 2) == 1) ? "What is $num1 times $num2?" : "What does $num1 * $num2 equal?";
+		else {
+			$newy = $ymax;
+			$newx = $x / $y * $newy;
 		}
-		elseif($op == 3)
+
+		$im2 = imagecreatetruecolor($newx, $newy);
+		imagecopyresized($im2, $im, 0, 0, 0, 0, floor($newx), floor($newy), $x, $y);
+		return $im2;
+	}	
+
+	// Retrieves the filesize of a remote file.
+	function remote_filesize($url, $user = "", $pw = "")
+	{
+		ob_start();
+		$ch = curl_init($url);
+		curl_setopt($ch, CURLOPT_HEADER, 1);
+		curl_setopt($ch, CURLOPT_NOBODY, 1);
+
+		if(!empty($user) && !empty($pw))
 		{
-			if($num1 < $num2)
+			$headers = array('Authorization: Basic ' .  base64_encode("$user:$pw"));
+			curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+		}
+
+		$ok = curl_exec($ch);
+		curl_close($ch);
+		$head = ob_get_contents();
+		ob_end_clean();
+
+		$regex = '/Content-Length:\s([0-9].+?)\s/';
+		$count = preg_match($regex, $head, $matches);
+
+		return isset($matches[1]) ? $matches[1] : "unknown";
+	}	
+
+	// Outputs a filesize in human readable format.
+	function human_readable($val, $thousands = 0)
+	{
+		if($val >= 1000)
+			$val = human_readable($val / 1024, ++$thousands);
+		else
+		{
+			$unit = array('','K','M','T','P','E','Z','Y');
+			$val  = round($val, 2) . $unit[$thousands] . 'B';
+		}
+		return $val;
+	}
+	
+	// Tests for a valid email address and optionally tests for valid MX records, too.
+	function valid_email($email, $test_mx = false)
+	{
+		if(eregi("^([_a-z0-9-]+)(\.[_a-z0-9-]+)*@([a-z0-9-]+)(\.[a-z0-9-]+)*(\.[a-z]{2,4})$", $email))
+			if($test_mx)
 			{
-				$temp = $num1;
-				$num1 = $num2;
-				$num2 = $temp;
+				list($username, $domain) = split("@", $email);
+				return getmxrr($domain, $mxrecords);
 			}
-			$answer   = $num1 - $num2;
-			$num1     = $words[rand(0, 1)][$num1];
-			$num2     = $words[rand(0, 1)][$num2];
-			$question = (rand(1, 2) == 1) ? "What is $num1 minus $num2?" : "What does $num1 - $num2 equal?";
-		}
-		
-		$_SESSION['captcha_question'] = $question;
-		$_SESSION['captcha_answer']   = $answer;
+			else
+				return true;
+		else
+			return false;
+	}
 
-		return $question;
+	// Grabs a remote file using curl since file(http) doesn't work on all systems.
+	function geturl($url)
+	{
+		$ch = curl_init();
+		$timeout = 5;
+		curl_setopt($ch, CURLOPT_URL, $url);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+		curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $timeout);
+		$html = curl_exec($ch);
+		curl_close($ch);
+		return $html;
 	}
 ?>
