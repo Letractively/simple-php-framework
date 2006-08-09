@@ -1,7 +1,7 @@
 <?PHP
 	class Database
 	{
-		var $onError   = 0; // 0 = die($error), 1 = email($error) & continue, 2 = do nothing & continue
+		var $onError   = 0; // 0 = die($error), 1 = notify & continue, 2 = do nothing & continue
 		var $longQuery = 0; // 0 = ignore, otherwise email($query) if query time > $longQuery
 		var $errorTo   = "email@domain.com";
 		var $errorFrom = "errors@domain.com";
