@@ -5,27 +5,29 @@
 		var $username;
 		var $password;
 		var $level;
-		var $salt = "678fdsi4h4iuys78346784s";
-		var $domain = "";
+		var $salt = "678fdsi4h4iuys78346784s"; // Pick any set of random characters
+		var $domain = ""; // Domain to set in cookie
 		var $user;
 
 		function Auth()
 		{
 			$this->user_id = 0;
 			$this->username = "Guest";
-			$this->user     = new User();
 
-			if(!$this->check_session()) $this->check_cookie();		
+			if(class_exists("DBObject") && class_exists("User"))
+				$this->user = new User();
+
+			if(!$this->checkSession()) $this->checkCookie();
 			return $this->ok();
 		}
 	
-		function check_session()
+		function checkSession()
 		{
 			if(!empty($_SESSION['auth_username']) && !empty($_SESSION['auth_password']))
 				$this->check($_SESSION['auth_username'], $_SESSION['auth_password']);
 		}
 
-		function check_cookie()
+		function checkCookie()
 		{
 			if(!empty($_COOKIE['auth_username']) && !empty($_COOKIE['auth_password']))
 				$this->check($_COOKIE['auth_username'], $_COOKIE['auth_password']);
@@ -46,8 +48,12 @@
 					$this->username = $username;
 					$this->level    = $row['level'];
 
-					$this->user->id = $this->user_id;
-					$this->user->load($row);
+					// Load any additional user info if DBObject and User are available
+					if(class_exists("DBObject") && class_exists("User"))
+					{
+						$this->user->id = $this->user_id;
+						$this->user->load($row);
+					}
 				}
 			}			
 		}
@@ -65,14 +71,22 @@
 				$this->username = $username;
 				$this->level = $row['level'];
 
-				$this->user->id = $this->user_id;
-				$this->user->load($row);
+				// Load any additional user info if DBObject and User are available
+				if(class_exists("DBObject") && class_exists("User"))
+				{
+					$this->user->id = $this->user_id;
+					$this->user->load($row);
+				}
 
 				$_SESSION['auth_username'] = $username;
 				$_SESSION['auth_password'] = md5($password . $this->salt);
 				setcookie("auth_username", $username, time()+60*60*24*30, "/", $this->domain);
 				setcookie("auth_password", md5($password . $this->salt), time()+60*60*24*30, "/", $this->domain);
+				
+				return true;
 			}
+			
+			return false;
 		}
 	
 		function logout()

@@ -13,7 +13,9 @@
 		{
 			$this->user_id  = 0;
 			$this->username = "Guest";
-			$this->user     = new User();
+
+			if(class_exists("DBObject") && class_exists("User"))
+				$this->user = new User();
 
 			if(!$this->check_session()) $this->check_cookie();
 			return $this->ok();
@@ -45,8 +47,12 @@
 				$this->username = $username;
 				$this->level    = $row['level'];
 
-				$this->user->id = $this->user_id;
-				$this->user->load($row);
+				// Load any additional user info if DBObject and User are available
+				if(class_exists("DBObject") && class_exists("User"))
+				{
+					$this->user->id = $this->user_id;
+					$this->user->load($row);
+				}
 			}
 		}
 
@@ -65,15 +71,23 @@
 					$this->username = $username;
 					$this->level    = $row['level'];
 
-					$this->user->id = $this->user_id;
-					$this->user->load($row);
+					// Load any additional user info if DBObject and User are available
+					if(class_exists("DBObject") && class_exists("User"))
+					{
+						$this->user->id = $this->user_id;
+						$this->user->load($row);
+					}
 
 					$_SESSION['auth_username'] = $username;
 					$_SESSION['auth_password'] = $md5pw;
 					setcookie("auth_username", $username, time()+60*60*24*30, "/", $this->domain);
 					setcookie("auth_password", $md5pw, time()+60*60*24*30, "/", $this->domain);
+					
+					return true;
 				}
 			}
+			
+			return false;
 		}
 	
 		function logout()
