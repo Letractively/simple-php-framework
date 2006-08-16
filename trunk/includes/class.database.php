@@ -27,10 +27,10 @@
 		{
 			$this->queries = array();
 
-			$this->db = mysql_connect($host, $user, $password)
+			$this->db = mysql_connect($this->host, $this->user, $this->password)
 				or $this->notify(mysql_error(), $redirect);
 
-			mysql_select_db($dbname, $this->db)
+			mysql_select_db($this->dbname, $this->db)
 				or $this->notify(mysql_error(), $redirect);
 		}
 
@@ -87,7 +87,7 @@
 			switch($this->onError)
 			{
 				case 0:
-					die($err . "<br/><br/>" . $this->lastQuery());
+					die($errMsg . "<br/><br/>" . $this->lastQuery());
 					break;
 				
 				case 1:
