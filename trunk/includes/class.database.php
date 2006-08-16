@@ -7,13 +7,13 @@
 		var $errorFrom = "errors@domain.com";
 		var $errorPage = "http://domain.com/database-error.php";
 
-		var $host;
-		var $user;
-		var $password;
-		var $dbname;
 		var $db;
-		var $result;
+		var $dbname;
+		var $host;
+		var $password;
 		var $queries;
+		var $result;
+		var $user;
 
 		function Database($host, $user, $password, $dbname)
 		{
@@ -80,7 +80,7 @@
 			return isset($this->result) && (mysql_num_rows($this->result) > 0);
 		}
 
-		function notify($errMsg, $redirect)
+		function notify($errMsg, $redirect = "")
 		{
 			global $auth;
 
@@ -103,7 +103,7 @@
 					break;
 			}
 			
-			if($redirect)
+			if($redirect != "")
 			{
 				header("Location: {$this->errorPage}");
 				exit();
