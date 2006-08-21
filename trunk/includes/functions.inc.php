@@ -179,13 +179,26 @@
 	// Grabs a remote file using curl since file(http) doesn't work on all systems.
 	function geturl($url)
 	{
-		$ch = curl_init();
-		$timeout = 5;
-		curl_setopt($ch, CURLOPT_URL, $url);
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-		curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $timeout);
-		$html = curl_exec($ch);
-		curl_close($ch);
-		return $html;
+		if(function_exists("curl_init"))
+		{
+			$ch = curl_init();
+			$timeout = 5;
+			curl_setopt($ch, CURLOPT_URL, $url);
+			curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+			curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $timeout);
+			$html = curl_exec($ch);
+			curl_close($ch);
+			return $html;
+		}
+		elseif(ini_get("allow_url_fopen") == true)
+		{
+			$html = file_get_contents($url);
+			return $html;
+		}
+		else
+		{
+			// Cannot open url. Either install curl-php or set allow_url_fopen = true in php.ini
+			return false;
+		}
 	}
 ?>
