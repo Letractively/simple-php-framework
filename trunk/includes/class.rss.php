@@ -111,6 +111,9 @@
 		var $pubDate;
 		var $guid;
 		var $tags;
+		var $attachment;
+		var $length;
+		var $type;		
 
 		function RSSItem()
 		{ 
@@ -149,9 +152,19 @@
 			if(empty($this->guid)) $this->guid = $this->link;
 			$out .= "<guid>" . $this->guid . "</guid>\n";
 
-			foreach($this->tags as $key => $val) $out .= "<$key>$val</$key\n>";
+			if($this->attachment != "")
+				$out .= "<enclosure url='{$this->attachment}' length='{$this->length}' type='{$this->type}' />\n";
+
+			foreach($this->tags as $key => $val) $out .= "<$key>$val</$key>\n";
 			$out .= "</item>\n";
 			return $out;
+		}
+
+		function enclosure($url, $type, $length)
+		{
+			$this->attachment = $url;
+			$this->type       = $type;
+			$this->length     = $length;
 		}
 	}
 ?>
