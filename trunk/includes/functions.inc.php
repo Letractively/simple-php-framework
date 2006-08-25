@@ -201,4 +201,43 @@
 			return false;
 		}
 	}
+
+	// Returns the user's browser info.
+	// browscap.ini must be available for this to work.
+	// See the PHP manual for more details.
+	function browser_info()
+	{
+		$info    = get_browser(null, true);
+		$browser = $info['browser'] . " " . $info['version'];
+		$os      = $info['platform'];	
+		$ip      = $_SERVER['REMOTE_ADDR'];		
+		return array( "ip" => $ip, "browser" => $browser, "os" => $os );
+	}
+
+	// Sends an HTML formatted email
+	function send_html_mail($to, $subject, $msg, $from = "", $plaintext = "")
+	{
+		if(!is_array($to)) $to = array($to)
+		
+		foreach($to as $address)
+		{
+			$boundary = uniqid(rand(), true);
+
+			$headers  = "From: $from\n";
+			$headers .= "MIME-Version: 1.0\n"; 
+			$headers .= "Content-Type: multipart/alternative; boundary = $boundary\n";
+			$headers .= "This is a MIME encoded message.\n\n"; 
+			$headers .= "--$boundary\n" . 
+			   			"Content-Type: text/plain; charset=ISO-8859-1\n" .
+			   			"Content-Transfer-Encoding: base64\n\n"; 
+			$headers .= chunk_split(base64_encode($plaintext)); 
+			$headers .= "--$boundary\n" . 
+			   			"Content-Type: text/html; charset=ISO-8859-1\n" . 
+			   			"Content-Transfer-Encoding: base64\n\n";
+			$headers .= chunk_split(base64_encode($msg));
+			$headers .= "--$boundary--\n" . 
+
+			mail($address, $subject, "", $headers);
+		}		
+	}
 ?>
