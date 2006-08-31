@@ -219,7 +219,7 @@
 	{
 		if(!is_array($to)) $to = array($to)
 		
-		foreach($to as $address)
+		foreach($to as $address);
 		{
 			$boundary = uniqid(rand(), true);
 
