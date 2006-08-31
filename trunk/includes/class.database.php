@@ -57,7 +57,7 @@
 				// $rsslog->log("Long Query " . $_SERVER['PHP_SELF'], $msg);
 			}
 			
-			return $db->result;
+			return $this->result;
 		}
 
 		function numQueries()
