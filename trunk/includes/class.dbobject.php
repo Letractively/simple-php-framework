@@ -90,7 +90,7 @@
 				$arrStuff[] = "$key = '$val'";
 			$stuff = implode(", ", $arrStuff);
 			
-			$id = mysql_real_escape_string($id, $db->db);
+			$id = mysql_real_escape_string($this->id, $db->db);
 		
 			$db->query("UPDATE " . $this->table_name . " SET $stuff WHERE " . $this->id_name . " = '" . $id . "'");
 			return mysql_affected_rows($db->db); // Not always correct due to mysql update bug/feature
