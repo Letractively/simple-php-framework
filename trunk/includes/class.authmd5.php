@@ -24,13 +24,13 @@
 		function check_session()
 		{
 			if(!empty($_SESSION['auth_username']) && !empty($_SESSION['auth_password']))
-				$this->check($_SESSION['auth_username'], $_SESSION['auth_password']);
+				return $this->check($_SESSION['auth_username'], $_SESSION['auth_password']);
 		}
 
 		function check_cookie()
 		{
 			if(!empty($_COOKIE['auth_username']) && !empty($_COOKIE['auth_password']))
-				$this->check($_COOKIE['auth_username'], $_COOKIE['auth_password']);
+				return $this->check($_COOKIE['auth_username'], $_COOKIE['auth_password']);
 		}
 	
 		function check($username, $password)
@@ -53,6 +53,8 @@
 					$this->user->id = $this->user_id;
 					$this->user->load($row);
 				}
+				
+				return true;
 			}
 		}
 
