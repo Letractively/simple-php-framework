@@ -68,16 +68,19 @@
 		function insert()
 		{
 			global $db;
+			
+			if(count($this->columns) > 0)
+			{
+				unset($this->columns[$this->id_name]);
 
-			unset($this->columns[$this->id_name]);
+				$columns = join(", ", array_keys($this->columns));
+				$values  = "'" . join("', '", $this->quote_column_vals()) . "'";
 
-			$columns = join(", ", array_keys($this->columns));
-			$values  = "'" . join("', '", $this->quote_column_vals()) . "'";
+				$db->query("INSERT INTO " . $this->table_name . " ($columns) VALUES ($values)");
 
-			$db->query("INSERT INTO " . $this->table_name . " ($columns) VALUES ($values)");
-
-			$this->id = mysql_insert_id($db->db);
-			return $this->id;
+				$this->id = mysql_insert_id($db->db);
+				return $this->id;
+			}
 		}
 
 		function update()
