@@ -102,7 +102,7 @@
 		function delete()
 		{
 			global $db;
-			$id = mysql_real_escape_string($id, $db->db);
+			$id = mysql_real_escape_string($this->id, $db->db);
 			$db->query("DELETE FROM " . $this->table_name . " WHERE " . $this->id_name . " = '" . $id . "'");
 			return mysql_affected_rows($db->db);
 		}
