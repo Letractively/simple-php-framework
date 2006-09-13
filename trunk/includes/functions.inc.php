@@ -217,7 +217,7 @@
 	// Sends an HTML formatted email
 	function send_html_mail($to, $subject, $msg, $from = "", $plaintext = "")
 	{
-		if(!is_array($to)) $to = array($to)
+		if(!is_array($to)) $to = array($to);
 		
 		foreach($to as $address)
 		{
