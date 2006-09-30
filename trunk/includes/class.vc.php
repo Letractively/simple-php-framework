@@ -7,6 +7,9 @@
 	// vc_tr(table, row)
 	// vc_extra(table, col, row)
 	// vc_format_<column>(table, val, row)
+	
+	/* P A G I N G */
+	/* <p class="paging"><?PHP echo $vc->prev() . " <strong>Page {$vc->page} of {$vc->numPages}</strong> " . $vc->next(); ?></p> */
 
 	class ViewController
 	{
