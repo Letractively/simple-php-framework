@@ -206,21 +206,26 @@
 	}
 
 	// Grabs a remote file using curl since file(http) doesn't work on all systems.
-	function geturl($url)
+	function geturl($url, $username = "", $password = "")
 	{
 		if(function_exists("curl_init"))
 		{
 			$ch = curl_init();
-			$timeout = 5;
+			if(!empty($username) && !empty($password)) curl_setopt($ch, CURLOPT_HTTPHEADER, array('Authorization: Basic ' .  base64_encode("$username:$password")));
 			curl_setopt($ch, CURLOPT_URL, $url);
 			curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-			curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $timeout);
+			curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
 			$html = curl_exec($ch);
 			curl_close($ch);
 			return $html;
 		}
 		elseif(ini_get("allow_url_fopen") == true)
 		{
+			if(!empty($username) && !empty($password))
+			{
+				$url = str_replace("http://", "http://$username:$password@", $url);
+				$url = str_replace("https://", "https://$username:$password@", $url);
+			}
 			$html = file_get_contents($url);
 			return $html;
 		}
