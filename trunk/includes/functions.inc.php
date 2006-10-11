@@ -1,4 +1,15 @@
 <?PHP
+	// Converts a date/timestamp into the specified format
+	function dater($format = "Y-m-d H:i:s", $date = "")
+	{
+		if($date == "") $date = time();
+		$converted = strtotime($date);
+		if($converted === false)
+			return date($format, $date);
+		else
+			return date($format, $converted);
+	}
+
 	// Formats a phone number as (xxx) xxx-xxxx or xxx-xxxx depending on the length.
 	function format_phone($phone)
 	{
