@@ -1,4 +1,21 @@
 <?PHP
+	// Creates a list of <option>s from the given database table
+	function get_options($table, $val, $text, $default = "", $where = "", $order = "")
+	{
+		global $db;
+		if($where != "") $where = "WHERE $where";
+		if($order != "") $order = "ORDER BY $order";
+		$db->query("SELECT * FROM `$table` $where $order");
+		while($row = mysql_fetch_array($db->result, MYSQL_ASSOC))
+		{
+			if($row[$val] == $default)
+				$out .= "<option value=\"" . $row[$val] . "\" selected=\"selected\">" . $row[$text] . "</option>";
+			else
+				$out .= "<option value=\"" . $row[$val] . "\">" . $row[$text] . "</option>";
+		}
+		return $out;
+	}
+
 	// Converts a date/timestamp into the specified format
 	function dater($format = "", $date = "")
 	{
