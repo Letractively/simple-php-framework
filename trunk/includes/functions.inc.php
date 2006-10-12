@@ -119,6 +119,7 @@
 	// Serves an external document for download as an HTTP attachment.
 	function download_document($filename, $path = "", $mimetype = "application/octet-stream")
 	{
+		if(substr($path, -1, 1) != "/") $path .= "/";
 		header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
 		header("Content-Disposition: attachment; filename = $filename");
 		header("Content-Length: " . filesize($path . $filename));
