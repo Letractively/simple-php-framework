@@ -60,6 +60,16 @@
 			return $this->result;
 		}
 
+		function isValid() 
+		{
+			return isset($this->result) && (mysql_num_rows($this->result) > 0);
+		}
+
+		function escape($var)
+		{
+			return mysql_real_escape_string($var, $this->db);
+		}
+
 		function numQueries()
 		{
 			return count($this->queries);
@@ -74,15 +84,12 @@
 		{
 			return implode("\n", $this->queries);
 		}
-		
-		function isValid() 
-		{
-			return isset($this->result) && (mysql_num_rows($this->result) > 0);
-		}
 
 		function notify($errMsg, $redirect = "")
 		{
 			global $auth;
+
+			error_log($errMsg);
 
 			switch($this->onError)
 			{
