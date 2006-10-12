@@ -121,9 +121,9 @@
 	{
 		header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
 		header("Content-Disposition: attachment; filename = $filename");
-		header("Content-Length: " . filesize($pathto . $filename));
+		header("Content-Length: " . filesize($path . $filename));
 		header("Content-Type: $mimetype");
-		echo file_get_contents($pathto . $filename);
+		echo file_get_contents($path . $filename);
 	}
 	
 	// Creates a thumbnail from an existing image.
