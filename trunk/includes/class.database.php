@@ -52,12 +52,25 @@
 				$msg .= $this->queries() . "\n\n";
 				
 				mail($this->errorTo, "Long Query " . $_SERVER['PHP_SELF'], $msg, "From: {$this->errorFrom}");
-				
-				// global $rsslog;
-				// $rsslog->log("Long Query " . $_SERVER['PHP_SELF'], $msg);
 			}
 			
 			return $this->result;
+		}
+
+		function getRows($result = "", $type = "array")
+		{
+			$rows = array();
+			if(!is_resource($result)) $result = $this->result;
+
+			if($this->isValid())
+			{
+				mysql_data_seek($result, 0);
+				$thirdParam = ($type == "array") ? MYSQL_ASSOC : "";
+				while($row = call_user_func("mysql_fetch_$type", $result, $thirdParam))
+					$rows[] = $row;
+			}
+
+			return $rows;
 		}
 
 		function isValid() 
