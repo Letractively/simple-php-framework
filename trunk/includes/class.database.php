@@ -22,8 +22,6 @@
 			$this->password = $password;
 			$this->dbname   = $dbname;			
 			$this->queries  = array();
-			
-			$this->connect();
 		}
 		
 		function connect()
@@ -61,18 +59,21 @@
         function selectValue($sql = null)
         {
 			if(!is_null($sql)) $this->query($sql);
+			if(!$this->isValid($this->result)) return false;
 			return(mysql_result($this->result, 0, 0));
         }
 
 		function selectRow($sql = null)
 		{
 			if(!is_null($sql)) $this->query($sql);
+			if(!$this->isValid($this->result)) return false;
 			return mysql_fetch_array($this->result, MYSQL_ASSOC);
 		}
 
 		function selectObject($sql = null)
 		{
 			if(!is_null($sql)) $this->query($sql);
+			if(!$this->isValid($this->result)) return false;
 			return mysql_fetch_object($this->result);
 		}
 

@@ -42,7 +42,7 @@
 			
 			$values = array();
 			foreach($this->__columns as $col)
-				$values[] = dbquote($this->$col);
+				$values[] = $db->quote($this->$col);
 			$values = join(',', $values);
 
 			$db->query("INSERT INTO " . $this->__table_name . " ($columns) VALUES ($values)");
@@ -58,7 +58,7 @@
 			$arrStuff = array();
 			unset($this->__columns[$this->__id_name]);
 			foreach($this->__columns as $key)
-				$arrStuff[] = $key.'='.dbquote($this->$key);
+				$arrStuff[] = $key.'='.$db->quote($this->$key);
 			$stuff = join(',', $arrStuff);
 		
 			$db->query("UPDATE " . $this->__table_name . " SET $stuff WHERE " . $this->__id_name . " = '" . $this->id . "'");
