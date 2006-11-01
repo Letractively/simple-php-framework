@@ -56,12 +56,12 @@
 			return $rows;
 		}
 
-        function selectValue($sql = null)
-        {
+		function selectValue($sql = null)
+		{
 			if(!is_null($sql)) $this->query($sql);
 			if(!$this->isValid($this->result)) return false;
 			return(mysql_result($this->result, 0, 0));
-        }
+		}
 
 		function selectRow($sql = null)
 		{
@@ -79,15 +79,15 @@
 
 		// Only makes sense for results with two columns
         function mapping($sql = null)
-        {
-            $result = array();
+		{
+			$result = array();
 			if(!is_null($sql)) $this->query($sql);
 
-            while(list($key, $value) = mysql_fetch_array($this->result))
-                $result[$key] = $value;
+			while(list($key, $value) = mysql_fetch_array($this->result))
+				$result[$key] = $value;
 
-            return $result;
-        }
+			return $result;
+		}
 
 		function isValid($result = null)
 		{
