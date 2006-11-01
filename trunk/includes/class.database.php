@@ -96,7 +96,7 @@
 		}
 
 		function quote($var) { return "'" . mysql_real_escape_string($var, $this->db) . "'"; }
-		function quoteParam($var) { return $this->quote(fix_slashes($_REQUEST[$param])); }
+		function quoteParam($var) { return $this->quote(fix_slashes($_REQUEST[$var])); }
 		function numQueries() { return count($this->queries); }
 		function lastQuery() { return $this->queries[count($this->queries) - 1]; }
 
