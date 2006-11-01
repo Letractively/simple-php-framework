@@ -109,7 +109,7 @@
 			switch($this->onError)
 			{
 				case "die":
-					echo $err_msg . "<br/><br/>" . $this->lastQuery() . "<br/><br/>";
+					echo $err_msg . "<br/><br/>" . $this->lastQuery() . "<br/><br/>\n\n";
 					debug_print_backtrace();
 					die();
 					break;

@@ -6,7 +6,7 @@
 		$dbname   = "";
 		$dbuser   = "root";
 		$dbpass   = "";
-		$onError  = 0; // die() on mysql error
+		$onError  = "die";
 
 		$docroot = $_SERVER['DOCUMENT_ROOT'] . "/";
 
@@ -20,7 +20,7 @@
 		$dbname   = "";
 		$dbuser   = "";
 		$dbpass   = "";
-		$onError  = 1; // Mail error report and continue on mysql error
+		$onError  = "email";
 
 		$docroot = $_SERVER['DOCUMENT_ROOT'] . "/";
 
@@ -34,7 +34,6 @@
 	require_once($docroot . "/includes/class.database.php");
 	require_once($docroot . "/includes/class.auth.php");
 	require_once($docroot . "/includes/class.vc.php");
-	require_once($docroot . "/includes/class.form.php");
 	require_once($docroot . "/includes/functions.inc.php");
 
 	$db = new Database($dbserver, $dbuser, $dbpass, $dbname);
