@@ -1,4 +1,12 @@
 <?PHP
+	function map_index($index, $array)
+	{
+	    $out = array();
+	    foreach($array as $row)
+	        $out[] = $row[$index];
+	    return $out;
+	}
+
 	// Creates a list of <option>s from the given database table
 	function get_options($table, $val, $text, $default = "", $where = "", $order = "")
 	{
