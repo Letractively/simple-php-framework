@@ -1,8 +1,7 @@
 <?PHP
 	class Database
 	{
-		var $onError   = 0; // 0 = die($error), 1 = notify & continue, 2 = do nothing & continue
-		var $longQuery = 0; // 0 = ignore, otherwise email($query) if query time > $longQuery
+		var $onError   = "die"; // die, email, or nothing
 		var $errorTo   = "email@domain.com";
 		var $errorFrom = "errors@domain.com";
 		var $errorPage = "http://domain.com/database-error.php";
@@ -14,6 +13,7 @@
 		var $queries;
 		var $result;
 		var $user;
+		var $redirect = false;
 
 		function Database($host, $user, $password, $dbname)
 		{
@@ -21,109 +21,111 @@
 			$this->user     = $user;
 			$this->password = $password;
 			$this->dbname   = $dbname;			
+			$this->queries  = array();
+			
+			$this->connect();
 		}
 		
-		function connect($redirect = false)
+		function connect()
 		{
-			$this->queries = array();
-
-			$this->db = mysql_connect($this->host, $this->user, $this->password)
-				or $this->notify(mysql_error(), $redirect);
-
-			mysql_select_db($this->dbname, $this->db)
-				or $this->notify(mysql_error(), $redirect);
+			$this->db = mysql_connect($this->host, $this->user, $this->password) or $this->notify();
+			mysql_select_db($this->dbname, $this->db) or $this->notify();
 		}
 
-		function query($sql, $redirect = false)
+		function query($sql)
 		{
 			$this->queries[] = $sql;
-
-			$start = microtime();
-			$this->result = mysql_query($sql, $this->db) or $this->notify(mysql_error());
-			$stop = microtime();
-
-			$delta = $stop - $start;
-			
-			if(($longQuery != 0) && ($delta > $longQuery))
-			{
-				$msg  = $_SERVER['PHP_SELF'] . " @ " . date("Y-m-d H:ia") . "\n\n";
-				$msg .= "The following query took $delta to complete:\n\n";
-				$msg .= $this->lastQuery() . "\n\n";
-				$msg .= $this->queries() . "\n\n";
-				
-				mail($this->errorTo, "Long Query " . $_SERVER['PHP_SELF'], $msg, "From: {$this->errorFrom}");
-			}
-			
+			$this->result = mysql_query($sql, $this->db) or $this->notify();
 			return $this->result;
 		}
 
-		function getRows($result = "", $type = "array")
+		function getRows($result = null, $returnObjects = false)
 		{
 			$rows = array();
-			if(!is_resource($result)) $result = $this->result;
+			if(is_null($result)) $result = $this->result;
 
-			if($this->isValid())
+			if($this->isValid($result))
 			{
 				mysql_data_seek($result, 0);
-				$thirdParam = ($type == "array") ? MYSQL_ASSOC : "";
-				while($row = call_user_func("mysql_fetch_$type", $result, $thirdParam))
-					$rows[] = $row;
+				if($returnObjects)
+					while($row = mysql_fetch_object($result))
+						$rows[] = $row;
+				else
+					while($row = mysql_fetch_array($result, MYSQL_ASSOC))
+						$rows[] = $row;
 			}
 
 			return $rows;
 		}
 
-		function isValid() 
+        function selectValue($sql = null)
+        {
+			if(!is_null($sql)) $this->query($sql);
+			return(mysql_result($this->result, 0, 0));
+        }
+
+		function selectRow($sql = null)
 		{
-			return isset($this->result) && (mysql_num_rows($this->result) > 0);
+			if(!is_null($sql)) $this->query($sql);
+			return mysql_fetch_array($this->result, MYSQL_ASSOC);
 		}
 
-		function escape($var)
+		function selectObject($sql = null)
 		{
-			return mysql_real_escape_string($var, $this->db);
+			if(!is_null($sql)) $this->query($sql);
+			return mysql_fetch_object($this->result);
 		}
 
-		function numQueries()
+		// Only makes sense for results with two columns
+        function mapping($sql = null)
+        {
+            $result = array();
+			if(!is_null($sql)) $this->query($sql);
+
+            while(list($key, $value) = mysql_fetch_array($this->result))
+                $result[$key] = $value;
+
+            return $result;
+        }
+
+		function isValid($result = null)
 		{
-			return count($this->queries);
+			if(is_null($result)) $result = $this->result;
+			return is_resource($result) && (mysql_num_rows($result) > 0);
 		}
 
-		function lastQuery()
-		{
-			return $this->queries[count($this->queries) - 1];
-		}
+		function quote($var) { return "'" . mysql_real_escape_string($var, $this->db) . "'"; }
+		function quoteParam($var) { return $this->quote(fix_slashes($_REQUEST[$param])); }
+		function numQueries() { return count($this->queries); }
+		function lastQuery() { return $this->queries[count($this->queries) - 1]; }
 
-		function queries()
-		{
-			return implode("\n", $this->queries);
-		}
-
-		function notify($errMsg, $redirect = "")
+		function notify()
 		{
 			global $auth;
-
-			error_log($errMsg);
+			
+			$err_msg = mysql_error($this->db);
+			error_log($err_msg);
 
 			switch($this->onError)
 			{
-				case 0:
-					die($errMsg . "<br/><br/>" . $this->lastQuery());
+				case "die":
+					echo $err_msg . "<br/><br/>" . $this->lastQuery() . "<br/><br/>";
+					debug_print_backtrace();
+					die();
 					break;
 				
-				case 1:
+				case "email":
 					$msg  = $_SERVER['PHP_SELF'] . " @ " . date("Y-m-d H:ia") . "\n";
-					$msg .= $errMsg . "\n\n";
-					$msg .= $this->queries() . "\n\n";
+					$msg .= $err_msg . "\n\n";
+					$msg .= implode("\n", $this->queries) . "\n\n";
 					$msg .= "CURRENT USER\n============\n"     . var_export($auth, true)  . "\n" . $_SERVER['REMOTE_ADDR'] . "\n\n";
 					$msg .= "POST VARIABLES\n==============\n" . var_export($_POST, true) . "\n\n";
 					$msg .= "GET VARIABLES\n=============\n"   . var_export($_GET, true)  . "\n\n";
 					mail($this->errorTo, $_SERVER['PHP_SELF'], $msg, "From: {$this->errorFrom}");
-					// global $rsslog;
-					// $rsslog->log("DB Error" . $_SERVER['PHP_SELF'], $msg);
 					break;
 			}
 			
-			if($redirect != "")
+			if($redirect === true)
 			{
 				header("Location: {$this->errorPage}");
 				exit();
