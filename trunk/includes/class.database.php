@@ -78,7 +78,7 @@
 		}
 
 		// Only makes sense for results with two columns
-        function mapping($sql = null)
+		function mapping($sql = null)
 		{
 			$result = array();
 			if(!is_null($sql)) $this->query($sql);
