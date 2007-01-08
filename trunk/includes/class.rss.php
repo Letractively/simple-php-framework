@@ -43,15 +43,15 @@
 		function setPubDate($when)
 		{
 			if(strtotime($when) == false)
-				$this->pubDate = date("D, d M Y H:i:s ", $when) . "GMT";
+				$this->pubDate = date("D, d M Y H:i:s O", $when);
 			else
-				$this->pubDate = date("D, d M Y H:i:s ", strtotime($when)) . "GMT";
+				$this->pubDate = date("D, d M Y H:i:s O", strtotime($when));
 		}
 
 		function getPubDate()
 		{
   			if(empty($this->pubDate))
-				return date("D, d M Y H:i:s ") . "GMT";
+				return date("D, d M Y H:i:s O");
 			else
 				return $this->pubDate;
 		}
@@ -123,15 +123,15 @@
 		function setPubDate($when)
 		{
 			if(strtotime($when) == false)
-				$this->pubDate = date("D, d M Y H:i:s ", $when) . "GMT";
+				$this->pubDate = date("D, d M Y H:i:s O", $when);
 			else
-				$this->pubDate = date("D, d M Y H:i:s ", strtotime($when)) . "GMT";
+				$this->pubDate = date("D, d M Y H:i:s O", strtotime($when));
 		}
 
 		function getPubDate()
 		{
 			if(empty($this->pubDate))
-				return date("D, d M Y H:i:s ") . "GMT";
+				return date("D, d M Y H:i:s O");
 			else
 				return $this->pubDate;
 		}
