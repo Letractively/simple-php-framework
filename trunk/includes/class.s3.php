@@ -3,8 +3,8 @@
 
 	class S3
 	{
-		var $_key        = "1TGRVYS5Q5PFDY9GZG82";
-		var $_secret     = "NqySNeM84s7/DR+9jakeeLrTSzxx/RIXkPrsXlRR";
+		var $_key        = "";
+		var $_secret     = "";
 		var $_server     = "http://s3.amazonaws.com";
 		var $_pathToCurl = "curl";
 		var $_hasher     = null;
@@ -36,7 +36,7 @@
 			return $this->deleteBucket($bucket . $object);
 		}
 		
-		function putObject($bucket, $object, $filename, $public = null, $type = null, $disposition = null)
+		function putObject($bucket, $object, $filename, $public = null, $disposition = null)
 		{
 			global $mime_types;
 
@@ -46,8 +46,6 @@
 
 			if(!isset($type))
 				$type = isset($mime_types[$ext]) ? $mime_types[$ext] : "application/octet-stream";
-
-			$disposition = isset($disposition) ? $basename : null;
 
 			$acl = isset($public) ? "public-read" : null;
 
@@ -151,7 +149,7 @@
 			return $ret;
 		}
 		
-		function getBucketContents($bucket, $prefix = null, $returnTags = false)
+		function getBucketContents($bucket, $prefix = null, $returnTags = false, $assoc = null)
 		{
 			$req = array(	"verb" => "GET",
 							"md5" => null,
@@ -169,7 +167,11 @@
 			{
 				preg_match_all('@<(.*?)>(.*?)</\1>@', $match, $keyInfo);
 				if($first && $returnTags) $keys[] = $keyInfo[1]; $first = false;
-				$keys[] = $keyInfo[2];
+				$keyInfo[2][2] = str_replace("&quot;", "", $keyInfo[2][2]);
+				if($assoc)
+					$keys[$keyInfo[2][0]] = $keyInfo[2];
+				else
+					$keys[] = $keyInfo[2];
 			}
 
 			return $keys;
