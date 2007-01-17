@@ -179,6 +179,12 @@
 		
 		function sendRequest($req, $params = null)
 		{
+			if(isset($req['resource']))
+			{
+				$req['resource'] = urlencode($req['resource']);
+				$req['resource'] = str_replace("%2F", "/", $req['resource']);
+			}
+
 			$sig = $this->signature($req);
 			
 			$args = array();
