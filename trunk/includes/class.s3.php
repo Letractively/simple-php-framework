@@ -11,7 +11,7 @@
 		var $_date       = null;
 		var $_error      = null;
 		
-		function S3($key = null, $secret = null)
+		function __construct($key = null, $secret = null)
 		{
 			if($key && $secret)
 			{
@@ -204,7 +204,7 @@
 				$curl .= "$key \"$val\" ";
 			}
 			
-			$curl .= $this->_server . $req['resource'];
+			$curl .= '"' . $this->_server . $req['resource'] . '"';
 			
 			if($params)
 			{
