@@ -8,8 +8,6 @@
 		$dbpass   = "";
 		$onError  = "die";
 
-		$docroot = $_SERVER['DOCUMENT_ROOT'] . "/";
-
 		ini_set('display_errors', "1");
 		ini_set('error_reporting', E_ALL ^ E_NOTICE);
 	}
@@ -22,18 +20,18 @@
 		$dbpass   = "";
 		$onError  = "email";
 
-		$docroot = $_SERVER['DOCUMENT_ROOT'] . "/";
-
 		ini_set('display_errors', "0");
 	}
 
 	session_start();
+
+	$docroot = dirname(__FILE__);
 	
-	require_once($docroot . "/includes/class.dbobject.php");
-	require_once($docroot . "/includes/class.misc.php");
-	require_once($docroot . "/includes/class.database.php");
-	require_once($docroot . "/includes/class.auth.php");
-	require_once($docroot . "/includes/functions.inc.php");
+	require_once($docroot . "/class.dbobject.php");
+	require_once($docroot . "/class.misc.php");
+	require_once($docroot . "/class.database.php");
+	require_once($docroot . "/class.auth.php");
+	require_once($docroot . "/functions.inc.php");
 
 	$db = new Database($dbserver, $dbuser, $dbpass, $dbname);
 	$db->onError = $onError;
