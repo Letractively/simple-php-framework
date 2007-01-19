@@ -18,7 +18,7 @@
 		$dbname   = "";
 		$dbuser   = "";
 		$dbpass   = "";
-		$onError  = "email";
+		$onError  = "";
 
 		ini_set('display_errors', "0");
 	}
