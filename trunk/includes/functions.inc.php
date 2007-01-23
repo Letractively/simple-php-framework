@@ -286,6 +286,15 @@
 		return array( "ip" => $ip, "browser" => $browser, "os" => $os );
 	}
 
+	// Quick wrapper for preg_match
+	function match($regex, $str, $i = 0)
+	{
+		if(preg_match($regex, $str, $match) == 1)
+			return $match[$i];
+		else
+			return false;
+	}
+
 	// Sends an HTML formatted email
 	function send_html_mail($to, $subject, $msg, $from = "", $plaintext = "")
 	{
