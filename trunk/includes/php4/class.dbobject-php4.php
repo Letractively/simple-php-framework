@@ -1,4 +1,4 @@
-<?php
+<?PHP
 
 	// 
 	// class User extends DBObject

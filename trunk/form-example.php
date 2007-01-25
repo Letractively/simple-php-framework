@@ -1,4 +1,5 @@
 <?PHP
+	// Please read the comments in class.form.php
 	require_once("includes/class.form.php");
 
 	// Setup the form

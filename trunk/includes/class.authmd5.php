@@ -5,7 +5,7 @@
 		var $username;
 		var $password;
 		var $level;
-		var $salt = "asd576567g5hx2h3746h3xb978687n7980n7x435x34z";
+		var $salt = "^&DS(*F9876SDF&*(#(W*FSD_bs8d7f";
 		var $domain = "";
 		var $user;
 

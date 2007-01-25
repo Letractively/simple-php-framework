@@ -23,8 +23,9 @@
 		
 		function directorySize($bucket, $prefix)
 		{
-			$foo = $this->getBucketContents($bucket, $prefix);
 			$total = 0;
+			$foo = $this->getBucketContents($bucket, $prefix);
+			if(!is_array($foo)) return false;
 			foreach($foo as $bar)
 				$total += $bar[3];
 			return $total;
@@ -32,8 +33,15 @@
 		
 		function deleteObject($bucket, $object)
 		{
-			if(substr($object, 0, 1) != "/" ) $object = "/$object";
-			return $this->deleteBucket($bucket . $object);
+			if($object[0] != "/" ) $object = "/$object";
+			$req = array(	"verb" => "DELETE",
+							"md5" => null,
+							"type" => null,
+							"headers" => null,
+							"resource" => "/$bucket" . $object,
+						);
+			$result = $this->sendRequest($req);
+			return $this->objectExists($bucket, $object);
 		}
 		
 		function putObject($bucket, $object, $filename, $public = null, $disposition = null)
@@ -60,13 +68,15 @@
 							"disposition" => $disposition,
 							"acl" => $acl,
 						);
-			$result = $this->sendRequest($req);
-			return $result;
+			$this->sendRequest($req);
+			
+			$info = $this->getObjectInfo($bucket, $object);
+			return ($info['ETag'] == md5_file($filename));
 		}
-
+		
 		function getObject($bucket, $object)
 		{
-			if(substr($object, 0, 1) != "/" ) $object = "/$object";
+			if($object[0] != "/" ) $object = "/$object";
 			$req = array(	"verb" => "GET",
 							"md5" => null,
 							"type" => null,
@@ -88,7 +98,12 @@
 							"download" => $saveTo,
 						);
 			$result = $this->sendRequest($req);
-		}		
+		}
+		
+		function bucketExists($bucket)
+		{
+			return in_array($bucket, $this->getBuckets());
+		}
 		
 		function getBuckets()
 		{
@@ -139,11 +154,16 @@
 				return true;
 		}
 		
+		function objectExists($bucket, $object)
+		{
+			return ($this->getObjectInfo($bucket, $object) !== false);
+		}
+		
 		function getObjectInfo($bucket, $object, $returnTags = true)
 		{
-			if(strpos($object, "/") != 0) $object = "/$object";
 			$ret = array();
 			$result = $this->getBucketContents($bucket, $object, $returnTags);
+			if(count($result) == 0) return false;
 			for($i = 0; $i < count($result[0]); $i++)
 				$ret[$result[0][$i]] = $result[1][$i];
 			return $ret;
@@ -157,7 +177,9 @@
 							"headers" => null,
 							"resource" => "/$bucket",
 						);
-			$params = array("prefix" => $prefix);
+
+			if($prefix[0] == "/") $prefix[0] = "";
+			$params = array("prefix" => trim($prefix));
 			$result = $this->sendRequest($req, $params);
 			preg_match_all("@<Contents>(.*?)</Contents>@", $result, $matches);
 			

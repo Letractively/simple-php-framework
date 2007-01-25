@@ -1,5 +1,5 @@
 <?PHP
-	if(strpos($_SERVER['DOCUMENT_ROOT'], ".com") === false)
+	if(preg_match('/\.com|\.net|\.org/', $_SERVER['SERVER_NAME']) === 0)
 	{
 		// Testing
 		$dbserver = "localhost";
@@ -25,13 +25,13 @@
 
 	session_start();
 
-	$docroot = dirname(__FILE__);
-	
-	require_once($docroot . "/class.dbobject.php");
-	require_once($docroot . "/class.misc.php");
-	require_once($docroot . "/class.database.php");
-	require_once($docroot . "/class.auth.php");
-	require_once($docroot . "/functions.inc.php");
+	$docroot = realpath(dirname(__FILE__) . "/../");
+
+	require_once($docroot . "/includes/class.dbobject.php");
+	require_once($docroot . "/includes/class.misc.php");
+	require_once($docroot . "/includes/class.database.php");
+	require_once($docroot . "/includes/class.auth.php");
+	require_once($docroot . "/includes/functions.inc.php");
 
 	$db = new Database($dbserver, $dbuser, $dbpass, $dbname);
 	$db->onError = $onError;

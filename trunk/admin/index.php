@@ -8,12 +8,12 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-
-	<title>index</title>
-	
+	<link rel="stylesheet" href="../styles/yui.css" type="text/css" media="screen" title="Style Reset" charset="utf-8" />
+	<link rel="stylesheet" href="../styles/screen.css" type="text/css" media="screen" title="Screen" charset="utf-8" />
+	<title>index</title>	
 </head>
 
 <body>
-
+	<p>If you can read this then you are logged in as an admin user.</p>
 </body>
 </html>

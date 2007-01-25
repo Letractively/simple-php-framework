@@ -64,6 +64,9 @@
 			unset($id_field);
 		}	
 	}
+
+	if(!isset($_POST['server'])) $_POST['server'] = "localhost";
+	if(!isset($_POST['dbusername'])) $_POST['dbusername'] = "root";
 ?>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
@@ -72,15 +75,14 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-
-	<title>untitled</title>
-	
+	<title>Simple Install</title>
 </head>
 
 <body>
 	<form action="<?PHP echo $_SERVER['PHP_SELF'];?>" method="post">
+		<h1>First...</h1>
+		<p>Fill in your database information.</p>
 		<table>
-			<caption>MySQL Connection Information</caption>
 			<tr>
 				<th>Server</th>
 				<td><input type="text" name="server" value="<?PHP echo $_POST['server'];?>" id="server" /></td>
@@ -95,18 +97,18 @@
 			</tr>
 			<tr>
 				<th>Database</th>
-				<td><input type="text" name="dbname" value="<?PHP echo $_POST['dbname'];?>" id="dbname" /></td>
-			</tr>
-			<tr>
-				<th></th>
-				<td><input type="submit" name="btnTables" value="Install Tables" id="btnTables" /></td>
+				<td><input type="text" name="dbname" value="<?PHP echo $_POST['dbname'];?>" id="dbname" /> <em>This database must already exist!</em></td>
 			</tr>
 		</table>
+		
+		<h1>Then...</h1>
+		<p>Install the database template.</p>
+		<input type="submit" name="btnTables" value="Install SQL Template" id="btnTables" />
 	
-		<br/><br/>
-	
+
+		<h1>Next...</h1>
+		<p>You can add a new user</p>
 		<table>
-			<caption>Add User</caption>
 			<tr>
 				<th>Username</th>
 				<td><input type="text" name="username" value="" id="username" /></td>
@@ -121,15 +123,17 @@
 			</tr>
 		</table>
 		
-		<br/>
-		
+		<h1>Or...</h1>
 		<p>
-			<input type="submit" name="btnGetTables" value="Get list of tables for DBObject" id="btnGetTables" />
+			Get a list of tables to generate DBObjects from.<br/>
+			<input type="submit" name="btnGetTables" value="Get List" id="btnGetTables" />
 			<input type="text" name="tables" value="<?PHP echo $tables;?>" id="tables" style="width:70%;" />
 		</p>
-
 			
-		<p><input type="submit" name="btnDBO" value="Create DBObject classes from above tables" id="btnDBO" /></p>
+		<p>
+			Once the text box has the tables you want, click this button to generate the proper code.<br/>
+			<input type="submit" name="btnDBO" value="Create DBObject classes from above tables" id="btnDBO" />
+		</p>
 	</form>
 
 	<?PHP if(!empty($out)) { ?>

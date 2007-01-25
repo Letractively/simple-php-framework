@@ -4,5 +4,6 @@ CREATE TABLE `users` (
   `password` varchar(65) NOT NULL,
   `level` enum('user','admin') NOT NULL,
   `email` varchar(65) NOT NULL,
-  PRIMARY KEY  (`user_id`)
+  PRIMARY KEY  (`user_id`),
+  UNIQUE KEY `username` (`username`)
 );

@@ -5,7 +5,7 @@
 		var $username;
 		var $password;
 		var $level;
-		var $salt = "678fdsi4h4iuys78346784s"; // Pick any set of random characters
+		var $salt = "687fdgj45386sdahsk2981298#&*A"; // Pick any set of random characters
 		var $domain = ""; // Domain to set in cookie
 		var $user;
 

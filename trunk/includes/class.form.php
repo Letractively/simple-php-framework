@@ -1,4 +1,7 @@
 <?PHP
+	// This class hasn't really been tested or even used it.
+	// It's just a quick idea that was written late one night.
+
 	class Form
 	{
 		var $els;

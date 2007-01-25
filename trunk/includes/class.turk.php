@@ -1,4 +1,5 @@
 <?PHP
+	// This class is still in progress
 	class Turk
 	{
 		var $_key        = "";

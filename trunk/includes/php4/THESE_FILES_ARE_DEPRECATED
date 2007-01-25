@@ -1,0 +1,3 @@
+These PHP4 files are deprecated and no longer maintained. They were
+written when a client needed PHP4 versions of the PHP5 classes. I can't
+gurantee that these are stable.

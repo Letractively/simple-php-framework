@@ -1,10 +1,11 @@
-<?php
+<?PHP
 
+	// Example sub class
 	//
 	// class User extends DBObject
 	// {
 	//	function __construct($id = "")
-	// 	{
+	// 	{                        table    primary_key      column names                             [load record with this id]
 	// 		parent::__construct('users', 'user_id', array('username', 'password', 'level', 'email'), $id);
 	// 	}
 	// }

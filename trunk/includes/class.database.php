@@ -1,10 +1,10 @@
 <?PHP
 	class Database
 	{
-		var $onError   = "die"; // die, email, or nothing
+		var $onError   = ""; // die, email, or nothing
 		var $errorTo   = "email@domain.com";
 		var $errorFrom = "errors@domain.com";
-		var $errorPage = "http://domain.com/database-error.php";
+		var $errorPage = "database-error.php";
 
 		var $db;
 		var $dbname;
@@ -37,7 +37,39 @@
 			return $this->result;
 		}
 
-		function getRows($result = null, $returnObjects = false)
+		// You can pass in nothing, a string, or a db result
+		function getValue($arg = null)
+		{
+			if(is_null($arg) && $this->isValid())
+				return mysql_result($this->result, 0, 0);
+			elseif(is_resource($arg) && $this->isValid($arg))
+				return mysql_result($arg, 0, 0);
+			elseif(is_string($arg))
+			{
+				$this->query($arg);
+				if($this->isValid())
+					return mysql_result($this->result, 0, 0);
+			}
+			return false;
+		}
+
+		// You can pass in nothing, a string, or a db result
+		function getRow($arg = null)
+		{
+			if(is_null($arg) && $this->isValid())
+				return mysql_fetch_array($this->result, MYSQL_ASSOC);
+			elseif(is_resource($arg) && $this->isValid($arg))
+				return mysql_fetch_array($arg, MYSQL_ASSOC);
+			elseif(is_string($arg))
+			{
+				$this->query($arg);
+				if($this->isValid())
+					return mysql_fetch_array($this->result, MYSQL_ASSOC);
+			}
+			return false;
+		}
+
+		function getRows($result = null)
 		{
 			$rows = array();
 			if(is_null($result)) $result = $this->result;
@@ -45,48 +77,10 @@
 			if($this->isValid($result))
 			{
 				mysql_data_seek($result, 0);
-				if($returnObjects)
-					while($row = mysql_fetch_object($result))
-						$rows[] = $row;
-				else
-					while($row = mysql_fetch_array($result, MYSQL_ASSOC))
-						$rows[] = $row;
+				while($row = mysql_fetch_array($result, MYSQL_ASSOC))
+					$rows[] = $row;
 			}
-
 			return $rows;
-		}
-
-		function selectValue($sql = null)
-		{
-			if(!is_null($sql)) $this->query($sql);
-			if(!$this->isValid($this->result)) return false;
-			return(mysql_result($this->result, 0, 0));
-		}
-
-		function selectRow($sql = null)
-		{
-			if(!is_null($sql)) $this->query($sql);
-			if(!$this->isValid($this->result)) return false;
-			return mysql_fetch_array($this->result, MYSQL_ASSOC);
-		}
-
-		function selectObject($sql = null)
-		{
-			if(!is_null($sql)) $this->query($sql);
-			if(!$this->isValid($this->result)) return false;
-			return mysql_fetch_object($this->result);
-		}
-
-		// Only makes sense for results with two columns
-		function mapping($sql = null)
-		{
-			$result = array();
-			if(!is_null($sql)) $this->query($sql);
-
-			while(list($key, $value) = mysql_fetch_array($this->result))
-				$result[$key] = $value;
-
-			return $result;
 		}
 
 		function isValid($result = null)
@@ -110,8 +104,11 @@
 			switch($this->onError)
 			{
 				case "die":
-					echo $err_msg . "<br/><br/>" . $this->lastQuery() . "<br/><br/>\n\n";
+					echo "<p style='border:5px solid red;background-color:#fff;padding:5px;'><strong>Database Error:</strong><br/>$err_msg</p>";
+					echo "<p style='border:5px solid red;background-color:#fff;padding:5px;'><strong>Last Query:</strong><br/>" . $this->lastQuery() . "</p>";
+					echo "<pre>";
 					debug_print_backtrace();
+					echo "</pre>";
 					die();
 					break;
 				
@@ -125,8 +122,8 @@
 					mail($this->errorTo, $_SERVER['PHP_SELF'], $msg, "From: {$this->errorFrom}");
 					break;
 			}
-			
-			if($redirect === true)
+
+			if($this->redirect === true)
 			{
 				header("Location: {$this->errorPage}");
 				exit();
