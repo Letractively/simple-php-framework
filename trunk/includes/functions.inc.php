@@ -1,4 +1,15 @@
 <?PHP
+	// Processes mod_rewrite URLs into key => value pairs
+	function pick_off($grabFirst = false, $sep = "/")
+	{
+		$ret = array();
+		$arr = explode($sep, trim($_SERVER['REQUEST_URI'], $sep));
+		if($grabFirst) $ret[0] = array_shift($arr);
+		while(count($arr) > 0)
+			$ret[array_shift($arr)] = array_shift($arr);
+		return (count($ret) > 0) ? $ret : false;
+	}
+
 	// Creates a list of <option>s from the given database table
 	function get_options($table, $val, $text, $default = null, $where = null, $order = null)
 	{

@@ -8,7 +8,6 @@
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 	<title>index</title>
-	<link rel="stylesheet" href="styles/yui.css" type="text/css" media="screen" title="Style Reset" charset="utf-8" />
 	<link rel="stylesheet" href="styles/screen.css" type="text/css" media="screen" title="Screen" charset="utf-8" />
 </head>
 
