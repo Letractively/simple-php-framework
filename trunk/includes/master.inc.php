@@ -3,7 +3,7 @@
 	{
 		// Testing
 		$dbserver = "localhost";
-		$dbname   = "test";
+		$dbname   = "";
 		$dbuser   = "root";
 		$dbpass   = "";
 		$onError  = "die";

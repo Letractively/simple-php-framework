@@ -1,5 +1,6 @@
 <?PHP
 	// Processes mod_rewrite URLs into key => value pairs
+	// See .htacess for more info.
 	function pick_off($grabFirst = false, $sep = "/")
 	{
 		$ret = array();
@@ -124,15 +125,9 @@
 	// Fixes MAGIC_QUOTES
 	function fix_slashes($arr = "")
 	{
-		if(empty($arr))
-			return;
-		elseif(get_magic_quotes_gpc())
-			if(!is_array($arr))
-				return stripslashes($arr);
-			else
-				return array_map('fix_slashes', $arr);
-		else
-			return $arr;
+		if(empty($arr)) return;
+		if(!get_magic_quotes_gpc()) return $arr;
+		return is_array($arr) ? array_map('fix_slashes', $arr) : stripslashes($arr);
 	}
 
 	// Returns the first $num words of $str
@@ -252,7 +247,8 @@
 		if(function_exists("curl_init"))
 		{
 			$ch = curl_init();
-			if(!empty($username) && !empty($password)) curl_setopt($ch, CURLOPT_HTTPHEADER, array('Authorization: Basic ' .  base64_encode("$username:$password")));
+			if(!empty($username) && !empty($password))
+				curl_setopt($ch, CURLOPT_HTTPHEADER, array('Authorization: Basic ' .  base64_encode("$username:$password")));
 			curl_setopt($ch, CURLOPT_URL, $url);
 			curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 			curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
@@ -296,7 +292,7 @@
 	}
 
 	// Sends an HTML formatted email
-	function send_html_mail($to, $subject, $msg, $from = "", $plaintext = "")
+	function send_html_mail($to, $subject, $msg, $from, $plaintext = "")
 	{
 		if(!is_array($to)) $to = array($to);
 		

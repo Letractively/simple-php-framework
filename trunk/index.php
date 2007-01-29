@@ -14,5 +14,6 @@
 <body>
 	<p>This is your home page.</p>
 	<p>You are <?PHP echo $auth->ok() ? "logged in as {$auth->username}. <a href='logout/'>Logout</a>." : "not logged in. <a href='login/'>Login</a>."; ?></p>
+	<p>If you haven't done so already, you may want to install the users table into the database. You can do so <a href='_masters/install/install.php'>here</a>.</p>
 </body>
 </html>

@@ -15,7 +15,7 @@
 		var $user;
 		var $redirect = false;
 
-		function Database($host, $user, $password, $dbname)
+		function Database($host, $user, $password, $dbname = null)
 		{
 			$this->host     = $host;
 			$this->user     = $user;
@@ -27,7 +27,8 @@
 		function connect()
 		{
 			$this->db = mysql_connect($this->host, $this->user, $this->password) or $this->notify();
-			mysql_select_db($this->dbname, $this->db) or $this->notify();
+			if(!empty($this->dbname))
+				mysql_select_db($this->dbname, $this->db) or $this->notify();
 		}
 
 		function query($sql)
@@ -90,9 +91,16 @@
 		}
 
 		function quote($var) { return "'" . mysql_real_escape_string($var, $this->db) . "'"; }
-		function quoteParam($var) { return $this->quote(fix_slashes($_REQUEST[$var])); }
+		function quoteParam($var) { return $this->quote($this->fix_slashes($_REQUEST[$var])); }
 		function numQueries() { return count($this->queries); }
 		function lastQuery() { return $this->queries[count($this->queries) - 1]; }
+
+		function fix_slashes($arr = "")
+		{
+			if(empty($arr)) return;
+			if(!get_magic_quotes_gpc()) return $arr;
+			return is_array($arr) ? array_map('fix_slashes', $arr) : stripslashes($arr);
+		}
 
 		function notify()
 		{
