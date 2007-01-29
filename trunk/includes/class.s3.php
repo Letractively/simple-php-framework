@@ -169,7 +169,7 @@
 			return $ret;
 		}
 		
-		function getBucketContents($bucket, $prefix = null, $returnTags = false, $assoc = null)
+		function getBucketContents($bucket, $prefix = null, $returnTags = false, $assoc = null, $marker = null)
 		{
 			$req = array(	"verb" => "GET",
 							"md5" => null,
@@ -179,8 +179,8 @@
 						);
 
 			if($prefix[0] == "/") $prefix[0] = "";
-			$params = array("prefix" => trim($prefix));
-			$result = $this->sendRequest($req, $params);
+			$params = array("prefix" => trim($prefix), "marker" => $marker);
+			$result = $this->sendRequest($req, $params);		
 			preg_match_all("@<Contents>(.*?)</Contents>@", $result, $matches);
 			
 			$first = true;
@@ -195,6 +195,10 @@
 				else
 					$keys[] = $keyInfo[2];
 			}
+			
+			preg_match('@<IsTruncated>(.*?)</IsTruncated>@', $result, $matches);
+			if(strtolower($matches[1]) == "true")
+				$keys = array_merge($keys, $this->getBucketContents($bucket, $prefix, $returnTags, $assoc, $keyInfo[2][0]));
 
 			return $keys;
 		}
@@ -232,7 +236,7 @@
 				$curl .= "$key \"$val\" ";
 			}
 			
-			$curl .= '"' . $this->_server . $req['resource'] . '"';
+			$curl .= '"' . $this->_server . $req['resource'];
 			
 			if($params)
 			{
@@ -240,9 +244,12 @@
 				foreach($params as $key => $val)
 					$curl .= "$key=" . urlencode($val) . "&";
 			}
+			
+			$curl .= '"';
 
 			if(isset($req['download'])) $curl .= ' -o "' . $req['download'] . '"';
 
+//			echo "$curl\n";die();
 			return `$curl`;
 		}
 		
