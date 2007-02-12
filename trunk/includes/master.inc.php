@@ -28,6 +28,7 @@
 	$docroot = realpath(dirname(__FILE__) . "/../");
 
 	require_once($docroot . "/includes/class.dbobject.php");
+	require_once($docroot . "/includes/class.objects.php");
 	require_once($docroot . "/includes/class.misc.php");
 	require_once($docroot . "/includes/class.database.php");
 	require_once($docroot . "/includes/class.auth.php");

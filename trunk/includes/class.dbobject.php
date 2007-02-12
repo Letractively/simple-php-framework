@@ -66,7 +66,12 @@
 			}
 		}
 
-		function insert()
+		function replace()
+		{
+			return $this->insert("REPLACE INTO");
+		}
+
+		function insert($cmd = "INSERT INTO")
 		{
 			global $db;
 			
@@ -77,7 +82,7 @@
 				$columns = "`" . join("`, `", array_keys($this->columns)) . "`";
 				$values  = "'" . join("', '", $this->quote_column_vals()) . "'";
 
-				$db->query("INSERT INTO " . $this->table_name . " ($columns) VALUES ($values)");
+				$db->query("$cmd " . $this->table_name . " ($columns) VALUES ($values)");
 
 				$this->id = mysql_insert_id($db->db);
 				return $this->id;
