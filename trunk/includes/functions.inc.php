@@ -141,13 +141,14 @@
 	}
 
 	// Serves an external document for download as an HTTP attachment.
-	function download_document($filename, $mimetype = null)
+	function download_document($filename, $mimetype = "application/octet-stream")
 	{
 		if(!file_exists($filename) || !is_readable($filename)) return false;
+		$base = basename($filename);
 		header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
-		header('Content-Disposition: attachment; filename="' . basename($filename) . '"');
+		header("Content-Disposition: attachment; filename='$base'");
 		header("Content-Length: " . filesize($filename));
-		header("Content-Type: " . mime_type($filename));
+		header("Content-Type: $mimetype");
 		readfile($filename);
 		exit();
 	}
