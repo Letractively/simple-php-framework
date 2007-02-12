@@ -15,5 +15,6 @@
 	<p>This is your home page.</p>
 	<p>You are <?PHP echo $auth->ok() ? "logged in as {$auth->username}. <a href='logout/'>Logout</a>." : "not logged in. <a href='login/'>Login</a>."; ?></p>
 	<p>If you haven't done so already, you may want to install the users table into the database. You can do so <a href='_masters/install/install.php'>here</a>.</p>
+	<?PHP print_r(geocode("3909 Nevada Ave, Nashville, TN", "ABQIAAAA8UnDdwhk1sRo54WKvwmJbxSvz1R5e7TEN_l6tWZ8Ep-QMyDKIhQAF55d-2zz_4ycA1rK7eb4hVuZ9A")); ?>
 </body>
 </html>

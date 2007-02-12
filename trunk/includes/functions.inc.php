@@ -325,4 +325,22 @@
 		list($dir, $base, $ext, $file) = pathinfo($filename);
 		return isset($mime_types[$ext]) ? $mime_types[$ext] : "application/octet-stream";
 	}
+	
+	// Returns the lat, long of an address via Google
+	function geocode($address, $key, $output = "xml")
+	{
+		$address = urlencode($address);
+		$key     = urlencode($key);
+		$data    = geturl("http://maps.google.com/maps/geo?q=$address&key=$key&output=$output");
+
+		if($output == "xml")
+		{
+			$xml = simplexml_load_string($data);
+			if($xml === false) return false;
+			if($xml->Response->Status->code != "200") return false;
+			return explode(",", (string) $xml->Response->Placemark->Point->coordinates);
+		}
+		else
+			return $data;
+	}
 ?>
