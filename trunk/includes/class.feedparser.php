@@ -1,5 +1,21 @@
 <?PHP
-	class FeedParser
+	# Currently, this code is shaky at best. It's really just an exercise to see
+	# how easy/hard it is to write a feed parser. I'm doing this because Magpie
+	# is bloated and LastRSS has bugs. This implementation is aimed at RSS 2.0.
+
+	# Example:
+	# $fp = new FeedParser("http://domain.com/rss.xml");
+	# print_r($fp->channels); // Data will be stored in channels array
+	#
+	# foreach($fp as $item) // You can also iterate over the (0th channel's) items
+	# 	print_r($item);
+
+	# TODO: I need a better way to handle tag attributes.
+	# TODO: Modularize the parsing so it can handle different feed types.
+	# TODO: Support namespaces.
+	# TODO: Ahem. Testing!
+
+	class FeedParser implements Iterator
 	{
 		public $url;
 		public $xml;
@@ -8,6 +24,7 @@
 		public $channels;
 		public $channel_tags;
 		public $item_tags;
+		public $no_attrs = true; // Don't return tag attributes
 
 		function __construct($url = null, $username = null, $password = null)
 		{
@@ -17,9 +34,12 @@
 
 			$this->channel_tags = array("title", "link", "description", "language", "copyright", "managingEditor", "pubDate", "lastBuildDate", "category", "generator", "docs", "cloud", "ttl", "image", "rating", "skipHours", "skipDays");
 			$this->item_tags    = array("title", "link", "description", "author", "category", "comments", "enclosure", "guid", "pubDate", "source");
+			
+			if(isset($this->url))
+				$this->parse();
 		}
 
-		function parse($url = null)
+		public function parse($url = null, $username = null, $password = null)
 		{
 			if(isset($url)) $this->url = $url;
 			if(isset($username)) $this->username = $username;
@@ -38,12 +58,14 @@
 			// Parse each channel
 			foreach($channels as $channelXML)
 				$this->channels[] = $this->parseChannel($channelXML);
+			
+			return $this->channels;
 		}
 
-		function parseChannel($xml)
+		private function parseChannel($xml)
 		{
 			$channel = array("items" => array());
-			preg_match_all('@<(\w+)(.*?)>(.*?)</\1>@ms', $xml, $matches);
+			preg_match_all('@<([\w:]+)(.*?)>(.*?)</\1>@ms', $xml, $matches);
 			for($i = 0; $i < count($matches[1]); $i++)
 			{
 				// Get the channel's tags
@@ -57,22 +79,25 @@
 			return $channel;
 		}
 
-		function parseItem($xml)
+		private function parseItem($xml)
 		{
 			$foo  = $this->parseTag($xml, "item");
 			$item = array("attrs" => $foo['attrs']);
 
-			preg_match_all('@<(\w+)(.*?)>(.*?)</\1>@ms', $foo['value'], $matches);
+			if(!$this->no_attrs) $foo = $foo["value"];
+			preg_match_all('@<(\w+)(.*?)>(.*?)</\1>@ms', $foo, $matches);
 			for($i = 0; $i < count($matches[1]); $i++)
 			{
 				if(in_array($matches[1][$i], $this->item_tags))
 					$item[$matches[1][$i]] = $this->parseTag($matches[0][$i], $matches[1][$i]);
 			}
 
+			if($this->no_attrs) unset($item["attrs"]);
+
 			return $item;
 		}
 
-		function parseTag($xml, $tag)
+		private function parseTag($xml, $tag)
 		{
 			if(preg_match("@<$tag(.*?)>(.*?)</$tag>@ms", $xml, $matches) == 1)
 			{
@@ -92,10 +117,13 @@
 					$out["attrs"][$key] = trim($val, '"');
 				}
 			}
+			
+			if($this->no_attrs) $out = $out["value"];
+			
 			return $out;
 		}
 
-		function geturl($url, $username = "", $password = "")
+		private function geturl($url, $username = "", $password = "")
 		{
 			if(function_exists("curl_init"))
 			{
@@ -119,6 +147,32 @@
 			else
 				return false;
 
+		}
+
+		// These functions handle the Iterator implementation
+		public function rewind()
+		{
+			reset($this->channels[0]["items"]);
+		}
+		
+		public function current()
+		{
+			return current($this->channels[0]["items"]);
+		}
+		
+		public function key()
+		{
+			return key($this->channels[0]["items"]);
+		}
+		
+		public function next()
+		{
+			return next($this->channels[0]["items"]);
+		}
+		
+		public function valid()
+		{
+			return $this->current() !== false;
 		}
 	}
 ?>
