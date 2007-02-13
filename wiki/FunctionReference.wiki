@@ -9,7 +9,7 @@
 
 *pick_off*($grabFirst = false, $sep = "/")
 
-  Processes mod_rewrite URLs into key => value pairs. See included .htacess for more info.
+  Processes mod_rewrite URLs into key => value pairs. See included [http://simple-php-framework.googlecode.com/svn/trunk/.htaccess .htacess] for more info.
 
 *get_options*($table, $val, $text, $default = null, $where = null, $order = null)
 
