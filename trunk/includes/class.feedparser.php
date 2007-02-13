@@ -59,6 +59,8 @@
 			foreach($channels as $channelXML)
 				$this->channels[] = $this->parseChannel($channelXML);
 			
+			reset($this->channels[0]["items"]);
+			
 			return $this->channels;
 		}
 
@@ -85,13 +87,13 @@
 			$item = array("attrs" => $foo['attrs']);
 
 			if(!$this->no_attrs) $foo = $foo["value"];
-			preg_match_all('@<(\w+)(.*?)>(.*?)</\1>@ms', $foo, $matches);
-			for($i = 0; $i < count($matches[1]); $i++)
+			
+			foreach($this->item_tags as $tag)
 			{
-				if(in_array($matches[1][$i], $this->item_tags))
-					$item[$matches[1][$i]] = $this->parseTag($matches[0][$i], $matches[1][$i]);
+				if(preg_match("@<$tag(.*?)>(.*?)</$tag>@ms", $foo, $matches) == 1)
+					$item[$tag] = $this->parseTag($matches[0], $tag);
 			}
-
+			
 			if($this->no_attrs) unset($item["attrs"]);
 
 			return $item;
@@ -175,4 +177,13 @@
 			return $this->current() !== false;
 		}
 	}
+
+	$fp = new FeedParser($_GET['url']);
+	print_r($fp->channels);
+	// foreach($fp as $item)
+	// {
+	// 	$item['description'] = str_replace(array("<![CDATA[", "]]>"), "", $item['description']);
+	// 	echo "<h3>{$item['title']}</h3>";
+	// 	echo "<p>{$item['description']}</p>";
+	// }
 ?>
