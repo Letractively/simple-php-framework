@@ -1,0 +1,12 @@
+#summary using this framework
+#labels Featured
+
+= Example Websites =
+
+The following websites were built with Simple PHP Framework.
+
+  * [http://snipplr.com Snipplr.com]
+  * [http://easyschmooze.com Easyschmooze.com]
+  * [http://basejumpr.com Basejumpr.com]
+
+
