@@ -178,8 +178,7 @@
 		}
 	}
 
-	$fp = new FeedParser($_GET['url']);
-	print_r($fp->channels);
+	// $fp = new FeedParser($_GET['url']);
 	// foreach($fp as $item)
 	// {
 	// 	$item['description'] = str_replace(array("<![CDATA[", "]]>"), "", $item['description']);
