@@ -125,7 +125,7 @@
 	// Fixes MAGIC_QUOTES
 	function fix_slashes($arr = "")
 	{
-		if(empty($arr)) return;
+		if(empty($arr)) return null;
 		if(!get_magic_quotes_gpc()) return $arr;
 		return is_array($arr) ? array_map('fix_slashes', $arr) : stripslashes($arr);
 	}
@@ -137,7 +137,7 @@
 		if(count($words) < $num)
 			return $str;
 		else
-			implode(" ", array_slice($words, 0, $num));
+			return implode(" ", array_slice($words, 0, $num));
 	}
 
 	// Serves an external document for download as an HTTP attachment.
@@ -204,13 +204,13 @@
 			curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
 		}
 
-		$ok = curl_exec($ch);
+		curl_exec($ch);
 		curl_close($ch);
 		$head = ob_get_contents();
 		ob_end_clean();
 
 		$regex = '/Content-Length:\s([0-9].+?)\s/';
-		$count = preg_match($regex, $head, $matches);
+		preg_match($regex, $head, $matches);
 
 		return isset($matches[1]) ? $matches[1] : "unknown";
 	}	
@@ -233,7 +233,7 @@
 		if(eregi("^([_a-z0-9+-]+)(\.[_a-z0-9-]+)*@([a-z0-9-]+)(\.[a-z0-9-]+)*(\.[a-z]{2,4})$", $email))
 			if($test_mx)
 			{
-				list($username, $domain) = split("@", $email);
+				list( , $domain) = split("@", $email);
 				return getmxrr($domain, $mxrecords);
 			}
 			else
@@ -342,5 +342,32 @@
 		}
 		else
 			return $data;
+	}
+
+	// Quick and dirty wrapper for curl
+	function curl($url, $referer = null, $post = null)
+	{
+		global $last_url;
+		static $cookie_id;
+		if($cookie_id == "") $cookie_id = 0;
+	
+		$ch = curl_init($url);
+		curl_setopt($ch, CURLOPT_COOKIEFILE, "cookies{$cookie_id}.txt");
+		curl_setopt($ch, CURLOPT_COOKIEJAR, "cookies" . ++$cookie_id . ".txt");
+		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+
+		if($referer) curl_setopt($ch, CURLOPT_REFERER, $referer);
+		if($post) {
+			curl_setopt($ch, CURLOPT_POST, true);
+			curl_setopt($ch, CURLOPT_POSTFIELDS, $post);
+		}
+
+		ob_start();
+		curl_exec($ch);
+		$html = ob_get_contents();
+		ob_end_clean();
+	
+		$last_url = curl_getinfo($ch, CURLINFO_EFFECTIVE_URL);
+		return $html;
 	}
 ?>

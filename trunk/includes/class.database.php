@@ -15,7 +15,7 @@
 		var $user;
 		var $redirect = false;
 
-		function Database($host, $user, $password, $dbname = null)
+		function __construct($host, $user, $password, $dbname = null)
 		{
 			$this->host     = $host;
 			$this->user     = $user;
