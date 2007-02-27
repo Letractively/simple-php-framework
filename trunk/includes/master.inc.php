@@ -3,7 +3,7 @@
 	{
 		// Testing
 		$dbserver = "localhost";
-		$dbname   = "";
+		$dbname   = "framework";
 		$dbuser   = "root";
 		$dbpass   = "";
 		$onError  = "die";
@@ -31,7 +31,7 @@
 	require_once($docroot . "/includes/class.objects.php");
 	require_once($docroot . "/includes/class.misc.php");
 	require_once($docroot . "/includes/class.database.php");
-	require_once($docroot . "/includes/class.auth.php");
+	require_once($docroot . "/includes/class.authmd5.php");
 	require_once($docroot . "/includes/functions.inc.php");
 
 	$db = new Database($dbserver, $dbuser, $dbpass, $dbname);

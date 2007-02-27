@@ -54,6 +54,21 @@
 			return false;
 		}
 
+		function numRows($arg = null)
+		{
+			if(is_null($arg) && $this->isValid())
+				return mysql_num_rows($this->result);
+			elseif(is_resource($arg) && $this->isValid($arg))
+				return mysql_num_rows($arg);
+			elseif(is_string($arg))
+			{
+				$this->query($arg);
+				if($this->isValid())
+					return mysql_num_rows($this->result);
+			}
+			return false;
+		}
+
 		// You can pass in nothing, a string, or a db result
 		function getRow($arg = null)
 		{
@@ -70,17 +85,27 @@
 			return false;
 		}
 
-		function getRows($result = null)
+		function getRows($arg = null)
 		{
-			$rows = array();
-			if(is_null($result)) $result = $this->result;
-
-			if($this->isValid($result))
+			if(is_null($arg) && $this->isValid())
+				$result = $this->result;
+			elseif(is_resource($arg) && $this->isValid($arg))
+				$result = $arg;
+			elseif(is_string($arg))
 			{
-				mysql_data_seek($result, 0);
-				while($row = mysql_fetch_array($result, MYSQL_ASSOC))
-					$rows[] = $row;
+				$this->query($arg);
+				if($this->isValid())
+					$result = $this->result;
+				else
+					return false;
 			}
+			else
+				return false;
+
+			$rows = array();
+			mysql_data_seek($result, 0);
+			while($row = mysql_fetch_array($result, MYSQL_ASSOC))
+				$rows[] = $row;
 			return $rows;
 		}
 
