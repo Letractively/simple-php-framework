@@ -7,6 +7,10 @@
 
 == Function List ==
 
+*calendar*($month = null, $year = null)
+
+  Returns an array representation of the given calendar month.
+
 *pick_off*($grabFirst = false, $sep = "/")
 
   Processes mod_rewrite URLs into key => value pairs. See included [http://simple-php-framework.googlecode.com/svn/trunk/.htaccess .htacess] for more info.
@@ -86,3 +90,7 @@
 *geocode*($address, $key, $output = "xml")
 
   Returns the lat, long of an address via Google's geocoding service. Requires a Google Maps API key. Output can be xml or json.
+
+*curl*($url, $referer = null, $post = null)
+
+  Quick and dirty wrapper for PHP's curl object.
