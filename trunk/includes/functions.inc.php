@@ -1,4 +1,33 @@
 <?PHP
+	// Returns an array representation of the given calendar month.
+	// The array values are timestamps which allow you to easily format
+	// and manipulate the dates as needed.
+	function calendar($month = null, $year = null)
+	{
+		if(is_null($month)) $month = date("n");
+		if(is_null($year)) $year = date("Y");
+
+		$first = mktime(0, 0, 0, $month, 1, $year);
+		$last = mktime(23, 59, 59, $month, date("t", $first), $year);
+
+		$start = $first - (86400 * date("w", $first));
+		$stop = $last + (86400 * (7 - date("w", $first)));
+
+		$month = array();
+		while($start < $stop)
+		{
+			$week = array();
+			for($i = 0; $i < 7; $i++)
+			{
+				$week[$i] = $start;
+				$start += 86400;
+			}
+			$month[] = $week;
+		}
+
+		return $month;
+	}
+
 	// Processes mod_rewrite URLs into key => value pairs
 	// See .htacess for more info.
 	function pick_off($grabFirst = false, $sep = "/")
