@@ -377,13 +377,17 @@
 	function curl($url, $referer = null, $post = null)
 	{
 		global $last_url;
-		static $cookie_id;
-		if($cookie_id == "") $cookie_id = 0;
+		static $tmpfile;
+		
+		if(!isset($tmpfile) || ($tmpfile == "")) $tmpfile = tempnam("/tmp", "FOO");
 	
 		$ch = curl_init($url);
-		curl_setopt($ch, CURLOPT_COOKIEFILE, "cookies{$cookie_id}.txt");
-		curl_setopt($ch, CURLOPT_COOKIEJAR, "cookies" . ++$cookie_id . ".txt");
+		curl_setopt($ch, CURLOPT_COOKIEFILE, $tmpfile);
+		curl_setopt($ch, CURLOPT_COOKIEJAR, $tmpfile);
 		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+		curl_setopt($ch, CURLOPT_USERAGENT, "Mozilla/5.0 (Macintosh; U; Intel Mac OS X; en-US; rv:1.8.1) Gecko/20061024 BonEcho/2.0");
+		// curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+		// curl_setopt($ch, CURLOPT_VERBOSE, 1);
 
 		if($referer) curl_setopt($ch, CURLOPT_REFERER, $referer);
 		if($post) {

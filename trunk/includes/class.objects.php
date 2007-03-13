@@ -1,5 +1,5 @@
 <?PHP
-	class Users extends DBObject
+	class User extends DBObject
 	{
 		function __construct($id = "")
 		{

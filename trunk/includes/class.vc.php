@@ -1,13 +1,14 @@
 <?PHP
-	function vc_format_phone($table, $val, $row) { return format_phone($val); }
-	function vc_format_email($table, $val, $row) { return ($val) ? "<a href='mailto:$val'>$val</a>" : ""; }
-
 	/* C A L L  B A C K S */
 	// vc_sort_<sort>(ASC | DESC)
 	// vc_tr(table, row)
 	// vc_extra(table, col, row)
 	// vc_format_<column>(table, val, row)
-	
+
+	// Examples:
+	// function vc_format_phone($table, $val, $row) { return format_phone($val); }
+	// function vc_format_email($table, $val, $row) { return ($val) ? "<a href='mailto:$val'>$val</a>" : ""; }
+
 	/* P A G I N G */
 	/* <p class="paging"><?PHP echo $vc->prev() . " <strong>Page {$vc->page} of {$vc->numPages}</strong> " . $vc->next(); ?></p> */
 

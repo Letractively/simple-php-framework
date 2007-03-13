@@ -5,7 +5,7 @@
 		var $username;
 		var $password;
 		var $level;
-		var $salt = "687fdgj45386sdahsk2981298#&*A"; // Pick any set of random characters
+		var $salt;
 		var $domain = ""; // Domain to set in cookie
 		var $user;
 
@@ -13,6 +13,7 @@
 		{
 			$this->user_id = 0;
 			$this->username = "Guest";
+			$this->salt = $GLOBALS['auth_salt'];
 
 			if(class_exists("DBObject") && class_exists("User"))
 				$this->user = new User();

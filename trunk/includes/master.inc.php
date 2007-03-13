@@ -1,9 +1,9 @@
 <?PHP
 	if(preg_match('/\.com|\.net|\.org/', $_SERVER['SERVER_NAME']) === 0)
 	{
-		// Testing
+		// Testing (It's important that testing comes first if you're using install.php)
 		$dbserver = "localhost";
-		$dbname   = "framework";
+		$dbname   = "";
 		$dbuser   = "root";
 		$dbpass   = "";
 		$onError  = "die";
@@ -37,6 +37,7 @@
 	$db = new Database($dbserver, $dbuser, $dbpass, $dbname);
 	$db->onError = $onError;
 	$db->connect();
-	
+
+	$auth_salt = "SDyiyisd2"; // Pick any random string of characters
 	$auth = new Auth();
 ?>
