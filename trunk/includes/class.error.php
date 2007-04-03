@@ -58,5 +58,71 @@
 			else
 				return $out;
 		}
+		
+		// Variable tests
+		
+		function blank($val, $id, $name = null)
+		{
+			if(trim($val) == "")
+			{
+				if(is_null($name)) $name = ucwords($id);
+				$this->add($id, "$name cannot be left blank.");
+				return false;
+			}
+			
+			return true;
+		}
+		
+		function range($val, $id, $lower, $upper, $name = null)
+		{
+			if($val < $lower || $val > $upper)
+			{
+				if(is_null($name)) $name = ucwords($id);
+				$this->add($id, "$name must be between $lower and $upper.");
+				return false;
+			}
+			
+			return true;
+		}
+
+		function length($val, $id, $lower, $upper, $name = null)
+		{
+			if(strlen($val) < $lower)
+			{
+				if(is_null($name)) $name = ucwords($id);
+				$this->add($id, "$name must be at least $lower characters.");
+				return false;
+			}
+			elseif(strlen($val) > $upper)
+			{
+				if(is_null($name)) $name = ucwords($id);
+				$this->add($id, "$name cannot be more than $upper characters long.");
+				return false;
+			}
+			
+			return true;
+		}
+		
+		function passwords($id, $pass1, $pass2)
+		{
+			if($pass1 !== $pass2)
+			{
+				$this->add($id, "The passwords you entered do not match.");
+				return false;
+			}
+			
+			return true;
+		}
+		
+		function email($id, $val)
+		{
+			if(!eregi("^([_a-z0-9+-]+)(\.[_a-z0-9-]+)*@([a-z0-9-]+)(\.[a-z0-9-]+)*(\.[a-z]{2,4})$", $email))
+			{
+				$this->add($id, "Email address is not valid.");
+				return false;
+			}
+			
+			return true;
+		}
 	}
 ?>
