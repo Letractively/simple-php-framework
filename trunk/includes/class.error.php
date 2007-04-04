@@ -1,6 +1,4 @@
 <?PHP
-	// This class has not been tested yet.
-	// Tyler - 4/3/07
 	class Error
 	{
 		public $errors;
@@ -14,7 +12,7 @@
 		
 		function __tostring()
 		{
-			return $this->ul();
+			return $this->ul("warn", false);
 		}
 
 		function ok()
@@ -24,7 +22,7 @@
 		
 		function add($id, $msg)
 		{
-			$this->errors[$id] = $msg;
+			if($id != "") $this->errors[$id] = $msg;
 		}
 		
 		function delete($Id)
@@ -40,10 +38,10 @@
 		function css($header = true)
 		{
 			$out = "";
-			if(count($this->errors) == 0)
+			if(count($this->errors) > 0)
 			{
 				if($header) $out .= '<style type="text/css" media="screen">';
-				$out .= "#" . implode(", #", array_keys($this->errors));
+				$out .= "#" . implode(", #", array_keys($this->errors)) . " { {$this->style} }";
 				if($header) $out .= '</style>';
 			}
 			echo $out;
@@ -52,7 +50,7 @@
 		function ul($class = "warn", $echo = true)
 		{
 			if(count($this->errors) == 0) return "";
-			$out = "<ul class='$class'><li>" . implode("</li><li>", $this->errors) . "</li>";
+			$out = "<ul class='$class'><li>" . implode("</li><li>", $this->errors) . "</li></ul>";
 			if($echo)
 				echo $out;
 			else
@@ -114,11 +112,22 @@
 			return true;
 		}
 		
-		function email($id, $val)
+		function email($val, $id)
 		{
 			if(!eregi("^([_a-z0-9+-]+)(\.[_a-z0-9-]+)*@([a-z0-9-]+)(\.[a-z0-9-]+)*(\.[a-z]{2,4})$", $email))
 			{
 				$this->add($id, "Email address is not valid.");
+				return false;
+			}
+			
+			return true;
+		}
+		
+		function date($val, $id)
+		{
+			if(!strtotime($val))
+			{
+				$this->add($id, "Please enter a valid date");
 				return false;
 			}
 			
