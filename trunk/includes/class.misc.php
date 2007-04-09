@@ -22,7 +22,7 @@
 			$this->_data[$key] = $val;
 			$_SESSION[$this->_id] = serialize($this->_data);
 		}
-		
+
 		function clear()
 		{
 			unset($_SESSION[$this->_id]);
