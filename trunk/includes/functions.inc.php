@@ -44,8 +44,8 @@
 	function get_options($table, $val, $text, $default = null, $where = null, $order = null)
 	{
 		global $db;
-		if(is_null($where)) $where = "WHERE $where";
-		if(is_null($order)) $order = "ORDER BY $order";
+		if(!is_null($where)) $where = "WHERE $where";
+		if(!is_null($order)) $order = "ORDER BY $order";
 		$db->query("SELECT * FROM `$table` $where $order");
 		while($row = mysql_fetch_array($db->result, MYSQL_ASSOC))
 		{
