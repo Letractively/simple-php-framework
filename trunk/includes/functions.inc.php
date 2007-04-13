@@ -49,10 +49,15 @@
 		$db->query("SELECT * FROM `$table` $where $order");
 		while($row = mysql_fetch_array($db->result, MYSQL_ASSOC))
 		{
+			if(!is_array($text)) $text = array($text); // Allows you to concat multiple fields for display
+			foreach($text as $t)
+				$the_text .= $row[$t] . " ";
+			$the_text = htmlspecialchars(trim($the_text));
+			
 			if(!is_null($default) && $row[$val] == $default)
-				$out .= "<option value=\"" . htmlspecialchars($row[$val], ENT_QUOTES) . "\" selected=\"selected\">" . htmlspecialchars($row[$text]) . "</option>";
+				$out .= "<option value=\"" . htmlspecialchars($row[$val], ENT_QUOTES) . "\" selected=\"selected\">$the_text</option>";
 			else
-				$out .= "<option value=\"" . htmlspecialchars($row[$val], ENT_QUOTES) . "\">" . htmlspecialchars($row[$text]) . "</option>";
+				$out .= "<option value=\"" . htmlspecialchars($row[$val], ENT_QUOTES) . "\">$the_text</option>";
 		}
 		return $out;
 	}
@@ -182,43 +187,6 @@
 		exit();
 	}
 	
-	// Creates a thumbnail from an existing image.
-	// $filename is the original filename, while $tmpname is the actual
-	// filesystem name (for example, the temporary filename used in a PHP upload).
-	// Returns an image resource which you can then output to the browser, or
-	// save to a file using imagejpg(), imagepng(), etc.
-	function resize_image($filename, $tmpname, $xmax, $ymax)
-	{
-		$ext = explode(".", $filename);
-		$ext = $ext[count($ext)-1];
-
-		if($ext == "jpg" || $ext == "jpeg")
-			$im = imagecreatefromjpeg($tmpname);
-		elseif($ext == "png")
-			$im = imagecreatefrompng($tmpname);
-		elseif($ext == "gif")
-			$im = imagecreatefromgif($tmpname);
-
-		$x = imagesx($im);
-		$y = imagesy($im);
-
-		if($x <= $xmax && $y <= $ymax)
-			return $im;
-
-		if($x >= $y) {
-			$newx = $xmax;
-			$newy = $newx * $y / $x;
-		}
-		else {
-			$newy = $ymax;
-			$newx = $x / $y * $newy;
-		}
-
-		$im2 = imagecreatetruecolor($newx, $newy);
-		imagecopyresized($im2, $im, 0, 0, 0, 0, floor($newx), floor($newy), $x, $y);
-		return $im2;
-	}	
-
 	// Retrieves the filesize of a remote file.
 	function remote_filesize($url, $user = null, $pw = null)
 	{
