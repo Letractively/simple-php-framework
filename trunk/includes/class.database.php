@@ -109,6 +109,46 @@
 			return $rows;
 		}
 
+		// You can pass in nothing, a string, or a db result
+		function getObject($arg = null)
+		{
+			if(is_null($arg) && $this->isValid())
+				return mysql_fetch_object($this->result);
+			elseif(is_resource($arg) && $this->isValid($arg))
+				return mysql_fetch_object($arg);
+			elseif(is_string($arg))
+			{
+				$this->query($arg);
+				if($this->isValid())
+					return mysql_fetch_object($this->result);
+			}
+			return false;
+		}
+
+		function getObjects($arg = null)
+		{
+			if(is_null($arg) && $this->isValid())
+				$result = $this->result;
+			elseif(is_resource($arg) && $this->isValid($arg))
+				$result = $arg;
+			elseif(is_string($arg))
+			{
+				$this->query($arg);
+				if($this->isValid())
+					$result = $this->result;
+				else
+					return array();
+			}
+			else
+				return array();
+
+			$objects = array();
+			mysql_data_seek($result, 0);
+			while($object = mysql_fetch_object($result))
+				$objects[] = $object;
+			return $objects;
+		}
+
 		function isValid($result = null)
 		{
 			if(is_null($result)) $result = $this->result;
