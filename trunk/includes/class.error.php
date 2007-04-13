@@ -114,7 +114,7 @@
 		
 		function email($val, $id)
 		{
-			if(!eregi("^([_a-z0-9+-]+)(\.[_a-z0-9-]+)*@([a-z0-9-]+)(\.[a-z0-9-]+)*(\.[a-z]{2,4})$", $email))
+			if(!eregi("^([_a-z0-9+-]+)(\.[_a-z0-9-]+)*@([a-z0-9-]+)(\.[a-z0-9-]+)*(\.[a-z]{2,4})$", $val))
 			{
 				$this->add($id, "Email address is not valid.");
 				return false;
