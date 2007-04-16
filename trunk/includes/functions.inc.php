@@ -49,6 +49,7 @@
 		$db->query("SELECT * FROM `$table` $where $order");
 		while($row = mysql_fetch_array($db->result, MYSQL_ASSOC))
 		{
+			$the_text = "";
 			if(!is_array($text)) $text = array($text); // Allows you to concat multiple fields for display
 			foreach($text as $t)
 				$the_text .= $row[$t] . " ";
