@@ -29,7 +29,7 @@
 		var $items;
 		var $tags;
 
-		function RSS()
+		function __construct()
 		{
 			$this->items = array();
 			$this->tags  = array();

@@ -12,6 +12,8 @@
 	/* P A G I N G */
 	/* <p class="paging"><?PHP echo $vc->prev() . " <strong>Page {$vc->page} of {$vc->numPages}</strong> " . $vc->next(); ?></p> */
 
+	// This is a rather unfortunate name and has nothing to do with the
+	// traditional MVC "V" or "C" meaning.
 	class ViewController
 	{
 		var $bodySQL;   // Override the default SELECT query
@@ -32,7 +34,7 @@
 		var $url;
 		var $where;      // Custom WHERE clause appended to default SELECT and COUNT(*) queries
 
-		function ViewController($table = "", $columns = "")
+		function __construct($table = "", $columns = "")
 		{
 			$this->table      = $table;
 			$this->columns    = is_array($columns) ? $columns : array();

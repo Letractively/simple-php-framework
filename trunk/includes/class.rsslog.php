@@ -9,7 +9,7 @@
 		var $description = "";
 		var $language    = "en-us";
 		
-		function RSSLog($title, $log_name = "")
+		function __construct($title, $log_name = "")
 		{
 			$this->title = $title;
 			

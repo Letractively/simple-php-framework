@@ -9,7 +9,7 @@
 		var $domain = ""; // Domain to set in cookie
 		var $user;
 
-		function Auth()
+		function __construct()
 		{
 			$this->user_id = 0;
 			$this->username = "Guest";
