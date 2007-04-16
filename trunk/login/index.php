@@ -1,5 +1,5 @@
 <?PHP
-	require_once("../includes/master.inc.php");
+	require("../includes/master.inc.php");
 
 	// Kick out user if already logged in
 	if($auth->ok()) redirect("/");

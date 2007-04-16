@@ -1,5 +1,5 @@
 <?PHP
-	require_once("../includes/master.inc.php");
+	require("../includes/master.inc.php");
 	if($auth->level != "admin") redirect("../");
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"

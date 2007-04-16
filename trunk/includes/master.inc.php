@@ -27,12 +27,12 @@
 
 	$docroot = realpath(dirname(__FILE__) . "/../");
 
-	require_once($docroot . "/includes/class.dbobject.php");
-	require_once($docroot . "/includes/class.objects.php");
-	require_once($docroot . "/includes/class.misc.php");
-	require_once($docroot . "/includes/class.database.php");
-	require_once($docroot . "/includes/class.authmd5.php");
-	require_once($docroot . "/includes/functions.inc.php");
+	require($docroot . "/includes/class.dbobject.php");
+	require($docroot . "/includes/class.objects.php");
+	require($docroot . "/includes/class.misc.php");
+	require($docroot . "/includes/class.database.php");
+	require($docroot . "/includes/class.authmd5.php");
+	require($docroot . "/includes/functions.inc.php");
 
 	$db = new Database($dbserver, $dbuser, $dbpass, $dbname);
 	$db->onError = $onError;
