@@ -4,21 +4,24 @@
 		var $user_id;
 		var $username;
 		var $password;
-		var $level;
-		var $salt;
-		var $domain = ""; // Domain to set in cookie
-		var $user;
+		var $level;          // Admin, User, etc.
+		var $salt;           // Used to compute password hash
+		var $domain = "";    // Domain to set in cookie
+		var $user;           // DBObject User class if available
+		var $useMD5 = false; // Are passwords hashed in the database?
 
 		function __construct()
 		{
-			$this->user_id = 0;
+			$this->user_id  = 0;
 			$this->username = "Guest";
-			$this->salt = $GLOBALS['auth_salt'];
+			$this->salt     = $GLOBALS['auth_salt']; // So you can set it in master.inc.php
 
-			if(class_exists("DBObject") && class_exists("User"))
+			if(class_exists("User") && (get_parent_class("User") == "DBObject"))
 				$this->user = new User();
 
-			if(!$this->checkSession()) $this->checkCookie();
+			if(!$this->checkSession())
+				$this->checkCookie();
+
 			return $this->ok();
 		}
 	
@@ -37,20 +40,25 @@
 		function check($username, $password)
 		{
 			global $db;
-			$username = mysql_real_escape_string($username, $db->db);
-			$db->query("SELECT * FROM users WHERE username = '$username'");
+
+			$db->query("SELECT * FROM users WHERE username = " . $db->quote($username));
 			if(mysql_num_rows($db->result) == 1)
 			{
 				$row = mysql_fetch_array($db->result, MYSQL_ASSOC);
+
 				$db_password = $row['password'];
-				if(md5($db_password . $this->salt) == $password)
+
+				if($this->useMD5 == false)
+					$db_password = md5($db_password . $this->salt);				
+				
+				if($db_password == $password)
 				{
 					$this->user_id  = $row['user_id'];
 					$this->username = $username;
 					$this->level    = $row['level'];
 
 					// Load any additional user info if DBObject and User are available
-					if(class_exists("DBObject") && class_exists("User"))
+					if(class_exists("User") && (get_parent_class("User") == "DBObject"))
 					{
 						$this->user->id = $this->user_id;
 						$this->user->load($row);
@@ -64,27 +72,29 @@
 		function login($username, $password)
 		{
 			global $db;
-			$username = mysql_real_escape_string($username, $db->db);
-			$password = mysql_real_escape_string($password, $db->db);
-			$db->query("SELECT * FROM users WHERE username = '$username' AND password = '$password'");
+
+			$db_password = $this->makePassword($password);
+			$db->query("SELECT * FROM users WHERE username = " . $db->quote($username) . " AND password = " . $db->quote($db_password));
+
 			if(mysql_num_rows($db->result) == 1)
 			{
 				$row = mysql_fetch_array($db->result, MYSQL_ASSOC);
-				$this->user_id = $row['user_id'];
+				$this->user_id  = $row['user_id'];
 				$this->username = $username;
-				$this->level = $row['level'];
+				$this->level    = $row['level'];
 
 				// Load any additional user info if DBObject and User are available
-				if(class_exists("DBObject") && class_exists("User"))
+				if(class_exists("User") && (get_parent_class("User") == "DBObject"))
 				{
 					$this->user->id = $this->user_id;
 					$this->user->load($row);
 				}
 
+				$hashed_password = md5($password . $this->salt);
 				$_SESSION['auth_username'] = $username;
-				$_SESSION['auth_password'] = md5($password . $this->salt);
+				$_SESSION['auth_password'] = $hashed_password;
 				setcookie("auth_username", $username, time()+60*60*24*30, "/", $this->domain);
-				setcookie("auth_password", md5($password . $this->salt), time()+60*60*24*30, "/", $this->domain);
+				setcookie("auth_password", $hashed_password, time()+60*60*24*30, "/", $this->domain);
 				
 				return true;
 			}
@@ -109,9 +119,16 @@
 			return ($this->username !== "Guest");
 		}
 
+		// Helper function that redirects away from "admin only" pages
+		function admin($url = "/")
+		{
+			if($this->level != "admin")
+				redirect($url);
+		}
+
 		function makePassword($pw)
 		{
-			return $pw;
+			return $this->useMD5 ? md5($pw . $this->salt) : $pw;
 		}
 	}
 ?>

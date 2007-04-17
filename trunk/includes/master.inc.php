@@ -1,7 +1,7 @@
 <?PHP
 	if(preg_match('/\.com|\.net|\.org/', $_SERVER['SERVER_NAME']) === 0)
 	{
-		// Testing (It's important that testing comes first if you're using install.php)
+		// Testing
 		$dbserver = "localhost";
 		$dbname   = "";
 		$dbuser   = "root";
@@ -31,13 +31,13 @@
 	require($docroot . "/includes/class.objects.php");
 	require($docroot . "/includes/class.misc.php");
 	require($docroot . "/includes/class.database.php");
-	require($docroot . "/includes/class.authmd5.php");
+	require($docroot . "/includes/class.auth.php");
 	require($docroot . "/includes/functions.inc.php");
 
 	$db = new Database($dbserver, $dbuser, $dbpass, $dbname);
 	$db->onError = $onError;
 	$db->connect();
 
-	$auth_salt = "SDyiyisd2"; // Pick any random string of characters
+	$auth_salt = "^AS%FSA%^Ddsfj"; // Pick any random string of characters
 	$auth = new Auth();
 ?>

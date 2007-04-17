@@ -1,4 +1,6 @@
 <?PHP
+	require("../../includes/master.inc.php");
+
 	// Try to find default values from master.inc.php
 	$master   = file_get_contents("../../includes/master.inc.php");
 	$dbserver = match('@\$dbserver\s*=\s*("|\')(.*?)\1@ms', $master, 2);
@@ -38,9 +40,10 @@
 		$db = mysql_connect($_POST['server'], $_POST['dbusername'], $_POST['dbpassword']) or die(mysql_error());
 		mysql_select_db($_POST['dbname'], $db) or die(mysql_error());
 		$username = mysql_real_escape_string($_POST['username'], $db);
-		$password = ($_POST['type'] == "normal") ? $_POST['password'] : md5($_POST['salt'] . $_POST['password']);
+		$password = $auth->makePassword($_POST['password']);
 		$password = mysql_real_escape_string($password, $db);
-		$result = mysql_query("INSERT INTO users (username, password) VALUES ('$username', '$password')", $db);
+		$level = mysql_real_escape_string($_POST['level'], $db->db);
+		$result = mysql_query("INSERT INTO users (username, password, level) VALUES ('$username', '$password', '$level')", $db);
 		$msg = (mysql_affected_rows($db) == 1) ? "<p class='alert'>User added!</p>" : "<p class='warn'>User was not added! Does that user already exist?</p>";
 	}
 
@@ -79,14 +82,6 @@
 			unset($id_field);
 		}
 	}
-
-	function match($regex, $str, $i = 0)
-	{
-		if(preg_match($regex, $str, $match) == 1)
-			return $match[$i];
-		else
-			return false;
-	}
 ?>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
@@ -95,24 +90,28 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-	<title>Framework Install</title>
+	<title>Simple PHP Framework Install Helper</title>
 	<style type="text/css" media="screen">
+		#help { position:absolute; right:5px; top:5px; font-weight:bold; }
 		.alert { color:green; font-weight:bold; }
 		.warn { color:red; font-weight:bold; }
 	</style>
+
+	<?PHP if(isset($_POST['btnDBO'])) : ?>
 	<script type="text/javascript" charset="utf-8">
 		window.onload = function() {
-			document.getElementById("type_normal").onclick = function() { document.getElementById("salt").disabled = true; };
-			document.getElementById("type_md5").onclick = function() { document.getElementById("salt").disabled = false; };
+			document.getElementById("dbo").focus();
+			document.getElementById("dbo").select();
 		}
 	</script>
+	<?PHP endif; ?>
 </head>
 
 <body>
 	<?PHP echo $msg;?>
 	<form action="" method="post">
 		<h1>First...</h1>
-		<p>Fill in your database information.</p>
+		<p>Fill in your database information. (We try to guess these values from your <em>master.inc.php file</em>, but please double-check just to be sure.)</p>
 		<table>
 			<tr>
 				<th>Server</th>
@@ -133,12 +132,12 @@
 		</table>
 		
 		<h1>Then...</h1>
-		<p>Install the database template.</p>
+		<p>Install the database template. This will load the users table structure into the database. You can see the SQL we're using <a href='mysql.sql' target="_blank">here</a>.</p>
 		<input type="submit" name="btnTables" value="Install SQL Template" id="btnTables" />
 	
 
 		<h1>Next...</h1>
-		<p>You can add a new user</p>
+		<p>You can add a new user.</p>
 		<table>
 			<tr>
 				<th>Username</th>
@@ -149,23 +148,25 @@
 				<td><input type="text" name="password" value="" id="password" /></td>
 			</tr>
 			<tr>
-				<th>Auth Type</th>
+				<th>Type</th>
 				<td>
-					<input type="radio" name="type" value="normal" id="type_normal" <?PHP if($_POST['type'] == "normal") echo "checked='checked'";?>><label for="type_normal">Normal</label>
-					<input type="radio" name="type" value="md5" id="type_md5" <?PHP if($_POST['type'] == "md5" || !isset($_POST['type'])) echo "checked='checked'";?>><label for="type_md5">MD5</label>
+					<input type="radio" name="level" value="admin" id="level_admin" checked="checked"/> <label for="level_admin">Admin</label>
+					<input type="radio" name="level" value="user" id="level_user"/> <label for="level_user">User</label>
 				</td>
 			</tr>
+			<?PHP if($auth->useMD5) : ?>
 			<tr>
 				<th>Auth Salt</th>
-				<td><input type="text" name="salt" value="<?PHP echo $_POST['salt'];?>" id="salt" /></td>
+				<td><input type="text" name="salt" value="<?PHP echo $_POST['salt'];?>" id="salt" /> <em>This should be set in master.inc.php</td>
 			</tr>
+			<?PHP endif; ?>
 			<tr>
 				<th></th>
 				<td><input type="submit" name="btnAddUser" value="Add User" id="btnuser" /></td>
 			</tr>
 		</table>
 		
-		<h1>Or...</h1>
+		<h1>You can also...</h1>
 		<p>
 			Get a list of tables to generate DBObjects from.<br/>
 			<input type="submit" name="btnGetTables" value="Get List" id="btnGetTables" />
@@ -173,13 +174,17 @@
 		</p>
 			
 		<p>
-			Once the text box has the tables you want, click this button to generate the proper code.<br/>
+			Once the text box has the tables you want, click this button to generate the skeleton code.<br/>
 			<input type="submit" name="btnDBO" value="Create DBObject classes from above tables" id="btnDBO" />
 		</p>
 	</form>
 
 	<?PHP if(!empty($out)) { ?>
-		<textarea style="width:100%; height:400px;"><?PHP echo $out;?></textarea>
+		<textarea style="width:100%; height:400px;" name="dbo" id="dbo"><?PHP echo $out;?></textarea>
 	<?PHP } ?>
+	
+	<div id="help">
+		<a href='http://code.google.com/p/simple-php-framework/' target="_blank">Help!</a>
+	</div>
 </body>
 </html>

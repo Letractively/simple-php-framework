@@ -40,7 +40,8 @@
 		return (count($ret) > 0) ? $ret : false;
 	}
 
-	// Creates a list of <option>s from the given database table
+	// Creates a list of <option>s from the given database table.
+	// table name, column to use as value, column(s) to use as text, default value to select, extra where clause, order by column name
 	function get_options($table, $val, $text, $default = null, $where = null, $order = null)
 	{
 		global $db;
