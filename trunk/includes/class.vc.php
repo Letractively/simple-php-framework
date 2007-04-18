@@ -112,6 +112,8 @@
 
 		function tableBody()
 		{
+			global $db;
+
 			$this->html .= "<tbody>";
 			
 			// Do the paging...
@@ -127,7 +129,7 @@
 			if(function_exists("vc_sort_{$this->sort}"))
 				$order = " ORDER BY " . call_user_func("vc_sort_{$this->sort}", $this->direction) . " ";
 			elseif($this->sort != "")
-				$order = " ORDER BY {$this->sort} {$this->direction} ";
+				$order = " ORDER BY " . mysql_real_escape_string($this->sort, $db->db) . " "  . mysql_real_escape_string($this->direction, $db->db);
 			else
 				$order = "";
 
