@@ -42,7 +42,7 @@
 		$username = mysql_real_escape_string($_POST['username'], $db);
 		$password = $auth->makePassword($_POST['password']);
 		$password = mysql_real_escape_string($password, $db);
-		$level = mysql_real_escape_string($_POST['level'], $db->db);
+		$level = mysql_real_escape_string($_POST['level'], $db);
 		$result = mysql_query("INSERT INTO users (username, password, level) VALUES ('$username', '$password', '$level')", $db);
 		$msg = (mysql_affected_rows($db) == 1) ? "<p class='alert'>User added!</p>" : "<p class='warn'>User was not added! Does that user already exist?</p>";
 	}
