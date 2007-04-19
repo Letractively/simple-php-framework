@@ -97,10 +97,10 @@
 				if($this->isValid())
 					$result = $this->result;
 				else
-					return false;
+					return array();
 			}
 			else
-				return false;
+				return array();
 
 			$rows = array();
 			mysql_data_seek($result, 0);
