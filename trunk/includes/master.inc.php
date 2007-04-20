@@ -1,10 +1,25 @@
 <?PHP
-	if(preg_match('/\.com|\.net|\.org/', $_SERVER['SERVER_NAME']) === 0)
+	$local_servers = array();
+	$staging_servers = array();
+
+	if(in_array($_SERVER['SERVER_NAME'], $local_servers))
 	{
 		// Testing
 		$dbserver = "localhost";
 		$dbname   = "";
 		$dbuser   = "root";
+		$dbpass   = "";
+		$onError  = "die";
+
+		ini_set('display_errors', "1");
+		ini_set('error_reporting', E_ALL ^ E_NOTICE);
+	}
+	elseif(in_array($_SERVER['SERVER_NAME'], $staging_servers))
+	{
+		// Staging
+		$dbserver = "";
+		$dbname   = "";
+		$dbuser   = "";
 		$dbpass   = "";
 		$onError  = "die";
 
