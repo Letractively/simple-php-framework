@@ -11,12 +11,12 @@ function isIgnorable(el) {
 }
 function nodeBefore(el) {
 	while((el = el.previousSibling))
-		if(!isIgnorable(el)) return sib;
+		if(!isIgnorable(el)) return el;
 	return null;
 }
 function nodeAfter(el) {
 	while((el = el.nextSibling))
-		if(!isIgnorable(el)) return sib;
+		if(!isIgnorable(el)) return el;
 	return null;
 }
 function firstchild(el) {
