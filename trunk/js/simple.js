@@ -35,9 +35,9 @@ function lastChild(el) {
 	}
 	return null;
 }
-function getElementsByClassName(el, class) {
+function getElementsByClassName(el, hooha) {
     a     = [];
-    regex = new RegExp('\\b' + class + '\\b');
+    regex = new RegExp('\\b' + hooha + '\\b');
     els   = el.getElementsByTagName("*");
 	for(el in els)
         if(regex.test(els[el].className))
