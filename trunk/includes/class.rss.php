@@ -12,6 +12,7 @@
 		{
 			$item = new RSSItem();
 			$item->title = $title;
+			$item->link  = $link;
 			$item->setPubDate($create_date); 
 			$item->description = "<![CDATA[ $html ]]>";
 			$feed->addItem($item);
@@ -167,4 +168,3 @@
 			$this->length     = $length;
 		}
 	}
-?>
