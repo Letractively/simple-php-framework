@@ -1,4 +1,13 @@
 <?PHP
+	// Computes the *full* URL of the current page (protocol, server, path, query parameters, etc)
+	function full_url()
+	{
+		$s = empty($_SERVER["HTTPS"]) ? '' : ($_SERVER["HTTPS"] == "on") ? "s" : "";
+		$protocol = substr(strtolower($_SERVER["SERVER_PROTOCOL"]), 0, strpos(strtolower($_SERVER["SERVER_PROTOCOL"]), "/")) . $s;
+		$port = ($_SERVER["SERVER_PORT"] == "80") ? "" : (":".$_SERVER["SERVER_PORT"]);
+		return $protocol . "://" . $_SERVER['SERVER_NAME'] . $port . $_SERVER['REQUEST_URI'];
+	}
+
 	// Returns an array representation of the given calendar month.
 	// The array values are timestamps which allow you to easily format
 	// and manipulate the dates as needed.
@@ -182,7 +191,7 @@
 		if(!file_exists($filename) || !is_readable($filename)) return false;
 		$base = basename($filename);
 		header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
-		header("Content-Disposition: attachment; filename='$base'");
+		header("Content-Disposition: attachment; filename=$base");
 		header("Content-Length: " . filesize($filename));
 		header("Content-Type: $mimetype");
 		readfile($filename);
@@ -373,4 +382,11 @@
 		$last_url = curl_getinfo($ch, CURLINFO_EFFECTIVE_URL);
 		return $html;
 	}
-?>
+
+	function pick()
+	{
+		foreach(func_get_args() as $arg)
+			if(!empty($arg))
+				return $arg;
+		return "";
+	}
