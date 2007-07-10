@@ -24,7 +24,7 @@
 
 			return $this->ok();
 		}
-	
+
 		function checkSession()
 		{
 			if(!empty($_SESSION['auth_username']) && !empty($_SESSION['auth_password']))
@@ -36,7 +36,7 @@
 			if(!empty($_COOKIE['auth_username']) && !empty($_COOKIE['auth_password']))
 				return $this->check($_COOKIE['auth_username'], $_COOKIE['auth_password']);
 		}
-	
+
 		function check($username, $password)
 		{
 			global $db;
@@ -49,8 +49,8 @@
 				$db_password = $row['password'];
 
 				if($this->useMD5 == false)
-					$db_password = md5($db_password . $this->salt);				
-				
+					$db_password = md5($db_password . $this->salt);
+
 				if($db_password == $password)
 				{
 					$this->user_id  = $row['user_id'];
@@ -63,10 +63,10 @@
 						$this->user->id = $this->user_id;
 						$this->user->load($row);
 					}
-					
+
 					return true;
 				}
-			}			
+			}
 		}
 
 		function login($username, $password)
@@ -95,32 +95,32 @@
 				$_SESSION['auth_password'] = $hashed_password;
 				setcookie("auth_username", $username, time()+60*60*24*30, "/", $this->domain);
 				setcookie("auth_password", $hashed_password, time()+60*60*24*30, "/", $this->domain);
-				
+
 				return true;
 			}
-			
+
 			return false;
 		}
-	
+
 		function logout()
 		{
 			$this->user_id = 0;
 			$this->username = "Guest";
-		
+
 			$_SESSION['auth_username'] = "";
 			$_SESSION['auth_password'] = "";
 
 			setcookie("auth_username", "", time() - 3600, "/", $this->domain);
 			setcookie("auth_password", "", time() - 3600, "/", $this->domain);
 		}
-	
+
 		function ok()
 		{
 			return ($this->username !== "Guest");
 		}
 
 		// Helper function that redirects away from "admin only" pages
-		function admin($url = "/")
+		function admin($url = "/login/")
 		{
 			if($this->level != "admin")
 				redirect($url);
@@ -131,4 +131,3 @@
 			return $this->useMD5 ? md5($pw . $this->salt) : $pw;
 		}
 	}
-?>
