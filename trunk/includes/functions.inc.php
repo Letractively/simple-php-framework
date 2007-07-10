@@ -22,19 +22,20 @@
 		$start = $first - (86400 * date("w", $first));
 		$stop = $last + (86400 * (7 - date("w", $first)));
 
-		$month = array();
+		$out = array();
 		while($start < $stop)
 		{
 			$week = array();
+			if($start > $last) break;
 			for($i = 0; $i < 7; $i++)
 			{
 				$week[$i] = $start;
 				$start += 86400;
 			}
-			$month[] = $week;
+			$out[] = $week;
 		}
 
-		return $month;
+		return $out;
 	}
 
 	// Processes mod_rewrite URLs into key => value pairs
@@ -126,6 +127,7 @@
 		$out .= "<option value='am'>am</option>";
 		if($pval == "pm") $out .= "<option value='pm' selected>pm</option>";
 		else $out .= "<option value='pm'>pm</option>";
+		$out .= "</select>";
 		
 		return $out;
 	}
@@ -170,7 +172,7 @@
 	// Fixes MAGIC_QUOTES
 	function fix_slashes($arr = "")
 	{
-		if(empty($arr)) return null;
+		if(is_null($arr) || $arr == "") return null;
 		if(!get_magic_quotes_gpc()) return $arr;
 		return is_array($arr) ? array_map('fix_slashes', $arr) : stripslashes($arr);
 	}
