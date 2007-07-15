@@ -1,0 +1,4 @@
+#labels Featured,Phase-Support,Phase-Implementation
+#PHP4 Compatibility
+
+Previously, the Simple PHP Framework has maintained a few bits of legacy PHP4 code to appease a minority of users who requested PHP4 compatibility. With the [http://www.php.net/index.php#2007-07-13-1 recent announcement] of PHP4's end of life, we've decided to remove all legacy hacks effective immediately.
