@@ -1,62 +1,62 @@
 <?PHP
-	// GD class handles opening images from disk, saving or outputting to
-	// the browser, and resizing them. Can work with jpeg, png, or gif.
-
+	// Simple wrapper class for GD
 	class GD
 	{
-		public $img;
-		public $width;
-		public $height;
-		
+		public $im     = null;
+		public $width  = null;
+		public $height = null;
+		public $type   = null;
+		public $mime   = null;
+
 		function __construct($data = null, $ext = null)
 		{
-			if(is_resource($data))
-				$this->loadResource($data);
-			elseif(file_exists($data))
-				$this->loadFile($data, $ext);
+			if(is_resource($data) && get_resource_type($data) == "gd")
+				return $this->loadResource($data);
+			elseif(file_exists($data) && is_readable($data))
+				return $this->loadFile($data, $ext);
+			else
+				return false;
 		}
-		
-		function loadResource($img)
+
+		function loadResource($im)
 		{	
-			$this->img = $img;
-			$this->width = imagesx($this->img);
-			$this->height = imagesy($this->img);
-		}
-		
-		// You can pass in the extension in case the filename doesn't have one
-		// (as is the case for PHP file uploads)
-		function loadFile($filename, $ext = null)
-		{
-			if(!file_exists($filename) || !is_readable($filename)) return false;
-			
-			if(is_null($ext))
-				$ext = array_pop(explode(".", $filename));
+			if(!is_resource($im) || !get_resource_type($im) == "gd") return false;
 
-			$ext = strtolower($ext);
-
-			if(($ext == "jpg" || $ext == "jpeg") && (imagetypes() & IMG_JPG)) $func = "imagecreatefromjpeg";
-			elseif($ext == "png" && (imagetypes() & IMG_PNG)) $func = "imagecreatefrompng";
-			elseif($ext == "gif" && (imagetypes() & IMG_GIF)) $func = "imagecreatefromgif";
-			else return false;
-			
-			$img = call_user_func($func, $filename);
-			if(!is_resource($img)) return false;
-
-			$this->img = $img;
-			$this->width = imagesx($this->img);
-			$this->height = imagesy($this->img);
+			$this->im     = $im;
+			$this->width  = imagesx($im);
+			$this->height = imagesy($im);
 
 			return true;
+		}
+		
+		function loadFile($filename)
+		{
+			if(!file_exists($filename) || !is_readable($filename)) return false;
+
+			$info = getimagesize($im);
+			$this->type   = image_type_to_extension($info[2], false);
+			$this->mime   = $info['mime'];
+			
+			if($this->type == "jpg" && (imagetypes() & IMG_JPG))
+				$im = imagecreatefromjpeg($filename);
+			elseif($this->type == "png" && (imagetypes() & IMG_PNG))
+				$im = imagecreatefromjpeg($filename);
+			elseif($this->type == "gif" && (imagetypes() & IMG_GIF))
+				$im = imagecreatefromjpeg($filename);
+			else
+				return false;
+
+			return $this->loadResource($im);
 		}
 		
 		function saveAs($filename, $type = "jpg")
 		{
 			if($type == "jpg" && (imagetypes() & IMG_JPG))
-				return imagejpeg($this->img, $filename);
+				return imagejpeg($this->im, $filename);
 			elseif($type == "png" && (imagetypes() & IMG_PNG))
-				return imagepng($this->img, $filename);
+				return imagepng($this->im, $filename);
 			elseif($type == "gif" && (imagetypes() & IMG_GIF))
-				return imagegif($this->img, $filename);
+				return imagegif($this->im, $filename);
 			else
 				return false;
 		}
@@ -68,47 +68,74 @@
 			{
 				header("Content-Type: image/jpeg");
 				imagejpeg($this->img);
+				return true;
 			}
 			elseif($type == "png" && (imagetypes() & IMG_PNG))
 			{
 				header("Content-Type: image/png");
 				imagepng($this->img);
+				return true;
 			}
 			elseif($type == "gif" && (imagetypes() & IMG_GIF))
 			{
 				header("Content-Type: image/gif");
 				imagegif($this->img);
-			}			
+				return true;
+			}
 			else
-				return false;
+				return false;			
 		}
 
-		// Resizes an image and maintains aspect ratio. By default,
-		// it scales to the largest side, but you can ovveride that
-		// by setting $force to "x" or "y".
-		function scale($new_width, $new_height, $force = "")
+		// Resizes an image and maintains aspect ratio.
+		function scale($new_width = null, $new_height = null)
 		{
-			if(($this->width >= $this->height && $force == "") || ($force == "x"))
-				$new_height = $new_width * ($this->height / $this->width);
+			if(!is_null($new_width) && is_null($new_height))
+				$new_height = $new_width * $this->height / $this->width;
+			elseif(is_null($new_width) && !is_null($new_height))
+				$new_width = $this->width / $this->height * $new_height;
+			elseif(!is_null($new_width) && !is_null($new_height))
+			{
+				if($this->width > $this->height)
+					$new_width = $this->width / $this->height * $new_height;
+				else
+					$new_height = $new_width * $this->height / $this->width;
+			}
 			else
-				$new_width = ($this->width / $this->height) * $new_height;
-
+				return false;
+			
 			return $this->resize($new_width, $new_height);
 		}
 		
 		// Resizes an image to an exact size
-		function resize($width, $height)
+		function resize($new_width, $new_height)
 		{
-			if(!is_resource($this->img)) return false;
+			$dest = imagecreatetruecolor($new_width, $new_height);
 
-			$dest = imagecreatetruecolor($width, $height);
-			if(imagecopyresized($dest, $this->img, 0, 0, 0, 0, $width, $height, $this->width, $this->height))
+			// Transparency fix contributed by Google Code user "desfrenes"
+			imagealphablending($dest, false);  
+			imagesavealpha($dest, true);
+
+			if(imagecopyresampled($dest, $this->im, 0, 0, 0, 0, $new_width, $new_height, $this->width, $this->height))
 			{
-				$this->img = $dest;
+				$this->im = $dest;
+				$this->width = imagesx($this->im);
+				$this->height = imagesy($this->img);
 				return true;
 			}
-			else
-				return false;
-		}		
+
+			return false;
+		}
+		
+		function crop($x, $y, $w, $h)
+		{
+			if(imagecopyresampled($dest, $this->im, 0, 0, $x, $y, $w, $h, $w, $h))
+			{
+				$this->im = $dest;
+				$this->width = imagesx($this->im);
+				$this->height = imagesy($this->img);
+				return true;
+			}
+			
+			return false;
+		}
 	}
-?>
