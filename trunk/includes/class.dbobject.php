@@ -59,8 +59,8 @@
 				return false;
 			else
 			{
-				$this->id = $id;
 				$row = mysql_fetch_array($db->result, MYSQL_ASSOC);
+				$this->id = $row[$this->id_name];
 				foreach($row as $key => $val)
 					$this->columns[$key] = $val;
 			}
@@ -137,4 +137,3 @@
 			return $columnVals;
 		}
 	}
-?>

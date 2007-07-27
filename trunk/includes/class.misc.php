@@ -29,4 +29,3 @@
 			unset($this->_data);
 		}
 	}
-?>

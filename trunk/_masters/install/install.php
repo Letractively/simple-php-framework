@@ -1,89 +1,82 @@
 <?PHP
-	require("../../includes/master.inc.php");
+	require "../../includes/master.inc.php";
 
-	// Try to find default values from master.inc.php
-	$master   = file_get_contents("../../includes/master.inc.php");
-	$dbserver = match('@\$dbserver\s*=\s*("|\')(.*?)\1@ms', $master, 2);
-	$dbname   = match('@\$dbname\s*=\s*("|\')(.*?)\1@ms', $master, 2);
-	$dbuser   = match('@\$dbuser\s*=\s*("|\')(.*?)\1@ms', $master, 2);
-	$salt     = match('@\$auth_salt\s*=\s*("|\')(.*?)\1@ms', $master, 2);
+	$server     = isset($_POST['server']) ? $_POST['server'] : "";
+	$dbname     = isset($_POST['dbname']) ? $_POST['dbname'] : "";
+	$dbusername = isset($_POST['dbusername']) ? $_POST['dbusername'] : "";
+	$dbpassword = isset($_POST['dbpassword']) ? $_POST['dbpassword'] : "";
+	$tables     = "";
+	$msg        = "";
 
-	if(!isset($_POST['server']) && !empty($dbserver)) $_POST['server'] = $dbserver;
-	if(!isset($_POST['dbname']) && !empty($dbname)) $_POST['dbname'] = $dbname;
-	if(!isset($_POST['dbusername']) && !empty($dbuser)) $_POST['dbusername'] = $dbuser;
-	if(!isset($_POST['salt']) && !empty($salt)) $_POST['salt'] = $salt;
-
-	if(!isset($_POST['server'])) $_POST['server'] = "localhost";
-	if(!isset($_POST['dbusername'])) $_POST['dbusername'] = "root";
-
-	if(isset($_POST['btnTables']))
-	{
-		$db = mysql_connect($_POST['server'], $_POST['dbusername'], $_POST['dbpassword']) or die(mysql_error());
-		mysql_select_db($_POST['dbname'], $db) or die(mysql_error());
-		$sql = file_get_contents("mysql.sql");
-		mysql_query($sql, $db) or die(mysql_error());
-		echo "<p class='alert'>Tables installed!</p>";
-	}
-
-	if(isset($_POST['btnGetTables']))
-	{
-		$db = mysql_connect($_POST['server'], $_POST['dbusername'], $_POST['dbpassword']) or die(mysql_error());
-		mysql_select_db($_POST['dbname'], $db) or die(mysql_error());
-		$arrTables = array();
-		$result = mysql_query("SHOW TABLES") or die(mysql_error());
-		while($row = mysql_fetch_array($result)) $arrTables[] = $row[0];
-		$tables = implode(", ", $arrTables);
-	}
-	
-	if(isset($_POST['btnAddUser']))
-	{
-		$db = mysql_connect($_POST['server'], $_POST['dbusername'], $_POST['dbpassword']) or die(mysql_error());
-		mysql_select_db($_POST['dbname'], $db) or die(mysql_error());
-		$username = mysql_real_escape_string($_POST['username'], $db);
-		$password = $auth->makePassword($_POST['password']);
-		$password = mysql_real_escape_string($password, $db);
-		$level = mysql_real_escape_string($_POST['level'], $db);
-		$result = mysql_query("INSERT INTO users (username, password, level) VALUES ('$username', '$password', '$level')", $db);
-		$msg = (mysql_affected_rows($db) == 1) ? "<p class='alert'>User added!</p>" : "<p class='warn'>User was not added! Does that user already exist?</p>";
-	}
-
-	if(isset($_POST['btnDBO']))
+	if($_SERVER['REQUEST_METHOD'] == "POST")
 	{
 		$db = mysql_connect($_POST['server'], $_POST['dbusername'], $_POST['dbpassword']) or die(mysql_error());
 		mysql_select_db($_POST['dbname'], $db) or die(mysql_error());
 
-		$tables = $_POST['tables'];
-		$arrTables = explode(",", $tables);
-		foreach($arrTables as $table)
+		// Install SQL template
+		if(isset($_POST['btnTables']))
 		{
-			$table = trim($table);
-			$uctable = ucfirst($table);
+			$sql = file_get_contents("mysql.sql");
+			mysql_query($sql, $db) or die(mysql_error());
+			echo "<p class='alert'>Tables installed!</p>";
+		}
 
-			$arrFields = array();
-			$result = mysql_query("SHOW FIELDS FROM $table", $db);
-			while($row = mysql_fetch_array($result, MYSQL_ASSOC))
+		// Add new user
+		if(isset($_POST['btnAddUser']))
+		{
+			$username = mysql_real_escape_string($_POST['username'], $db);
+			$password = $auth->makePassword($_POST['password']);
+			$password = mysql_real_escape_string($password, $db);
+			$level = mysql_real_escape_string($_POST['level'], $db);
+			$result = mysql_query("INSERT INTO users (username, password, level) VALUES ('$username', '$password', '$level')", $db);
+			$msg = (mysql_affected_rows($db) == 1) ? "<p class='alert'>User added!</p>" : "<p class='warn'>User was not added! Does that user already exist?</p>";
+		}
+
+		// Get list of tables
+		if(isset($_POST['btnGetTables']))
+		{
+			$arrTables = array();
+			$result = mysql_query("SHOW TABLES") or die(mysql_error());
+			while($row = mysql_fetch_array($result)) $arrTables[] = $row[0];
+			$tables = implode(", ", $arrTables);
+		}
+
+		// Create DBObject code from table names
+		if(isset($_POST['btnDBO']))
+		{
+			$out = "";
+			$tables = $_POST['tables'];
+			$arrTables = explode(",", $tables);
+			foreach($arrTables as $table)
 			{
-				if(!isset($id_field))
-					$id_field = current($row);
-				else
-					$arrFields[] = current($row);
-			}
-			$fields = "'" . implode("', '", $arrFields) . "'";
+				$table = trim($table);
+				$uctable = ucfirst($table);
 
-			$out .= "		class $uctable extends DBObject\n";
-			$out .= "		{\n";
-			$out .= "			function __construct(\$id = \"\")\n";
-			$out .= "			{\n";
-			$out .= "				parent::__construct('$table', '$id_field', array($fields), \$id);\n";
-			$out .= "			}\n";
-			$out .= "		}\n";
-			$out .= "\n\n";
+				$arrFields = array();
+				$result = mysql_query("SHOW FIELDS FROM $table", $db);
+				while($row = mysql_fetch_array($result, MYSQL_ASSOC))
+				{
+					if(!isset($id_field))
+						$id_field = current($row);
+					else
+						$arrFields[] = current($row);
+				}
+				$fields = "'" . implode("', '", $arrFields) . "'";
+
+				$out .= "class $uctable extends DBObject\n";
+				$out .= "{\n";
+				$out .= "	function __construct(\$id = \"\")\n";
+				$out .= "	{\n";
+				$out .= "		parent::__construct('$table', '$id_field', array($fields), \$id);\n";
+				$out .= "	}\n";
+				$out .= "}\n";
+				$out .= "\n\n";
 		
-			unset($id_field);
+				unset($id_field);
+			}
 		}
 	}
 ?>
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
 	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 
@@ -111,23 +104,23 @@
 	<?PHP echo $msg;?>
 	<form action="" method="post">
 		<h1>First...</h1>
-		<p>Fill in your database information. (We try to guess these values from your <em>master.inc.php file</em>, but please double-check just to be sure.)</p>
+		<p>Fill in your database information.</p>
 		<table>
 			<tr>
 				<th>Server</th>
-				<td><input type="text" name="server" value="<?PHP echo $_POST['server'];?>" id="server" /></td>
+				<td><input type="text" name="server" value="<?PHP echo $server;?>" id="server" /></td>
 			</tr>
 			<tr>
 				<th>Database</th>
-				<td><input type="text" name="dbname" value="<?PHP echo $_POST['dbname'];?>" id="dbname" /> <em>This database must already exist!</em></td>
+				<td><input type="text" name="dbname" value="<?PHP echo $dbname;?>" id="dbname" /> <em>This database must already exist!</em></td>
 			</tr>
 			<tr>
 				<th>Username</th>
-				<td><input type="text" name="dbusername" value="<?PHP echo $_POST['dbusername'];?>" id="dbusername" /></td>
+				<td><input type="text" name="dbusername" value="<?PHP echo $dbusername;?>" id="dbusername" /></td>
 			</tr>
 			<tr>
 				<th>Password</th>
-				<td><input type="text" name="dbpassword" value="<?PHP echo $_POST['dbpassword'];?>" id="dbpassword" /></td>
+				<td><input type="text" name="dbpassword" value="<?PHP echo $dbpassword;?>" id="dbpassword" /></td>
 			</tr>
 		</table>
 		
@@ -157,7 +150,7 @@
 			<?PHP if($auth->useMD5) : ?>
 			<tr>
 				<th>Auth Salt</th>
-				<td><input type="text" name="salt" value="<?PHP echo $_POST['salt'];?>" id="salt" /> <em>This should be set in master.inc.php</td>
+				<td><input type="text" name="salt" value="<?PHP echo $salt;?>" id="salt" /> <em>This should be set in master.inc.php</td>
 			</tr>
 			<?PHP endif; ?>
 			<tr>
@@ -174,7 +167,7 @@
 		</p>
 			
 		<p>
-			Once the text box has the tables you want, click this button to generate the skeleton code.<br/>
+			Once the text box has the tables you want, click this button to generate the skeleton code which you can place into <em>class.objects.php</em><br/>
 			<input type="submit" name="btnDBO" value="Create DBObject classes from above tables" id="btnDBO" />
 		</p>
 	</form>

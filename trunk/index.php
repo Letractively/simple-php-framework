@@ -1,5 +1,5 @@
 <?PHP
-	require("includes/master.inc.php");
+	require "includes/master.inc.php";
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
 	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -12,6 +12,7 @@
 </head>
 
 <body>
+	<h1>Simple PHP Framework</h1>
 	<p>This is your home page.</p>
 	<p>You are <?PHP echo $auth->ok() ? "logged in as {$auth->username}. <a href='logout/'>Logout</a>." : "not logged in. <a href='login/'>Login</a>."; ?></p>
 	<?PHP if(!$auth->ok()) : ?>

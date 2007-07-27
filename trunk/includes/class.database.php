@@ -1,19 +1,19 @@
 <?PHP
 	class Database
 	{
-		var $onError   = ""; // die, email, or nothing
-		var $errorTo   = "email@domain.com";
-		var $errorFrom = "errors@domain.com";
-		var $errorPage = "database-error.php";
+		public $onError   = ""; // die, email, or nothing
+		public $errorTo   = "email@domain.com";
+		public $errorFrom = "errors@domain.com";
+		public $errorPage = "database-error.php";
 
-		var $db;
-		var $dbname;
-		var $host;
-		var $password;
-		var $queries;
-		var $result;
-		var $user;
-		var $redirect = false;
+		public $db;
+		public $dbname;
+		public $host;
+		public $password;
+		public $queries;
+		public $result;
+		public $user;
+		public $redirect = false;
 
 		function __construct($host, $user, $password, $dbname = null)
 		{
@@ -27,12 +27,26 @@
 		function connect()
 		{
 			$this->db = mysql_connect($this->host, $this->user, $this->password) or $this->notify();
-			if(!empty($this->dbname))
+			if($this->dbname != "")
 				mysql_select_db($this->dbname, $this->db) or $this->notify();
 		}
 
 		function query($sql)
 		{
+			// Optionally allow extra args which are escaped and inserted in place of
+			// their corresponding question mark placeholders.
+			if(func_num_args() > 1)
+			{
+				$args = func_get_args();
+				// Surely there's a faster way than doing it this way, right?
+				for($i = 1; $i < func_num_args(); $i++)
+				{
+					$args[$i] = str_replace("?", "[[qmark]]", $args[$i]);
+					$sql = preg_replace('/\?/', $this->quote($args[$i]), $sql, 1);
+				}
+				$sql = str_replace("[[qmark]]", "?", $sql);
+			}
+
 			$this->queries[] = $sql;
 			$this->result = mysql_query($sql, $this->db) or $this->notify();
 			return $this->result;
@@ -160,11 +174,10 @@
 		function numQueries() { return count($this->queries); }
 		function lastQuery() { return $this->queries[count($this->queries) - 1]; }
 
-		function fix_slashes($arr = "")
+		function fix_slashes($val = "")
 		{
-			if(empty($arr)) return;
-			if(!get_magic_quotes_gpc()) return $arr;
-			return is_array($arr) ? array_map('fix_slashes', $arr) : stripslashes($arr);
+			if(is_null($val) || $val == "") return null;			
+			return get_magic_quotes_gpc() ? stripslashes($val) : $val;
 		}
 
 		function notify()
@@ -203,4 +216,3 @@
 			}			
 		}
 	}
-?>

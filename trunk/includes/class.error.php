@@ -22,7 +22,13 @@
 		
 		function add($id, $msg)
 		{
-			if($id != "") $this->errors[$id] = $msg;
+			if($id != "")
+			{
+				if(!is_array($this->errors[$id]))
+					$this->errors[$id] = array($msg);
+				else
+					$this->errors[$id][] = $msg;
+			}
 		}
 		
 		function delete($Id)
@@ -50,7 +56,12 @@
 		function ul($class = "warn", $echo = true)
 		{
 			if(count($this->errors) == 0) return "";
-			$out = "<ul class='$class'><li>" . implode("</li><li>", $this->errors) . "</li></ul>";
+
+			$out = "<ul class='$class'><li>";
+			foreach($this->errors as $error)
+			 	$out .= implode("</li><li>", $error);
+			$out .= "</li></ul>";
+
 			if($echo)
 				echo $out;
 			else
@@ -133,5 +144,49 @@
 			
 			return true;
 		}
+
+		function phone($val, $id)
+		{
+			$val = preg_replace("/[^0-9]/", "", $val);
+			if(strlen($val) != 7 && strlen($val) != 10)
+			{
+				$this->add($id, "Please enter a valid 7 or 10 digit phone number.");
+				return false;
+			}
+			
+			return true;
+		}
+
+		function upload($val, $id)
+		{
+			if(!is_uploaded_file($val['tmp_name']) && is_readable($val['tmp_name']))
+			{
+				$this->add($id, "Your file was not uploaded successfully. Please try again.");
+				return false;
+			}
+			
+			return true;
+		}
+
+		function zip($val, $id, $name = null)
+		{
+			if(preg_match('/^[0-9]{5}$/', $val) == 0)
+			{
+				if(is_null($name)) $name = ucwords($id);
+				$this->add($id, "Please enter a valid, 5-digit zip code.");
+				return false;
+			}
+			return true;			
+		}
+		
+		function nan($val, $id, $name = null)
+		{
+			if(preg_match('/^-?[0-9]*\.?[0-9]*$/', $val) == 0)
+			{
+				if(is_null($name)) $name = ucwords($id);
+				$this->add($id, "$name must be a number.");
+				return false;
+			}
+			return true;
+		}
 	}
-?>

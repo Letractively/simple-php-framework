@@ -12,12 +12,12 @@
 		public $numPages; // ceil($count / $perPage)
 
 		// Prev/Next HTML when *not* linked
-		public $prevMark = "&#171;";
-		public $nextMark = "&#187;";
+		public $prevMark = "";
+		public $nextMark = "";
 
 		// Prev/Next HTML when linked
-		public $prevMarkLinked = "&#171;";
-		public $nextMarkLinked = "&#187;";
+		public $prevMarkLinked = "&#171; Previous";
+		public $nextMarkLinked = "Next &#187;";
 
 		// Number of pages to show to left and right of current
 		public $radius    = 5; 
@@ -25,16 +25,17 @@
 		// Tag to wrap page numbers with (advanced mode only)
 		// Use a complete tag such as "<span>" not just "span".
 		// This lets you do stuff like "<span class='foo'>"
-		public $wrapTag = "";
+		public $wrapTag = "<span>";
 
 		// HTML between page numbers (advanced mode only)
-		public $seperator = "";
+		public $seperator = " | ";
 
 		// You typically don't need to modify these
 		public $prev;
 		public $cur;
 		public $next;
 		public $count; // Total number of items (not pages!)
+		public $limit; // Limit value you should pass to your SELECT query
 
 		function __construct($cur, $count, $link = null, $per_page = null)
 		{
@@ -50,7 +51,7 @@
 			$this->calculate();
 		}
 
-		// If you set any variables after create the Pager object,
+		// If you set any variables after creating the Pager object,
 		// you can call this function to redo the math.
 		function calculate()
 		{
@@ -59,6 +60,8 @@
 
 			if($this->cur < 1) $this->cur = 1;
 			if($this->cur > $this->numPages) $this->cur = $this->numPages;
+
+			$this->limit = ($this->cur - 1) * $this->perPage;
 
 			if($this->cur == 1)
 			{
@@ -84,18 +87,18 @@
 			elseif($this->cur == 1 && $this->numPages > 1)
 			{
 				$href = $this->makeLink($this->next);
-				return "<span class='pager_prev'>{$this->prevMark}</span> Page 1 of {$this->numPages} <a href='$href' class='pager_next'>{$this->nextMarkLinked}</a>";
+				return "<span id='pager_prev'>{$this->prevMark}</span> Page 1 of {$this->numPages} <a href='$href' id='pager_next'>{$this->nextMarkLinked}</a>";
 			}
 			elseif($this->cur == $this->numPages)
 			{
 				$href = $this->makeLink($this->prev);
-				return "<a href='$href' class='pager_prev'>{$this->prevMarkLinked}</a> Page {$this->cur} of {$this->numPages} <span class='pager_next'>{$this->nextMark}</span>";
+				return "<a href='$href' id='pager_prev'>{$this->prevMarkLinked}</a> Page {$this->cur} of {$this->numPages} <span id='pager_next'>{$this->nextMark}</span>";
 			}
 			else
 			{
 				$href_prev = $this->makeLink($this->prev);
 				$href_next = $this->makeLink($this->next);
-				return "<a href='$href_prev' class='pager_prev'>{$this->prevMarkLinked}</a> Page {$this->cur} of {$this->numPages} <a href='$href_next' class='pager_next'>{$this->nextMarkLinked}</a>";
+				return "<a href='$href_prev' id='pager_prev'>{$this->prevMarkLinked}</a> Page {$this->cur} of {$this->numPages} <a href='$href_next' id='pager_next'>{$this->nextMarkLinked}</a>";
 			}
 		}
 	
@@ -136,18 +139,18 @@
 			elseif($this->cur == 1 && $this->numPages > 1)
 			{
 				$href = $this->makeLink($this->next);
-				return "<span class='pager_prev'>{$this->prevMark}</span> $numbers <a href='$href' class='pager_next'>{$this->nextMarkLinked}</a>";
+				return "<span class='pager_prev'>{$this->prevMark}</span> $numbers &#8212; <a href='$href' class='pager_next'>{$this->nextMarkLinked}</a>";
 			}
 			elseif($this->cur == $this->numPages)
 			{
 				$href = $this->makeLink($this->prev);
-				return "<a href='$href' class='pager_prev'>{$this->prevMarkLinked}</a> $numbers <span class='pager_next'>{$this->nextMark}</span>";
+				return "<a href='$href' class='pager_prev'>{$this->prevMarkLinked}</a> &#8212; $numbers <span class='pager_next'>{$this->nextMark}</span>";
 			}
 			else
 			{
 				$href_prev = $this->makeLink($this->prev);
 				$href_next = $this->makeLink($this->next);
-				return "<a href='$href_prev' class='pager_prev'>{$this->prevMarkLinked}</a> $numbers <a href='$href_next' class='pager_next'>{$this->nextMarkLinked}</a>";
+				return "<a href='$href_prev' class='pager_prev'>{$this->prevMarkLinked}</a> &#8212; $numbers &#8212; <a href='$href_next' class='pager_next'>{$this->nextMarkLinked}</a>";
 			}
 		}
 
@@ -156,4 +159,3 @@
 			return str_replace("[#]", $page_num, $this->link);
 		}
 	}
-?>

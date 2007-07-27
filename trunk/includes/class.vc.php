@@ -217,4 +217,3 @@
 			return $db->result;
 		}
 	}
-?>
