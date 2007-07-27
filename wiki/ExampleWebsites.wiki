@@ -3,9 +3,12 @@
 
 = Example Websites =
 
-The following websites were built with Simple PHP Framework.
+The following websites are known to be using the Simple PHP Framework.
 
   * [http://snipplr.com Snipplr.com] - Share code snippets among designers and developers.
   * [http://easyschmooze.com Easyschmooze.com] - Easynews Usenet RSS Feeds.
   * [http://basejumpr.com Basejumpr.com] - activeCollab project hosting and Basecamp exporter.
-  * [http://pdnh.polaris-digital.com/ PDnH Server] - an open source content management framework designed to be completely extensible and customisable.
+  * [http://pdnh.polaris-digital.com/ PDnH Server] - Open source content management framework designed to be completely extensible and customizable.
+* [http://www.dippindots.com DippinDots.com] - Dippin' Dots Ice Cream corporate website
+* [http://iphonehaiku.com/ iPhoneHaiku.com] - iPhone Haikus
+* [http://www.styleinternet.com/ StyleInternet.com] - Style Net salon website hosting
