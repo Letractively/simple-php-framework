@@ -67,19 +67,19 @@
 			if($type == "jpg" && (imagetypes() & IMG_JPG))
 			{
 				header("Content-Type: image/jpeg");
-				imagejpeg($this->img);
+				imagejpeg($this->im);
 				return true;
 			}
 			elseif($type == "png" && (imagetypes() & IMG_PNG))
 			{
 				header("Content-Type: image/png");
-				imagepng($this->img);
+				imagepng($this->im);
 				return true;
 			}
 			elseif($type == "gif" && (imagetypes() & IMG_GIF))
 			{
 				header("Content-Type: image/gif");
-				imagegif($this->img);
+				imagegif($this->im);
 				return true;
 			}
 			else
@@ -119,7 +119,7 @@
 			{
 				$this->im = $dest;
 				$this->width = imagesx($this->im);
-				$this->height = imagesy($this->img);
+				$this->height = imagesy($this->im);
 				return true;
 			}
 
@@ -132,7 +132,7 @@
 			{
 				$this->im = $dest;
 				$this->width = imagesx($this->im);
-				$this->height = imagesy($this->img);
+				$this->height = imagesy($this->im);
 				return true;
 			}
 			
@@ -141,3 +141,5 @@
 	}
 	
 	$gd = new GD("google.gif");
+	$gd->scale(50);
+	$gd->saveAs("google2.jpg");
