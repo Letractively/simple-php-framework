@@ -139,7 +139,3 @@
 			return false;
 		}
 	}
-	
-	$gd = new GD("google.gif");
-	$gd->resize(50, 100);
-	$gd->saveAs("google2.jpg");
