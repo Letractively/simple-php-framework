@@ -13,7 +13,7 @@
 			if(is_resource($data) && get_resource_type($data) == "gd")
 				return $this->loadResource($data);
 			elseif(file_exists($data) && is_readable($data))
-				return $this->loadFile($data, $ext);
+				return $this->loadFile($data);
 			else
 				return false;
 		}
@@ -33,16 +33,16 @@
 		{
 			if(!file_exists($filename) || !is_readable($filename)) return false;
 
-			$info = getimagesize($im);
+			$info = getimagesize($filename);
 			$this->type   = image_type_to_extension($info[2], false);
 			$this->mime   = $info['mime'];
 			
 			if($this->type == "jpg" && (imagetypes() & IMG_JPG))
 				$im = imagecreatefromjpeg($filename);
 			elseif($this->type == "png" && (imagetypes() & IMG_PNG))
-				$im = imagecreatefromjpeg($filename);
+				$im = imagecreatefrompng($filename);
 			elseif($this->type == "gif" && (imagetypes() & IMG_GIF))
-				$im = imagecreatefromjpeg($filename);
+				$im = imagecreatefromgif($filename);
 			else
 				return false;
 
@@ -139,3 +139,5 @@
 			return false;
 		}
 	}
+	
+	$gd = new GD("google.gif");
