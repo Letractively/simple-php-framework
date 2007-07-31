@@ -99,6 +99,7 @@
 			return false;
 		}
 
+		// You can pass in nothing, a string, or a db result
 		function getRows($arg = null)
 		{
 			if(is_null($arg) && $this->isValid())
@@ -170,15 +171,9 @@
 		}
 
 		function quote($var) { return "'" . mysql_real_escape_string($var, $this->db) . "'"; }
-		function quoteParam($var) { return $this->quote($this->fix_slashes($_REQUEST[$var])); }
+		function quoteParam($var) { return $this->quote($_REQUEST[$var]); }
 		function numQueries() { return count($this->queries); }
 		function lastQuery() { return $this->queries[count($this->queries) - 1]; }
-
-		function fix_slashes($val = "")
-		{
-			if(is_null($val) || $val == "") return null;			
-			return get_magic_quotes_gpc() ? stripslashes($val) : $val;
-		}
 
 		function notify()
 		{

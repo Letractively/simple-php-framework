@@ -18,6 +18,11 @@
 			$feed->addItem($item);
 		}
 		echo $feed->serve();
+		
+		Or, you can eliminate the while loop above by using the
+		built-in loadRecordset() method. It takes a MySQL result
+		and the column names you want to use for the title, link,
+		description, and pub-date.
 	---------------------------------------------------------------- */
 
 	class RSS
@@ -60,6 +65,19 @@
 		function addTag($tag, $value)
 		{
 			$this->tags[$tag] = $value;
+		}
+		
+		function loadRecordset($result, $title, $link, $description, $pub_date)
+		{
+			while($row = mysql_fetch_array($result, MYSQL_ASSOC))
+			{
+				$item = new RSSItem();
+				$item->title       = $row[$title];
+				$item->link        = $row[$link];
+				$item->description = "<![CDATA[ " . $row[$description] . "]]>";
+				$item->setPubDate($row[$pub_date]);
+				$this->addItem($item);
+			}
 		}
 
 		function out()

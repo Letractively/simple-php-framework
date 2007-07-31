@@ -121,7 +121,7 @@
 			{
 				foreach($arr as $key => $val)
 					if(array_key_exists($key, $this->columns) && $key != $this->id_name)
-						$this->columns[$key] = fix_slashes($val);
+						$this->columns[$key] = $val;
 				return true;
 			}
 			else

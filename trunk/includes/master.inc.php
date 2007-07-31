@@ -1,5 +1,5 @@
 <?PHP
-	$local_servers = array("local.server.site", "another.server.site", "framework.site");
+	$local_servers = array("local.server.site", "another.server.site");
 	$staging_servers = array("staging.server.site");
 	$production_servers = array("production.server.site");
 

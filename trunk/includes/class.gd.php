@@ -45,7 +45,6 @@
 				$im = imagecreatefromgif($filename);
 			else
 				return false;
-
 			return $this->loadResource($im);
 		}
 		

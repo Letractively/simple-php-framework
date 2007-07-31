@@ -178,7 +178,7 @@
 			}
 			return true;			
 		}
-		
+
 		function nan($val, $id, $name = null)
 		{
 			if(preg_match('/^-?[0-9]*\.?[0-9]*$/', $val) == 0)
