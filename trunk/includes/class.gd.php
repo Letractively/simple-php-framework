@@ -34,10 +34,12 @@
 			if(!file_exists($filename) || !is_readable($filename)) return false;
 
 			$info = getimagesize($filename);
+			$this->width  = $info[0];
+			$this->height = $info[1];
 			$this->type   = image_type_to_extension($info[2], false);
 			$this->mime   = $info['mime'];
 			
-			if($this->type == "jpg" && (imagetypes() & IMG_JPG))
+			if($this->type == "jpeg" && (imagetypes() & IMG_JPG))
 				$im = imagecreatefromjpeg($filename);
 			elseif($this->type == "png" && (imagetypes() & IMG_PNG))
 				$im = imagecreatefrompng($filename);
