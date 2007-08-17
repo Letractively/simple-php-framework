@@ -16,23 +16,23 @@
 	// traditional MVC "V" or "C" meaning.
 	class ViewController
 	{
-		var $bodySQL;   // Override the default SELECT query
-		var $caption;   // Table caption
-		var $columns;   // Array of column names and labels
-		var $countSQL;  // Overrride the default COUNT(*) query
-		var $direction;
-		var $dontSort;  // Array of column names to not sort on
-		var $html;      // Final output
-		var $numPages;
-		var $page;
-		var $perPage;
-		var $searchCols; // Array of columns to search on. Defaults to $columns
-		var $sort;       // "column_name,desc"
-		var $table;
-		var $tableAttr;  // Inserted into <table> tag. Let's you set ID and class
-		var $tfoot;      // HTML to insert into <tfoot></tfoot>
-		var $url;
-		var $where;      // Custom WHERE clause appended to default SELECT and COUNT(*) queries
+		public $bodySQL;   // Override the default SELECT query
+		public $caption;   // Table caption
+		public $columns;   // Array of column names and labels
+		public $countSQL;  // Overrride the default COUNT(*) query
+		public $direction;
+		public $dontSort;  // Array of column names to not sort on
+		public $html;      // Final output
+		public $numPages;
+		public $page;
+		public $perPage;
+		public $searchCols; // Array of columns to search on. Defaults to $columns
+		public $sort;       // "column_name,desc"
+		public $table;
+		public $tableAttr;  // Inserted into <table> tag. Let's you set ID and class
+		public $tfoot;      // HTML to insert into <tfoot></tfoot>
+		public $url;
+		public $where;      // Custom WHERE clause appended to default SELECT and COUNT(*) queries
 
 		function __construct($table = "", $columns = "")
 		{

@@ -1,14 +1,14 @@
 <?PHP
 	class Auth
 	{
-		var $user_id;
-		var $username;
-		var $password;
-		var $level;          // Admin, User, etc.
-		var $salt;           // Used to compute password hash
-		var $domain = "";    // Domain to set in cookie
-		var $user;           // DBObject User class if available
-		var $useMD5 = false; // Are passwords hashed in the database?
+		public $user_id;
+		public $username;
+		public $password;
+		public $level;          // Admin, User, etc.
+		public $salt;           // Used to compute password hash
+		public $domain = "";    // Domain to set in cookie
+		public $user;           // DBObject User class if available
+		public $useMD5 = false; // Are passwords hashed in the database?
 
 		function __construct()
 		{

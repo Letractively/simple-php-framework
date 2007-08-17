@@ -14,6 +14,8 @@
 	class DBObject
 	{
 		public $id;
+		public $searchCols;
+		
 		private $id_name;
 		private $table_name;
 		private $columns = array();
@@ -28,6 +30,56 @@
 				
 			if($id != "")
 				$this->select($id);
+		}
+
+		function search($q, $order_by = "")
+		{
+			global $db;
+			$objs = array();
+
+			if(!is_array($q)) // Lazy anything-goes search
+			{
+				$q = mysql_real_escape_string($q, $db->db);
+				
+				if(is_array($this->searchCols) && count($this->searchCols) > 0)
+					$where = implode(" LIKE '%$q%' OR ", $this->searchCols) . " LIKE '%$q%' ";
+				else
+					$where = implode(" LIKE '%$q%' OR ", $this->columns) . " LIKE '%$q%' ";
+			}
+			else // Search by specific columns
+			{
+				$where = "";
+				foreach($q as $col => $val)
+				{
+					$col = mysql_real_escape_string($col, $db->db);
+					if(!is_array($val))
+					{
+						$val = mysql_real_escape_string($val, $db->db);
+						$where .= " $col = '$val' OR ";
+					}
+					else
+					{
+						list($lower, $upper) = $val;
+						$lower = mysql_real_escape_string($lower, $db->db);
+						$upper = mysql_real_escape_string($upper, $db->db);
+						$where = " ($col >= '$lower' AND $col <= '$upper') OR ";
+					}
+				}
+				$where .= " 1 = 2 ";
+			}
+			
+			$rows = $db->getRows("SELECT * FROM {$this->table_name} WHERE $where $order_by");
+
+			$class = get_class($this);
+			foreach($rows as $row)
+			{
+				$o = new $class;
+				$o->load($row);
+				$o->id = $row[$this->id_name];
+				$objs[] = $o;
+			}
+			
+			return $objs;
 		}
 
 		function __get($key)

@@ -2,8 +2,8 @@
 	// Stores session variables unique to a given URL
 	class PagePref
 	{
-		var $_id;
-		var $_data;
+		public $_id;
+		public $_data;
 
 		function __construct()
 		{

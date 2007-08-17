@@ -27,13 +27,13 @@
 
 	class RSS
 	{
-		var $title;
-		var $link;
-		var $description;
-		var $language = "en-us";
-		var $pubDate;
-		var $items;
-		var $tags;
+		public $title;
+		public $link;
+		public $description;
+		public $language = "en-us";
+		public $pubDate;
+		public $items;
+		public $tags;
 
 		function __construct()
 		{
