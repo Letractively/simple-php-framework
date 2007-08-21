@@ -57,10 +57,10 @@
 		{
 			if(count($this->errors) == 0) return "";
 
-			$out = "<ul class='$class'><li>";
+			$out = "<ul class='$class'>";
 			foreach($this->errors as $error)
-			 	$out .= implode("</li><li>", $error);
-			$out .= "</li></ul>";
+			 	$out .= "<li>" . implode("</li><li>", $error) . "</li>";
+			$out .= "</ul>";
 
 			if($echo)
 				echo $out;
