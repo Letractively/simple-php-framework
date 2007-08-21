@@ -159,7 +159,7 @@
 
 		function upload($val, $id)
 		{
-			if(!is_uploaded_file($val['tmp_name']) && is_readable($val['tmp_name']))
+			if(!is_uploaded_file($val['tmp_name']) || !is_readable($val['tmp_name']))
 			{
 				$this->add($id, "Your file was not uploaded successfully. Please try again.");
 				return false;
