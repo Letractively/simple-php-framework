@@ -47,14 +47,14 @@
 
 			if(!is_null($link)) $this->link        = $link;
 			if(!is_null($per_page)) $this->perPage = $per_page;
-
-			$this->calculate();
 		}
 
 		// If you set any variables after creating the Pager object,
 		// you can call this function to redo the math.
 		function calculate()
 		{
+			$this->calculate();
+
 			$this->numPages = ceil($this->count / $this->perPage);
 			if($this->numPages < 1) $this->numPages = 1;
 
@@ -82,6 +82,8 @@
 
 		function simple()
 		{
+			$this->calculate();
+
 			if($this->cur == 1 && $this->numPages == 1)
 				return "{$this->prevMark} Page 1 of 1 {$this->nextMark}";
 			elseif($this->cur == 1 && $this->numPages > 1)
@@ -104,6 +106,8 @@
 	
 		function advanced()
 		{
+			$this->calculate();
+
 			$start = $this->cur - $this->radius;
 			if($start < 1) $start = 1;
 
