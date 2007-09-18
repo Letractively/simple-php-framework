@@ -1,5 +1,4 @@
 <?PHP
-
 	// Example sub class
 	//
 	// class User extends DBObject
@@ -32,6 +31,7 @@
 				$this->select($id);
 		}
 
+		// The search() function is still experimental!
 		function search($q, $order_by = "")
 		{
 			global $db;
