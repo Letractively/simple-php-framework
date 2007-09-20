@@ -14,7 +14,7 @@
 			$item->title = $title;
 			$item->link  = $link;
 			$item->setPubDate($create_date); 
-			$item->description = "<![CDATA[ $html ]]>";
+			$item->description = $html;
 			$feed->addItem($item);
 		}
 		echo $feed->serve();
@@ -165,7 +165,7 @@
 			$out .= "<item>\n";
 			$out .= "<title>" . $this->title . "</title>\n";
 			$out .= "<link>" . $this->link . "</link>\n";
-			$out .= "<description>" . $this->description . "</description>\n";
+			$out .= "<description><![CDATA[ " . $this->description . " ]]></description>\n";
 			$out .= "<pubDate>" . $this->getPubDate() . "</pubDate>\n";
 
 			if(empty($this->guid)) $this->guid = $this->link;
