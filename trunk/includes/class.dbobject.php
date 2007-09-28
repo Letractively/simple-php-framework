@@ -31,57 +31,6 @@
 				$this->select($id);
 		}
 
-		// The search() function is still experimental!
-		function search($q, $order_by = "")
-		{
-			global $db;
-			$objs = array();
-
-			if(!is_array($q)) // Lazy anything-goes search
-			{
-				$q = mysql_real_escape_string($q, $db->db);
-				
-				if(is_array($this->searchCols) && count($this->searchCols) > 0)
-					$where = implode(" LIKE '%$q%' OR ", $this->searchCols) . " LIKE '%$q%' ";
-				else
-					$where = implode(" LIKE '%$q%' OR ", $this->columns) . " LIKE '%$q%' ";
-			}
-			else // Search by specific columns
-			{
-				$where = "";
-				foreach($q as $col => $val)
-				{
-					$col = mysql_real_escape_string($col, $db->db);
-					if(!is_array($val))
-					{
-						$val = mysql_real_escape_string($val, $db->db);
-						$where .= " $col = '$val' OR ";
-					}
-					else
-					{
-						list($lower, $upper) = $val;
-						$lower = mysql_real_escape_string($lower, $db->db);
-						$upper = mysql_real_escape_string($upper, $db->db);
-						$where = " ($col >= '$lower' AND $col <= '$upper') OR ";
-					}
-				}
-				$where .= " 1 = 2 ";
-			}
-			
-			$rows = $db->getRows("SELECT * FROM {$this->table_name} WHERE $where $order_by");
-
-			$class = get_class($this);
-			foreach($rows as $row)
-			{
-				$o = new $class;
-				$o->load($row);
-				$o->id = $row[$this->id_name];
-				$objs[] = $o;
-			}
-			
-			return $objs;
-		}
-
 		function __get($key)
 		{
 			return $this->columns[$key];
@@ -164,7 +113,37 @@
 			$db->query("DELETE FROM " . $this->table_name . " WHERE `" . $this->id_name . "` = '" . $id . "'");
 			return mysql_affected_rows($db->db);
 		}
-		
+
+		// Glob is still being *tested*. Returns an array of pre-initialized objects.
+		// Basically, lets you grab a large block of instantiated objects from the database using
+		// only one query.
+		function glob($str_args = "")
+		{
+			global $db;
+
+			parse_url($str_args, $args);
+			$order = isset($args['order']) ? "ORDER BY {$args['order']}" : "";			
+
+			$where = "";
+			if(in_array($this->table_name, $this->city_tables))
+				$where .= " city_id = " . THE_CITY . " AND ";
+
+			if($this->id != "")
+				$where .= " {$this->id_name} <> '{$this->id}' AND ";
+			
+			$objs = array();
+			$rows = $db->getRows("SELECT * FROM {$this->table_name} WHERE $where 1 $order");
+			$class = get_class($this);
+			foreach($rows as $row)
+			{
+				$o = new $class;
+				$o->load($row);
+				$o->id = $row[$this->id_name];
+				$objs[] = $o;
+			}
+			return $objs;
+		}
+
 		function postload() { $this->load($_POST); }
 		function getload()  { $this->load($_GET); }
 		function load($arr)
