@@ -1,7 +1,8 @@
 <?PHP
-	$local_servers = array("local.server.site", "another.server.site");
-	$staging_servers = array("staging.server.site");
-	$production_servers = array("production.server.site");
+	// Add your server names to the appropriate arrays.
+	$local_servers      = array("local.server.site");
+	$staging_servers    = array("staging.server.com");
+	$production_servers = array("production.server.com");
 
 	if(in_array($_SERVER['SERVER_NAME'], $production_servers))
 	{
@@ -28,9 +29,9 @@
 	}
 	elseif(in_array($_SERVER['SERVER_NAME'], $local_servers))
 	{
-		// Testing
+		// Local (testing)
 		$dbserver = "localhost";
-		$dbname   = "framework";
+		$dbname   = "";
 		$dbuser   = "root";
 		$dbpass   = "";
 		$on_error = "die";
@@ -43,33 +44,37 @@
 
 	session_start();
 
+	// Determine our absolute document root
 	$docroot = realpath(dirname(__FILE__) . "/../");
 
-	include $docroot . "/includes/class.dbobject.php";
-	include $docroot . "/includes/class.objects.php";
-	include $docroot . "/includes/class.misc.php";
-	include $docroot . "/includes/class.database.php";
-	include $docroot . "/includes/class.auth.php";
-	include $docroot . "/includes/class.error.php";
-	// include $docroot . "/includes/class.gd.php";
-	// include $docroot . "/includes/class.vc.php";
-	// include $docroot . "/includes/class.pager.php";
-	// include $docroot . "/includes/class.rss.php";
-	include $docroot . "/includes/functions.inc.php";
+	// Global include files
+	require $docroot . '/includes/class.objects.php';
+	require $docroot . '/includes/functions.inc.php';
 
+	// Connect to database
 	$db = new Database($dbserver, $dbuser, $dbpass, $dbname);
 	$db->onError = $on_error;
 	$db->connect();
 	unset($dbserver, $dbname, $dbuser, $dbpass, $on_error);
 
+	// Initialize current user
 	$auth_salt = "nFSD76n9234A34%@9"; // Pick any random string of characters
 	$auth = new Auth();
 
+	// Object for tracking and displaying error messages
 	$Error = new Error();
 
+	// Fix magic quotes
 	if(get_magic_quotes_gpc())
 	{
 		$_POST    = fix_slashes($_POST);
 		$_GET     = fix_slashes($_GET);
 		$_REQUEST = fix_slashes($_REQUEST);
+	}
+
+	// Autloader
+	function __autoload($class_name)
+	{
+		global $docroot;
+		require $docroot . '/includes/class.' . strtolower($class_name) . '.php';
 	}

@@ -1,5 +1,4 @@
 <?PHP
-	require "../includes/master.inc.php";
-	$auth = new Auth();
+	require '../includes/master.inc.php';
 	$auth->logout();
-	redirect("../");
+	redirect("/");

@@ -1,5 +1,5 @@
 <?PHP
-	require "includes/master.inc.php";
+	require 'includes/master.inc.php';
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
 	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -8,7 +8,7 @@
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 	<title>index</title>
-	<link rel="stylesheet" href="styles/screen.css" type="text/css" media="screen" title="Screen" charset="utf-8" />
+	<link rel="stylesheet" href="/styles/screen.css" type="text/css" media="screen" title="Screen" charset="utf-8" />
 </head>
 
 <body>

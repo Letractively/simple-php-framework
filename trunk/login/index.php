@@ -10,7 +10,7 @@
 	{
 		$auth->login($_POST['username'], $_POST['password']);
 		if($auth->ok())
-			redirect("../");
+			redirect("/");
 		else
 			$alert = "<div class='alert'>We're sorry, you have entered an incorrect username and password. Please try again.</div>";
 	}
@@ -23,7 +23,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-	<link rel="stylesheet" href="../styles/screen.css" type="text/css" media="screen" title="Screen" charset="utf-8" />
+	<link rel="stylesheet" href="/styles/screen.css" type="text/css" media="screen" title="Screen" charset="utf-8" />
 	<title>index</title>	
 </head>
 
