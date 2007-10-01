@@ -124,17 +124,17 @@
 
 	class RSSItem
 	{
-		var $title;
-		var $link;
-		var $description;
-		var $pubDate;
-		var $guid;
-		var $tags;
-		var $attachment;
-		var $length;
-		var $type;		
+		public $title;
+		public $link;
+		public $description;
+		public $pubDate;
+		public $guid;
+		public $tags;
+		public $attachment;
+		public $length;
+		public $type;		
 
-		function RSSItem()
+		function __construct()
 		{ 
 			$this->tags = array();
 		}
