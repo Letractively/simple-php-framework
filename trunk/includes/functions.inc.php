@@ -405,3 +405,10 @@
 				return $arg;
 		return "";
 	}
+
+	// Class Autloader
+	function __autoload($class_name)
+	{
+		global $docroot;
+		require $docroot . '/includes/class.' . strtolower($class_name) . '.php';
+	}

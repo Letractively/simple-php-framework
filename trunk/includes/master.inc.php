@@ -48,8 +48,8 @@
 	$docroot = realpath(dirname(__FILE__) . "/../");
 
 	// Global include files
+	require $docroot . '/includes/functions.inc.php'; // __autoload() is contained in this file
 	require $docroot . '/includes/class.objects.php';
-	require $docroot . '/includes/functions.inc.php';
 
 	// Connect to database
 	$db = new Database($dbserver, $dbuser, $dbpass, $dbname);
@@ -70,11 +70,4 @@
 		$_POST    = fix_slashes($_POST);
 		$_GET     = fix_slashes($_GET);
 		$_REQUEST = fix_slashes($_REQUEST);
-	}
-
-	// Autloader
-	function __autoload($class_name)
-	{
-		global $docroot;
-		require $docroot . '/includes/class.' . strtolower($class_name) . '.php';
 	}
