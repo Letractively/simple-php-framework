@@ -69,7 +69,7 @@
 
 		function tableHead()
 		{
-			$this->html .= "<table{$this->tableAttr}>";
+			$this->html .= "<table {$this->tableAttr}>";
 			
 			if($this->caption != "") $this->html .= "<caption>" . $this->caption . "</caption>";
 			$this->html .= "<thead>";
