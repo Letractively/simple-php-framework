@@ -53,8 +53,6 @@
 		// you can call this function to redo the math.
 		function calculate()
 		{
-			$this->calculate();
-
 			$this->numPages = ceil($this->count / $this->perPage);
 			if($this->numPages < 1) $this->numPages = 1;
 
