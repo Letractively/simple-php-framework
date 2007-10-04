@@ -40,7 +40,7 @@
 		ini_set('error_reporting', E_ALL ^ E_NOTICE);
 	}
 	else
-		die("Where am I? (You need to setup your server names in master.inc.php)");
+		die("Where am I? (You need to setup your server names in master.inc.php) You might want to read our <a href='/_masters/overview.html'>quick overview</a> to get started.");
 
 	session_start();
 

@@ -14,9 +14,10 @@
 <body>
 	<h1>Simple PHP Framework</h1>
 	<p>This is your home page.</p>
-	<p>You are <?PHP echo $auth->ok() ? "logged in as {$auth->username}. <a href='logout/'>Logout</a>." : "not logged in. <a href='login/'>Login</a>."; ?></p>
-	<?PHP if(!$auth->ok()) : ?>
-	<p>If you haven't done so already, you may want to install the users table into the database. You can do so <a href='_masters/install/install.php'>here</a>.</p>
+	<?PHP if($auth->ok()) : ?>
+	<p>You are logged in as <?PHP echo $auth->username; ?>. <a href='/logout/'>Logout</a>.</p>
+	<?PHP else : ?>
+	<p>You are not logged in. <a href='/login/'>Login</a>.</p>
 	<?PHP endif; ?>
 </body>
 </html>
