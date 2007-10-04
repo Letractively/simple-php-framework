@@ -9,6 +9,8 @@
 		public $domain = "";    // Domain to set in cookie
 		public $user;           // DBObject User class if available
 		public $useMD5 = false; // Are passwords hashed in the database?
+		
+		private $loggedIn = false;
 
 		function __construct()
 		{
@@ -49,7 +51,7 @@
 				$db_password = $row['password'];
 
 				if($this->useMD5 == false)
-					$db_password = md5($db_password . $this->salt);
+					$db_password = sha1($db_password . $this->salt);
 
 				if($db_password == $password)
 				{
@@ -64,9 +66,13 @@
 						$this->user->load($row);
 					}
 
+					$this->loggedIn = true;
 					return true;
 				}
 			}
+
+			$this->loggedIn = false;
+			return false;
 		}
 
 		function login($username, $password)
@@ -90,15 +96,17 @@
 					$this->user->load($row);
 				}
 
-				$hashed_password = md5($password . $this->salt);
+				$hashed_password = sha1($password . $this->salt);
 				$_SESSION['auth_username'] = $username;
 				$_SESSION['auth_password'] = $hashed_password;
 				setcookie("auth_username", $username, time()+60*60*24*30, "/", $this->domain);
 				setcookie("auth_password", $hashed_password, time()+60*60*24*30, "/", $this->domain);
 
+				$this->loggedIn = true;
 				return true;
 			}
 
+			$this->loggedIn = false;
 			return false;
 		}
 
@@ -112,11 +120,13 @@
 
 			setcookie("auth_username", "", time() - 3600, "/", $this->domain);
 			setcookie("auth_password", "", time() - 3600, "/", $this->domain);
+
+			$this->loggedIn = false;
 		}
 
 		function ok()
 		{
-			return ($this->username !== "Guest");
+			return $this->loggedIn;
 		}
 
 		// Helper function that redirects away from "admin only" pages
@@ -126,8 +136,15 @@
 				redirect($url);
 		}
 
+		// Helper function that redirects away from "member only" pages
+		function user($url = "/login/")
+		{
+			if($this->ok() === false)
+				redirect($url);
+		}
+
 		function makePassword($pw)
 		{
-			return $this->useMD5 ? md5($pw . $this->salt) : $pw;
+			return $this->useMD5 ? sha1($pw . $this->salt) : $pw;
 		}
 	}

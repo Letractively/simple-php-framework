@@ -33,7 +33,10 @@
 
 		function __get($key)
 		{
-			return $this->columns[$key];
+			if(substr($key, 0, 2) == "__")
+				return htmlspecialchars($this->columns[substr($key, 2)]);
+			else
+				return $this->columns[$key];
 		}
 
 		function __set($key, $value)

@@ -31,7 +31,7 @@
 			}
 		}
 		
-		function delete($Id)
+		function delete($id)
 		{
 			unset($this->errors[$id]);
 		}
