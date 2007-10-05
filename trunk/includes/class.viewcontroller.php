@@ -149,10 +149,12 @@
 						$extra = function_exists("vc_extra") ? call_user_func("vc_extra", $this->table, $col, $row) : "&nbsp;";
 						$this->html .= "<td>$extra</td>";
 					}
+					elseif(function_exists("vc_format_$col"))
+					{
+						$this->html .= "<td>" . call_user_func("vc_format_$col", $this->table, $row[$col], $row) . "</td>";
+					}
 					else
 					{
-						if(function_exists("vc_format_$col"))
-							$row[$col] = call_user_func("vc_format_$col", $this->table, $row[$col], $row);
 						$this->html .= "<td>" . $row[$col] . "</td>";
 					}
 				}
