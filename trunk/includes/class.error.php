@@ -189,4 +189,16 @@
 			}
 			return true;
 		}
+
+		function url($val, $id, $name = null)
+		{
+			$info = @parse_url($val);
+			if(($info === false) || ($info['scheme'] != "http" && $info['scheme'] != "https") || ($info['host'] == ""))
+			{
+				if(is_null($name)) $name = ucwords($id);
+				$this->add($id, "$name is not a valid URL.");
+				return false;
+			}
+			return true;
+		}
 	}
