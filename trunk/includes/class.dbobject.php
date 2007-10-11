@@ -124,7 +124,7 @@
 		{
 			global $db;
 
-			parse_url($str_args, $args);
+			parse_str($str_args, $args);
 			$order = isset($args['order']) ? "ORDER BY {$args['order']}" : "";			
 
 			$where = "";

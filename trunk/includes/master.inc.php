@@ -25,19 +25,19 @@
 		$on_error = "die";
 
 		ini_set('display_errors', "1");
-		ini_set('error_reporting', E_ALL ^ E_NOTICE);
+		ini_set('error_reporting', E_ALL);
 	}
 	elseif(in_array($_SERVER['SERVER_NAME'], $local_servers))
 	{
 		// Local (testing)
 		$dbserver = "localhost";
-		$dbname   = "";
+		$dbname   = "framework";
 		$dbuser   = "root";
 		$dbpass   = "";
 		$on_error = "die";
 
 		ini_set('display_errors', "1");
-		ini_set('error_reporting', E_ALL ^ E_NOTICE);
+		ini_set('error_reporting', E_ALL);
 	}
 	else
 		die("Where am I? (You need to setup your server names in master.inc.php) You might want to read our <a href='/_masters/overview.html'>quick overview</a> to get started.");
