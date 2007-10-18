@@ -128,9 +128,6 @@
 			$order = isset($args['order']) ? "ORDER BY {$args['order']}" : "";			
 
 			$where = "";
-			if(in_array($this->table_name, $this->city_tables))
-				$where .= " city_id = " . THE_CITY . " AND ";
-
 			if($this->id != "")
 				$where .= " {$this->id_name} <> '{$this->id}' AND ";
 			
