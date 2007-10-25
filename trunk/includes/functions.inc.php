@@ -63,6 +63,8 @@
 	function get_options($table, $val, $text, $default = null, $where = null, $order = null)
 	{
 		global $db;
+		$out = "";
+
 		if(!is_null($where)) $where = "WHERE $where";
 		if(!is_null($order)) $order = "ORDER BY $order";
 		$db->query("SELECT * FROM `$table` $where $order");
@@ -73,7 +75,7 @@
 			foreach($text as $t)
 				$the_text .= $row[$t] . " ";
 			$the_text = htmlspecialchars(trim($the_text));
-			
+
 			if(!is_null($default) && $row[$val] == $default)
 				$out .= '<option value="' . htmlspecialchars($row[$val], ENT_QUOTES) . '" selected="selected">' . $the_text . '</option>';
 			else
