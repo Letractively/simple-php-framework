@@ -3,7 +3,7 @@
 	function slugify($str)
 	{
 		$str = preg_replace("/[^a-zA-Z0-9 ]/", "", $str);
-		$str = strtolower(str_replace(" ", "-", $str));
+		$str = strtolower(str_replace(" ", "-", trim($str)));
 		return $str;
 	}
 
