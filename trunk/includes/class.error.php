@@ -24,7 +24,7 @@
 		{
 			if($id != "")
 			{
-				if(!is_array($this->errors[$id]))
+				if(isset($this->errors[$id]) && !is_array($this->errors[$id]))
 					$this->errors[$id] = array($msg);
 				else
 					$this->errors[$id][] = $msg;
