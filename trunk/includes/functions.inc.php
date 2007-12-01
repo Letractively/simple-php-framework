@@ -59,7 +59,7 @@
 	}
 
 	// Creates a list of <option>s from the given database table.
-	// table name, column to use as value, column(s) to use as text, default value to select, extra where clause, order by column name
+	// table name, column to use as value, column(s) to use as text, default value(s) to select (can accept an array of values), extra where clause, order by column name
 	function get_options($table, $val, $text, $default = null, $where = null, $order = null)
 	{
 		global $db;
@@ -76,7 +76,7 @@
 				$the_text .= $row[$t] . " ";
 			$the_text = htmlspecialchars(trim($the_text));
 
-			if(!is_null($default) && $row[$val] == $default)
+			if(!is_null($default) && $row[$val] == $default || in_array($row[$val],$default))
 				$out .= '<option value="' . htmlspecialchars($row[$val], ENT_QUOTES) . '" selected="selected">' . $the_text . '</option>';
 			else
 				$out .= '<option value="' . htmlspecialchars($row[$val], ENT_QUOTES) . '">' . $the_text . '</option>';
