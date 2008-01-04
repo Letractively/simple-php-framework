@@ -150,7 +150,7 @@
 			<?PHP if($auth->useMD5) : ?>
 			<tr>
 				<th>Auth Salt</th>
-				<td><input type="text" name="salt" value="<?PHP echo $salt;?>" id="salt" /> <em>This should be set in master.inc.php</td>
+				<td><input type="text" name="salt" value="<?PHP echo $auth_salt;?>" id="salt" /> <em>This should be set in master.inc.php</td>
 			</tr>
 			<?PHP endif; ?>
 			<tr>
