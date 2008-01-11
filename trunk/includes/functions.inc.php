@@ -76,7 +76,9 @@
 				$the_text .= $row[$t] . " ";
 			$the_text = htmlspecialchars(trim($the_text));
 
-			if(!is_null($default) && $row[$val] == $default || in_array($row[$val],$default))
+			if(!is_null($default) && $row[$val] == $default)
+				$out .= '<option value="' . htmlspecialchars($row[$val], ENT_QUOTES) . '" selected="selected">' . $the_text . '</option>';
+			elseif(is_array($default) && in_array($row[$val],$default))
 				$out .= '<option value="' . htmlspecialchars($row[$val], ENT_QUOTES) . '" selected="selected">' . $the_text . '</option>';
 			else
 				$out .= '<option value="' . htmlspecialchars($row[$val], ENT_QUOTES) . '">' . $the_text . '</option>';
