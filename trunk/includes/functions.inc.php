@@ -89,13 +89,14 @@
 	// Converts a date/timestamp into the specified format
 	function dater($format = null, $date = null)
 	{
-		if(is_null($format)) // Default to MySQL format if none given
+		if(is_null($format))
 			$format = "Y-m-d H:i:s";
 
 		if(is_null($date))
 			$date = time();
 
-		if(strtotime($date) === false)
+		// if $date contains only numbers, treat it as a timestamp
+		if (ctype_digit($date) === true)
 			return date($format, $date);
 		else
 			return date($format, strtotime($date));
