@@ -45,20 +45,19 @@
 	session_start();
 
 	// Determine our absolute document root
-	$docroot = realpath(dirname(__FILE__) . "/../");
+	define('DOC_ROOT', realpath(dirname(__FILE__) . "/../"));
 
 	// Global include files
-	require $docroot . '/includes/functions.inc.php'; // __autoload() is contained in this file
-	require $docroot . '/includes/class.objects.php';
+	require DOC_ROOT . '/includes/functions.inc.php'; // __autoload() is contained in this file
+	require DOC_ROOT . '/includes/class.objects.php';
 
 	// Connect to database
 	$db = new Database($dbserver, $dbuser, $dbpass, $dbname);
 	$db->onError = $on_error;
 	$db->connect();
-	unset($dbserver, $dbname, $dbuser, $dbpass, $on_error);
 
 	// Initialize current user
-	$auth_salt = "nFSD76n9234A34%@9"; // Pick any random string of characters
+	define('AUTH_SALT', 'nFSD76n9234A34%@9');; // Pick any random string of characters
 	$auth = new Auth();
 
 	// Object for tracking and displaying error messages
@@ -71,3 +70,6 @@
 		$_GET     = fix_slashes($_GET);
 		$_REQUEST = fix_slashes($_REQUEST);
 	}
+	
+	// Clean up the global namespace
+	unset($dbserver, $dbname, $dbuser, $dbpass, $on_error, $local_servers, $staging_servers, $production_servers);

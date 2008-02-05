@@ -37,3 +37,8 @@
 	// echo "<tr color='$color'/>";
 	// echo "<tr color='$color'/>";
 	// echo "<tr color='$color'/>";
+	//
+	// Or
+	//
+	// while($row = mysql_fetch_array($result))
+	// 		echo "<tr color'$color'>the row colors will alternate</tr>";

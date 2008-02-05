@@ -84,7 +84,7 @@
 				unset($this->columns[$this->id_name]);
 
 				$columns = "`" . join("`, `", array_keys($this->columns)) . "`";
-				$values  = "'" . join("', '", $this->quote_column_vals()) . "'";
+				$values  = "'" . join("', '", $this->quoteColumnVals()) . "'";
 
 				$db->query("$cmd " . $this->table_name . " ($columns) VALUES ($values)");
 
@@ -99,7 +99,7 @@
 
 			$arrStuff = array();
 			unset($this->columns[$this->id_name]);
-			foreach($this->quote_column_vals() as $key => $val)
+			foreach($this->quoteColumnVals() as $key => $val)
 				$arrStuff[] = "`$key` = '$val'";
 			$stuff = implode(", ", $arrStuff);
 			
@@ -117,7 +117,7 @@
 			return mysql_affected_rows($db->db);
 		}
 
-		// Glob is still being *tested*. Returns an array of pre-initialized objects.
+		// Glob is still being *tested*. Returns an array of pre-initialized dbobjects.
 		// Basically, lets you grab a large block of instantiated objects from the database using
 		// only one query.
 		function glob($str_args = "")
@@ -144,8 +144,8 @@
 			return $objs;
 		}
 
-		function postload() { $this->load($_POST); }
-		function getload()  { $this->load($_GET); }
+		function postLoad() { $this->load($_POST); }
+		function getLoad()  { $this->load($_GET); }
 		function load($arr)
 		{
 			if(is_array($arr))
@@ -159,7 +159,7 @@
 				return false;
 		}
 		
-		function quote_column_vals()
+		function quoteColumnVals()
 		{
 			global $db;
 			$columnVals = array();

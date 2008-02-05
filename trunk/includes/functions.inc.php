@@ -15,6 +15,36 @@
 		$port = ($_SERVER["SERVER_PORT"] == "80") ? "" : (":".$_SERVER["SERVER_PORT"]);
 		return $protocol . "://" . $_SERVER['SERVER_NAME'] . $port . $_SERVER['REQUEST_URI'];
 	}
+	
+	// Returns an English representation of a past date within the last month
+	// Graciously stolen from http://ejohn.org/files/pretty.js
+	function pretty_date($ts)
+	{
+		if(!ctype_digit($ts))
+			$ts = strtotime($ts);
+
+		$diff = time() - $ts;
+		$day_diff = floor($diff / 86400);
+
+		if($day_diff < 0) return false;
+
+		if($day_diff == 0)
+		{
+			if($diff < 60) return "just now";
+			if($diff < 120) return "1 minute ago";
+			if($diff < 3600) return floor($diff / 60) . " minutes ago";
+			if($diff < 7200) return "1 hour ago";
+			if($diff < 86400) return floor($diff / 3600) . " hours ago";
+		}
+		
+		if($day_diff == 1) return "Yesterday";
+		
+		if($day_diff < 7) return $day_diff . " days ago";
+		
+		if($day_diff < 31) return ceil($day_diff / 7) . " weeks ago";
+
+		return false;
+	}
 
 	// Returns an array representation of the given calendar month.
 	// The array values are timestamps which allow you to easily format
@@ -96,7 +126,7 @@
 			$date = time();
 
 		// if $date contains only numbers, treat it as a timestamp
-		if (ctype_digit($date) === true)
+		if(ctype_digit($date) === true)
 			return date($format, $date);
 		else
 			return date($format, strtotime($date));
@@ -414,6 +444,5 @@
 	// Class Autloader
 	function __autoload($class_name)
 	{
-		global $docroot;
-		require $docroot . '/includes/class.' . strtolower($class_name) . '.php';
+		require DOC_ROOT . '/includes/class.' . strtolower($class_name) . '.php';
 	}
