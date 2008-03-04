@@ -48,9 +48,14 @@
 			$this->load();
 
 			// Then overwrite them with new ones if given...
-			if(isset($_GET['perPage'])) $this->perPage = $_GET['perPage'];
-			if(isset($_GET['page']))    $this->page = $_GET['page'];
-			if(isset($_GET['sort']))    list($this->sort, $this->direction) = explode(",", $_GET['sort']);
+			if(isset($_GET['perPage'])) $this->perPage = intval($_GET['perPage']);
+			if(isset($_GET['page']))    $this->page = intval($_GET['page']);
+			if(isset($_GET['sort']))
+			{
+				list($this->sort, $this->direction) = explode(",", $_GET['sort']);
+				$this->sort = key_exists($this->sort, $this->columns) ? $this->sort : '';
+				$this->direction = (strtolower($this->direction) != "asc") ? 'desc' : 'asc';
+			}
 
 			// Save the settings
 			$this->save();
