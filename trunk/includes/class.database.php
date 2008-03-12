@@ -1,38 +1,42 @@
 <?PHP
 	class Database
 	{
-		public $onError   = ""; // die, email, or nothing
+		public $onError   = "die"; // die, email, or leave blank to simply continue
 		public $errorTo   = "email@domain.com";
 		public $errorFrom = "errors@domain.com";
 		public $errorPage = "database-error.php";
 
-		public $db;
+		public $db = false;
 		public $dbname;
 		public $host;
+		public $user;
 		public $password;
 		public $queries;
 		public $result;
-		public $user;
 		public $redirect = false;
 
-		function __construct($host, $user, $password, $dbname = null)
+		function __construct($host, $user, $password, $dbname = null, $on_error = null)
 		{
 			$this->host     = $host;
 			$this->user     = $user;
 			$this->password = $password;
-			$this->dbname   = $dbname;			
+			if(!is_null($dbname)) $this->dbname = $dbname;
+			if(!is_null($on_error)) $this->onError = $on_error;
 			$this->queries  = array();
 		}
 		
 		function connect()
 		{
 			$this->db = mysql_connect($this->host, $this->user, $this->password) or $this->notify();
-			if($this->dbname != "")
-				mysql_select_db($this->dbname, $this->db) or $this->notify();
+			if($this->db === false) return false;
+			mysql_select_db($this->dbname, $this->db) or $this->notify();
 		}
 
 		function query($sql)
 		{
+			if(!is_resource($this->db))
+				$this->connect();
+
 			// Optionally allow extra args which are escaped and inserted
 			// in place of their corresponding question mark placeholders.
 			// Surely there's a faster way than doing it this way, right?
@@ -170,7 +174,14 @@
 			return is_resource($result) && (mysql_num_rows($result) > 0);
 		}
 
-		function quote($var) { return "'" . mysql_real_escape_string($var, $this->db) . "'"; }
+		function quote($var)
+		{
+			if(!is_resource($this->db))
+				$this->connect();
+
+			return "'" . mysql_real_escape_string($var, $this->db) . "'";
+		}
+
 		function quoteParam($var) { return $this->quote($_REQUEST[$var]); }
 		function numQueries() { return count($this->queries); }
 		function lastQuery() { return $this->queries[count($this->queries) - 1]; }

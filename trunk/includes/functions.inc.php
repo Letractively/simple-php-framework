@@ -2,8 +2,9 @@
 	// Creates a friendly URL slug from a string
 	function slugify($str)
 	{
-		$str = preg_replace("/[^a-zA-Z0-9 ]/", "", $str);
-		$str = strtolower(str_replace(" ", "-", trim($str)));
+		$str = preg_replace('/[^a-zA-Z0-9 -]/', '', $str);
+		$str = strtolower(str_replace(' ', '-', trim($str)));
+		$str = preg_replace('/-+/', '-', $str);
 		return $str;
 	}
 
@@ -18,32 +19,49 @@
 	
 	// Returns an English representation of a past date within the last month
 	// Graciously stolen from http://ejohn.org/files/pretty.js
-	function pretty_date($ts)
+	function time2str($ts)
 	{
 		if(!ctype_digit($ts))
 			$ts = strtotime($ts);
 
 		$diff = time() - $ts;
-		$day_diff = floor($diff / 86400);
-
-		if($day_diff < 0) return false;
-
-		if($day_diff == 0)
+		if($diff == 0)
+			return "now";
+		elseif($diff > 0)
 		{
-			if($diff < 60) return "just now";
-			if($diff < 120) return "1 minute ago";
-			if($diff < 3600) return floor($diff / 60) . " minutes ago";
-			if($diff < 7200) return "1 hour ago";
-			if($diff < 86400) return floor($diff / 3600) . " hours ago";
+			$day_diff = floor($diff / 86400);
+			if($day_diff == 0)
+			{
+				if($diff < 60) return "just now";
+				if($diff < 120) return "1 minute ago";
+				if($diff < 3600) return floor($diff / 60) . " minutes ago";
+				if($diff < 7200) return "1 hour ago";
+				if($diff < 86400) return floor($diff / 3600) . " hours ago";
+			}
+			if($day_diff == 1) return "Yesterday";
+			if($day_diff < 7) return $day_diff . " days ago";
+			if($day_diff < 31) return ceil($day_diff / 7) . " weeks ago";
+			if($day_diff < 60) return "last month";
+			return date("F Y", $ts);
 		}
-		
-		if($day_diff == 1) return "Yesterday";
-		
-		if($day_diff < 7) return $day_diff . " days ago";
-		
-		if($day_diff < 31) return ceil($day_diff / 7) . " weeks ago";
-
-		return false;
+		else
+		{
+			$diff = abs($diff);
+			$day_diff = floor($diff / 86400);
+			if($day_diff == 0)
+			{
+				if($diff < 120) return "in a minute";
+				if($diff < 3600) return "in " . floor($diff / 60) . " minutes";
+				if($diff < 7200) return "in an hour";
+				if($diff < 86400) return "in " . floor($diff / 3600) . " hours";
+			}
+			if($day_diff == 1) return "Tomorrow";
+			if($day_diff < 4) return date("l", $ts);
+			if($day_diff < 7 + (7 - date("w"))) return "next week";
+			if(ceil($day_diff / 7) < 4) return "in " . ceil($day_diff / 7) . " weeks";
+			if(date("n", $ts) == date("n") + 1) return "next month";
+			return date("F Y", $ts);
+		}
 	}
 
 	// Returns an array representation of the given calendar month.
@@ -89,15 +107,13 @@
 	}
 
 	// Creates a list of <option>s from the given database table.
-	// table name, column to use as value, column(s) to use as text, default value(s) to select (can accept an array of values), extra where clause, order by column name
-	function get_options($table, $val, $text, $default = null, $where = null, $order = null)
+	// table name, column to use as value, column(s) to use as text, default value(s) to select (can accept an array of values), extra sql to limit results
+	function get_options($table, $val, $text, $default = null, $sql = "")
 	{
 		global $db;
 		$out = "";
 
-		if(!is_null($where)) $where = "WHERE $where";
-		if(!is_null($order)) $order = "ORDER BY $order";
-		$db->query("SELECT * FROM `$table` $where $order");
+		$db->query("SELECT * FROM `$table` $sql");
 		while($row = mysql_fetch_array($db->result, MYSQL_ASSOC))
 		{
 			$the_text = "";
@@ -178,9 +194,20 @@
 	// Outputs month, day, and year dropdown boxes with default values and custom id/names
 	function mdy($mid = "month", $did = "day", $yid = "year", $mval = null, $dval = null, $yval = null)
 	{
-		if(is_null($mval)) $mval = date("m");
-		if(is_null($dval)) $dval = date("d");
-		if(is_null($yval)) $yval = date("Y");
+		// Dumb hack to let you just pass in a timestamp instead
+		if(func_num_args() == 1)
+		{
+			list($yval, $mval, $dval) = explode(" ", date("Y m d", $mid));
+			$mid = "month";
+			$did = "day";
+			$yid = "year";
+		}
+		else
+		{
+			if(is_null($mval)) $mval = date("m");
+			if(is_null($dval)) $dval = date("d");
+			if(is_null($yval)) $yval = date("Y");
+		}
 		
 		$months = array(1 => "January", 2 => "February", 3 => "March", 4 => "April", 5 => "May", 6 => "June", 7 => "July", 8 => "August", 9 => "September", 10 => "October", 11 => "November", 12 => "December");
 		$out = "<select name='$mid' id='$mid'>";
@@ -269,7 +296,7 @@
 	}	
 
 	// Outputs a filesize in human readable format.
-	function human_readable($val, $round = 0)
+	function bytes2str($val, $round = 0)
 	{
 		$unit = array('','K','M','G','T','P','E','Z','Y');
 		while($val >= 1000)
@@ -439,6 +466,12 @@
 			if(!empty($arg))
 				return $arg;
 		return "";
+	}
+
+	// This is easier than typing "echo WEB_ROOT"
+	function WEBROOT()
+	{
+		echo WEB_ROOT;
 	}
 
 	// Class Autloader

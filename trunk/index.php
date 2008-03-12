@@ -8,16 +8,17 @@
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 	<title>index</title>
-	<link rel="stylesheet" href="/styles/screen.css" type="text/css" media="screen" title="Screen" charset="utf-8" />
+	<!-- <link rel="stylesheet" href="http://yui.yahooapis.com/2.5.0/build/reset-fonts-grids/reset-fonts-grids.css" type="text/css" /> -->
+	<link rel="stylesheet" href="<?PHP WEBROOT();?>styles/screen.css" type="text/css" media="screen" title="Screen" charset="utf-8" />
 </head>
 
 <body>
 	<h1>Simple PHP Framework</h1>
 	<p>This is your home page.</p>
 	<?PHP if($auth->ok()) : ?>
-	<p>You are logged in as <?PHP echo $auth->username; ?>. <a href='/logout/'>Logout</a>.</p>
+	<p>You are logged in as <?PHP echo $auth->username; ?>. <a href='<?PHP WEBROOT();?>logout/'>Logout</a>.</p>
 	<?PHP else : ?>
-	<p>You are not logged in. <a href='/login/'>Login</a>.</p>
+	<p>You are not logged in. <a href='<?PHP WEBROOT();?>login/'>Login</a>.</p>
 	<?PHP endif; ?>
 </body>
 </html>

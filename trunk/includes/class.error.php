@@ -12,7 +12,7 @@
 		
 		function __tostring()
 		{
-			return $this->ul("warn", false);
+			return $this->ul("warn");
 		}
 
 		function ok()
@@ -53,7 +53,7 @@
 			echo $out;
 		}
 
-		function ul($class = "warn", $echo = true)
+		function ul($class = "warn")
 		{
 			if(count($this->errors) == 0) return "";
 
@@ -62,10 +62,7 @@
 			 	$out .= "<li>" . implode("</li><li>", $error) . "</li>";
 			$out .= "</ul>";
 
-			if($echo)
-				echo $out;
-			else
-				return $out;
+			return $out;
 		}
 		
 		// Variable tests
@@ -127,16 +124,16 @@
 		{
 			if(!eregi("^([_a-z0-9+-]+)(\.[_a-z0-9-]+)*@([a-z0-9-]+)(\.[a-z0-9-]+)*(\.[a-z]{2,4})$", $val))
 			{
-				$this->add($id, "Email address is not valid.");
+				$this->add($id, "The email address you entered is not valid.");
 				return false;
 			}
 			
 			return true;
 		}
-		
+
 		function date($val, $id)
 		{
-			if(!strtotime($val))
+			if(strtotime($val) === false)
 			{
 				$this->add($id, "Please enter a valid date");
 				return false;

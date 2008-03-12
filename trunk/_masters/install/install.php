@@ -147,7 +147,7 @@
 					<input type="radio" name="level" value="user" id="level_user"/> <label for="level_user">User</label>
 				</td>
 			</tr>
-			<?PHP if($auth->useMD5) : ?>
+			<?PHP if($auth->useHash) : ?>
 			<tr>
 				<th>Auth Salt</th>
 				<td><input type="text" name="salt" value="<?PHP echo AUTH_SALT;?>" id="salt" /> <em>This should be set in master.inc.php</td>

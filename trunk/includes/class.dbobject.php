@@ -1,34 +1,28 @@
 <?PHP
-	// Example sub class
-	//
-	// class User extends DBObject
-	// {
-	//	function __construct($id = "")
-	// 	{                        table    primary_key      column names                             [load record with this id]
-	// 		parent::__construct('users', 'user_id', array('username', 'password', 'level', 'email'), $id);
-	// 	}
-	// }
-	//
-
 	class DBObject
 	{
 		public $id;
 		public $searchCols;
-		
-		private $id_name;
-		private $table_name;
+
+		protected $taggable = false;
+		protected $tagCol;
+
+		private $idName;
+		private $tableName;
 		private $columns = array();
 
 		function __construct($table_name, $id_name, $columns, $id = "")
 		{
-			$this->table_name = $table_name;
-			$this->id_name = $id_name;
+			$this->tableName = $table_name;
+			$this->idName    = $id_name;
 
 			foreach($columns as $key)
 				$this->columns[$key] = null;
-				
+
 			if($id != "")
 				$this->select($id);
+
+			$this->tagCol = get_class($this) . "_id";
 		}
 
 		function __get($key)
@@ -52,19 +46,18 @@
 		function select($id, $column = "")
 		{
 			global $db;
-			
-			if($column == "") $column = $this->id_name;
+			if($column == "") $column = $this->idName;
 
 			$id = mysql_real_escape_string($id, $db->db);
 			$column = mysql_real_escape_string($column, $db->db);
 
-			$db->query("SELECT * FROM " . $this->table_name . " WHERE `$column` = '$id'");
+			$db->query("SELECT * FROM " . $this->tableName . " WHERE `$column` = '$id'");
 			if(mysql_num_rows($db->result) == 0)
 				return false;
 			else
 			{
 				$row = mysql_fetch_array($db->result, MYSQL_ASSOC);
-				$this->id = $row[$this->id_name];
+				$this->id = $row[$this->idName];
 				foreach($row as $key => $val)
 					$this->columns[$key] = $val;
 			}
@@ -78,15 +71,15 @@
 		function insert($cmd = "INSERT INTO")
 		{
 			global $db;
-			
+
 			if(count($this->columns) > 0)
 			{
-				unset($this->columns[$this->id_name]);
+				unset($this->columns[$this->idName]);
 
 				$columns = "`" . join("`, `", array_keys($this->columns)) . "`";
-				$values  = "'" . join("', '", $this->quoteColumnVals()) . "'";
+				$values  = join(",", $this->quoteColumnVals());
 
-				$db->query("$cmd " . $this->table_name . " ($columns) VALUES ($values)");
+				$db->query("$cmd " . $this->tableName . " ($columns) VALUES ($values)");
 
 				$this->id = mysql_insert_id($db->db);
 				return $this->id;
@@ -98,47 +91,39 @@
 			global $db;
 
 			$arrStuff = array();
-			unset($this->columns[$this->id_name]);
+			unset($this->columns[$this->idName]);
 			foreach($this->quoteColumnVals() as $key => $val)
-				$arrStuff[] = "`$key` = '$val'";
+				$arrStuff[] = "`$key` = $val";
 			$stuff = implode(", ", $arrStuff);
-			
+
 			$id = mysql_real_escape_string($this->id, $db->db);
-		
-			$db->query("UPDATE " . $this->table_name . " SET $stuff WHERE " . $this->id_name . " = '" . $id . "'");
+
+			$db->query("UPDATE " . $this->tableName . " SET $stuff WHERE " . $this->idName . " = '" . $id . "'");
 			return mysql_affected_rows($db->db); // Not always correct due to mysql update bug/feature
 		}
 
 		function delete()
 		{
 			global $db;
+
 			$id = mysql_real_escape_string($this->id, $db->db);
-			$db->query("DELETE FROM " . $this->table_name . " WHERE `" . $this->id_name . "` = '" . $id . "'");
+			$db->query("DELETE FROM " . $this->tableName . " WHERE `" . $this->idName . "` = '" . $id . "'");
 			return mysql_affected_rows($db->db);
 		}
 
-		// Glob is still being *tested*. Returns an array of pre-initialized dbobjects.
-		// Basically, lets you grab a large block of instantiated objects from the database using
-		// only one query.
-		function glob($str_args = "")
+		// Grab a large block of instantiated objects from the database using only one query.
+		function glob($sql = "")
 		{
 			global $db;
 
-			parse_str($str_args, $args);
-			$order = isset($args['order']) ? "ORDER BY {$args['order']}" : "";			
-
-			$where = "";
-			if($this->id != "")
-				$where .= " {$this->id_name} <> '{$this->id}' AND ";
-			
 			$objs = array();
-			$rows = $db->getRows("SELECT * FROM {$this->table_name} WHERE $where 1 $order");
+			$rows = $db->getRows("SELECT * FROM {$this->tableName} $sql");
 			$class = get_class($this);
 			foreach($rows as $row)
 			{
 				$o = new $class;
 				$o->load($row);
-				$o->id = $row[$this->id_name];
+				$o->id = $row[$this->idName];
 				$objs[] = $o;
 			}
 			return $objs;
@@ -151,20 +136,76 @@
 			if(is_array($arr))
 			{
 				foreach($arr as $key => $val)
-					if(array_key_exists($key, $this->columns) && $key != $this->id_name)
+					if(array_key_exists($key, $this->columns) && $key != $this->idName)
 						$this->columns[$key] = $val;
 				return true;
 			}
-			else
-				return false;
-		}
-		
+
+			return false;
+	 	}
+
 		function quoteColumnVals()
 		{
 			global $db;
-			$columnVals = array();
+
+			$vals = array();
 			foreach($this->columns  as $key => $val)
-				$columnVals[$key] = mysql_real_escape_string($val, $db->db);
-			return $columnVals;
+				$vals[$key] = $db->quote($val);
+			return $vals;
+		}
+
+		function addTag($name)
+		{
+			global $db;
+
+			if($this->taggable)
+			{
+				if($this->id == "") return false;
+				$t = new Tag($name);
+				$db->query("INSERT IGNORE {$this->tableName}2tags ({$this->tagCol}, tag_id) VALUES (?, ?)", $this->id, $t->id);
+			}
+		}
+
+		function removeTag($name)
+		{
+			global $db;
+
+			if($this->taggable)
+			{
+				if($this->id == "") return false;
+				$t = new Tag($name);
+				$db->query("DELETE FROM {$this->tableName}2tags WHERE {$this->tagCol} = ? AND tag_id = ?", $this->id, $t->id);
+			}
+		}
+
+		function tags()
+		{
+			global $db;
+
+			if($this->taggable)
+			{
+				if($this->id == "") return false;
+				$rows = $db->getRows("SELECT * FROM {$this->tableName}2tags a LEFT JOIN tags t ON a.tag_id = t.id WHERE a.{$this->tagCol} = '{$this->id}'");
+				return $rows;
+			}
+		}
+
+		// Glob by tag name
+		function tagged($tag_name, $sql = "")
+		{
+			global $db;
+
+			$tag = new Tag($tag_name);
+			$objs = array();
+			$rows = $db->getRows("SELECT b.* FROM {$this->tableName}2tags a LEFT JOIN {$this->tableName} b ON a.{$this->tagCol} = b.{$this->idName} WHERE a.tag_id = {$tag->id} $sql");
+			$class = get_class($this);
+			foreach($rows as $row)
+			{
+				$o = new $class;
+				$o->load($row);
+				$o->id = $row[$this->idName];
+				$objs[] = $o;
+			}
+			return $objs;
 		}
 	}

@@ -4,18 +4,18 @@
 		public $user_id;
 		public $username;
 		public $password;
-		public $level;          // Admin, User, etc.
-		public $salt;           // Used to compute password hash
-		public $domain = "";    // Domain to set in cookie
-		public $user;           // DBObject User class if available
-		public $useMD5 = false; // Are passwords hashed in the database?
+		public $level;           // Admin, User, etc.
+		public $salt;            // Used to compute password hash
+		public $domain = "";     // Domain to set in cookie
+		public $user;            // DBObject User class if available
+		public $useHash = false; // Are passwords hashed in the database?
 		
 		private $loggedIn = false;
 
 		// Call with no arguments to create a guest user (which can then be logged in using $this->login($un, $pw)
 		// Or pass a user_id to simply login that user. The $seriously is just a safeguard to be certain you really do
 		// want to blindly login a user. Set it to true.
-		public function __construct($user_id = null, $seriously = null)
+		public function __construct($user_id = null, $seriously = false)
 		{
 			global $db;
 
@@ -34,6 +34,7 @@
 				{
 					$row = mysql_fetch_array($db->result, MYSQL_ASSOC);
 					$this->doLogin($row);
+					$this->storeSessionData($row['username'], $row['password']);
 				}
 			} // But normally we login via a session or cookie variable
 			elseif($this->checkSession())
@@ -73,7 +74,7 @@
 				$db_password = $row['password'];
 
 				// This looks backwards, but it really is correct!
-				if($this->useMD5 == false)
+				if($this->useHash == false)
 					$db_password = sha1($db_password . $this->salt);
 
 				// If password is ok
@@ -127,6 +128,29 @@
 
 			$this->loggedIn = true;
 		}
+		
+		public function impersonate($user)
+		{
+			global $db;
+
+			if(ctype_digit($user))
+				$result = $db->query("SELECT * FROM users WHERE user_id = " . $db->quote($user));
+			else
+				$result = $db->query("SELECT * FROM users WHERE username = " . $db->quote($user));
+
+			if(mysql_num_rows($result) == 1)
+			{
+				$row = mysql_fetch_array($result, MYSQL_ASSOC);
+				$this->doLogin($row);
+				$this->storeSessionData($row['username'], $row['password']);
+				return true;
+			}
+			else
+			{
+				$this->loggedIn = false;
+				return false;
+			}
+		}
 
 		// Save login in a session and cookie
 		private function storeSessionData($username, $password)
@@ -159,15 +183,17 @@
 		}
 
 		// Helper function that redirects away from "admin only" pages
-		public function admin($url = "/login/")
+		public function admin($url = null)
 		{
+			if(is_null($url)) $url = WEB_ROOT . "login/";
 			if($this->level != "admin")
 				redirect($url);
 		}
 
 		// Helper function that redirects away from "member only" pages
-		public function user($url = "/login/")
+		public function user($url = null)
 		{
+			if(is_null($url)) $url = WEB_ROOT . "login/";
 			if($this->ok() === false)
 				redirect($url);
 		}
@@ -175,6 +201,6 @@
 		// Returns the hashed version of a password if $this->md5 is turned on
 		public function makePassword($pw)
 		{
-			return $this->useMD5 ? sha1($pw . $this->salt) : $pw;
+			return $this->useHash ? sha1($pw . $this->salt) : $pw;
 		}
 	}

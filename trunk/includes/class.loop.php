@@ -1,5 +1,4 @@
 <?PHP
-	// This class is still being tested
 	class Loop
 	{
 		private $index;
@@ -28,6 +27,11 @@
 				$this->index = 0;
 
 			return $val;
+		}
+		
+		function rand()
+		{
+			return $this->elements[array_rand($this->elements)];
 		}
 	}
 

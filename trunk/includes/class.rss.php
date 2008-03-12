@@ -17,7 +17,7 @@
 			$item->description = $html;
 			$feed->addItem($item);
 		}
-		echo $feed->serve();
+		$feed->serve();
 		
 		Or, you can eliminate the while loop above by using the
 		built-in loadRecordset() method. It takes a MySQL result
@@ -162,7 +162,7 @@
 
 		function out()
 		{
-			$out .= "<item>\n";
+			$out  = "<item>\n";
 			$out .= "<title>" . $this->title . "</title>\n";
 			$out .= "<link>" . $this->link . "</link>\n";
 			$out .= "<description><![CDATA[ " . $this->description . " ]]></description>\n";
