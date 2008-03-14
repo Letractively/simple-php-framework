@@ -3,7 +3,7 @@ CREATE TABLE `users` (
   `username` varchar(65) NOT NULL,
   `password` varchar(65) NOT NULL,
   `level` enum('user','admin') NOT NULL,
-  `email` varchar(65) NOT NULL,
+  `email` varchar(65) default NULL,
   PRIMARY KEY  (`user_id`),
   UNIQUE KEY `username` (`username`)
 );
