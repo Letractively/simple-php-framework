@@ -62,9 +62,6 @@
 	// Connect to database (does not actually open the connection until it's needed)
 	$db = new Database($dbserver, $dbuser, $dbpass, $dbname, $on_error);
 	
-	// Initialize our session
-	$Session = new Session();
-
 	// Initialize current user
 	define('AUTH_SALT', '697845hjkSDF9687');; // Pick any random string of characters
 	$auth = new Auth();
