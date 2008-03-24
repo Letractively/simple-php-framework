@@ -156,7 +156,7 @@
 		private function storeSessionData($username, $password)
 		{
 			$_SESSION['auth_username'] = $username;
-			$_SESSION['auth_password'] = sha1($password . $this->salt);
+			$_SESSION['auth_password'] = $this->useHash ? $password : sha1($password . $this->salt);
 			setcookie("auth_username", $_SESSION['auth_username'], time()+60*60*24*30, "/", $this->domain);
 			setcookie("auth_password", $_SESSION['auth_password'], time()+60*60*24*30, "/", $this->domain);
 		}
