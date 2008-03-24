@@ -4,7 +4,6 @@
 		public $id;
 		public $searchCols;
 
-		protected $taggable = false;
 		protected $tagCol;
 
 		private $idName;
@@ -153,41 +152,33 @@
 				$vals[$key] = $db->quote($val);
 			return $vals;
 		}
+	}
 
+	class TaggableDBObject extends DBObject
+	{
 		function addTag($name)
 		{
 			global $db;
 
-			if($this->taggable)
-			{
-				if($this->id == "") return false;
-				$t = new Tag($name);
-				$db->query("INSERT IGNORE {$this->tableName}2tags ({$this->tagCol}, tag_id) VALUES (?, ?)", $this->id, $t->id);
-			}
+			if($this->id == "") return false;
+			$t = new Tag($name);
+			$db->query("INSERT IGNORE {$this->tableName}2tags ({$this->tagCol}, tag_id) VALUES (?, ?)", $this->id, $t->id);
 		}
 
 		function removeTag($name)
 		{
 			global $db;
-
-			if($this->taggable)
-			{
-				if($this->id == "") return false;
-				$t = new Tag($name);
-				$db->query("DELETE FROM {$this->tableName}2tags WHERE {$this->tagCol} = ? AND tag_id = ?", $this->id, $t->id);
-			}
+			if($this->id == "") return false;
+			$t = new Tag($name);
+			$db->query("DELETE FROM {$this->tableName}2tags WHERE {$this->tagCol} = ? AND tag_id = ?", $this->id, $t->id);
 		}
 
 		function tags()
 		{
 			global $db;
-
-			if($this->taggable)
-			{
-				if($this->id == "") return false;
-				$rows = $db->getRows("SELECT * FROM {$this->tableName}2tags a LEFT JOIN tags t ON a.tag_id = t.id WHERE a.{$this->tagCol} = '{$this->id}'");
-				return $rows;
-			}
+			if($this->id == "") return false;
+			$rows = $db->getRows("SELECT * FROM {$this->tableName}2tags a LEFT JOIN tags t ON a.tag_id = t.id WHERE a.{$this->tagCol} = '{$this->id}'");
+			return $rows;
 		}
 
 		// Glob by tag name
