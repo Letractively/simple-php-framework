@@ -49,10 +49,7 @@
 	else
 		die('Where am I? (You need to setup your server names in master.inc.php) You might want to read our <a href="_masters/overview.html">quick overview</a> to get started.');
 
-	session_start();
-
 	// Determine our absolute document root
-	// (You may want to hard code this for production use. It'll save you a system call.)
 	define('DOC_ROOT', realpath(dirname(__FILE__) . '/../'));
 
 	// Global include files
@@ -61,6 +58,11 @@
 
 	// Connect to database (does not actually open the connection until it's needed)
 	$db = new Database($dbserver, $dbuser, $dbpass, $dbname, $on_error);
+	$db->connect();
+
+	// Initialize our session...
+	// DBSession::register(); // Uncomment this line to store sessions in the database
+	session_start();
 	
 	// Initialize current user
 	define('AUTH_SALT', '697845hjkSDF9687');; // Pick any random string of characters

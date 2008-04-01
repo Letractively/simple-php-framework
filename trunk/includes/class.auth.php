@@ -81,6 +81,7 @@
 				if($db_password == $password)
 				{
 					$this->doLogin($row);
+					$this->storeSessionData($row['username'], $row['password']);
 					return true;
 				}
 			}

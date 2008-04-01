@@ -239,6 +239,22 @@
 		exit();
 	}
 
+	// Ensures $str ends with a /
+	function slash($str)
+	{
+		return rtrim($str, '/') . '/';
+	}
+
+	function gimme($arr, $key = null)
+	{
+		$first_key = array_shift(array_keys($arr));
+		if(count($arr) == 0) return array();
+		if(is_null($key)) $key = array_shift(array_keys($arr[$first_key]));
+		if(!isset($arr[$first_key][$key])) return array();
+		foreach($arr as $a) $ret[] = $a[$key];
+		return $ret;
+	}
+
 	// Fixes MAGIC_QUOTES
 	function fix_slashes($arr = "")
 	{

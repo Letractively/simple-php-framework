@@ -120,7 +120,7 @@
 			return true;
 		}
 		
-		function email($val, $id)
+		function email($val, $id = "email")
 		{
 			if(!eregi("^([_a-z0-9+-]+)(\.[_a-z0-9-]+)*@([a-z0-9-]+)(\.[a-z0-9-]+)*(\.[a-z]{2,4})$", $val))
 			{
