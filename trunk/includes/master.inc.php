@@ -13,8 +13,10 @@
 	$db = new Database();
 
 	// Initialize our session...
+	if($Config->useDBSessions === true)
+		DBSession::register();
 	session_start();
-	
+
 	// Initialize current user
 	$auth = new Auth();
 

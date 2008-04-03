@@ -7,21 +7,15 @@
 		private $__localServers      = array('local.server.site');
 
 		// No need to mess with this
-		private $__values = array();
+		private $values = array();
 
 		// Add code to be run on all servers
 		public function everywhere()
 		{
-			// Uncomment to store sessions in the database
-			// DBSession::register();
-
-			// Config variables
-			$arr  = array();
-			$arr['auth_salt']   = '^&ASDF5678dfsaghjdkfghkj~'; // Pick any random string of characters
-			$arr['auth_domain'] = ''; // Domain to set in Auth cookie
-			$arr['auth_hash']   = false; // Stored hashed password in database? (versus plain-text)
-			
-			$this->__values = array_merge($this->__values, $arr);
+			$this->values['useDBSessions'] = false;
+			$this->values['auth_hash']     = false; // Stored hashed password in database? (versus plain-text)
+			$this->values['auth_domain']   = ''; // Domain to set in Auth cookie
+			$this->values['auth_salt']     = '^&ASDF5678dfsaghjdkfghkj~'; // Pick any random string of characters
 		}
 
 		// Add code/variables to be run only on production servers
@@ -30,15 +24,11 @@
 			define('WEB_ROOT', '/');
 			ini_set('display_errors', '0');
 
-			// Config variables
-			$arr  = array();
-			$arr['dbserver'] = '';
-			$arr['dbname']   = '';
-			$arr['dbuser']   = '';
-			$arr['dbpass']   = '';
-			$arr['dberror'] = '';
-			
-			$this->__values = array_merge($this->__values, $arr);
+			$this->values['dbserver'] = '';
+			$this->values['dbname']   = '';
+			$this->values['dbuser']   = '';
+			$this->values['dbpass']   = '';
+			$this->values['dberror']  = '';
 		}
 
 		// Add code/variables to be run only on staging servers
@@ -48,15 +38,11 @@
 			ini_set('display_errors', '1');
 			ini_set('error_reporting', E_ALL);
 
-			// Config variables
-			$arr  = array();
-			$arr['dbserver'] = '';
-			$arr['dbname']   = '';
-			$arr['dbuser']   = '';
-			$arr['dbpass']   = '';
-			$arr['dberror'] = 'die';
-			
-			$this->__values = array_merge($this->__values, $arr);
+			$this->values['dbserver'] = '';
+			$this->values['dbname']   = '';
+			$this->values['dbuser']   = '';
+			$this->values['dbpass']   = '';
+			$this->values['dberror']  = 'die';
 		}
 		
 		// Add code/variables to be run only on local (testing) servers
@@ -66,15 +52,11 @@
 			ini_set('display_errors', '1');
 			ini_set('error_reporting', E_ALL);
 
-			// Config variables
-			$arr  = array();
-			$arr['dbserver'] = 'localhost';
-			$arr['dbname']   = '';
-			$arr['dbuser']   = '';
-			$arr['dbpass']   = '';
-			$arr['dberror'] = 'die';
-			
-			$this->__values = array_merge($this->__values, $arr);
+			$this->values['dbserver'] = 'localhost';
+			$this->values['dbname']   = '';
+			$this->values['dbuser']   = '';
+			$this->values['dbpass']   = '';
+			$this->values['dberror']  = 'die';
 		}
 
 		public function __construct()
@@ -93,22 +75,22 @@
 		
 		public function __get($key)
 		{
-			return isset($this->__values[$key]) ? $this->__values[$key] : null;
+			return isset($this->values[$key]) ? $this->values[$key] : null;
 		}
 		
 		public function __set($key, $val)
 		{
-			return ($this->__values[$key] = $val);
+			return ($this->values[$key] = $val);
 		}
 		
 		public function __isset($key)
 		{
-			return isset($this->__values[$key]);
+			return isset($this->values[$key]);
 		}
 		
 		public function __unset($key)
 		{
-			unset($this->__values[$key]);
+			unset($this->values[$key]);
 		}
 		
 		public function whereAmI()
