@@ -13,7 +13,6 @@
 	$db = new Database();
 
 	// Initialize our session...
-	DBSession::register(); // Uncomment this line to store sessions in the database
 	session_start();
 	
 	// Initialize current user

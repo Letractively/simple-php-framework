@@ -5,16 +5,17 @@
 		public $username;
 		public $password;
 		public $level;           // Admin, User, etc.
+		public $domain;
 		public $salt;            // Used to compute password hash
-		public $domain = '';     // Domain to set in cookie
 		public $user;            // DBObject User class if available
-		public $useHash = false; // Are passwords hashed in the database?
-		
+		public $useHash;
 		private $loggedIn = false;
 
-		// Call with no arguments to create a guest user (which can then be logged in using $this->login($un, $pw)
-		// Or pass a user_id to simply login that user. The $seriously is just a safeguard to be certain you really do
-		// want to blindly login a user. Set it to true.
+		// Call with no arguments to attempt to restore a previous logged in session
+		// which then falls back to a guest user (which can then be logged in using
+		// $this->login($un, $pw). Or pass a user_id to simply login that user. The
+		// $seriously is just a safeguard to be certain you really do want to blindly
+		// login a user. Set it to true.
 		public function __construct($user_id = null, $seriously = false)
 		{
 			global $db;
@@ -22,6 +23,8 @@
 			$this->user_id  = 0;
 			$this->username = 'Guest';
 			$this->salt     = $GLOBALS['Config']->auth_salt;
+			$this->domain   = isset($GLOBALS['Config']->auth_domain) ? $GLOBALS['Config']->auth_domain : '';
+			$this->useHash  = isset($GLOBALS['Config']->auth_hash) ? $GLOBALS['Config']->auth_hash : false;
 
 			// Load a User DBObject if possible
 			if(class_exists('User') && (get_parent_class('User') == 'DBObject'))

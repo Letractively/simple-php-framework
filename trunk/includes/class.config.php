@@ -12,8 +12,14 @@
 		// Add code to be run on all servers
 		public function everywhere()
 		{
-			$arr = array();
-			$arr['auth_salt'] = '^&ASDF5678dfsaghjdkfghkj~';
+			// Uncomment to store sessions in the database
+			// DBSession::register();
+
+			// Config variables
+			$arr  = array();
+			$arr['auth_salt']   = '^&ASDF5678dfsaghjdkfghkj~'; // Pick any random string of characters
+			$arr['auth_domain'] = ''; // Domain to set in Auth cookie
+			$arr['auth_hash']   = false; // Stored hashed password in database? (versus plain-text)
 			
 			$this->__values = array_merge($this->__values, $arr);
 		}
@@ -24,6 +30,7 @@
 			define('WEB_ROOT', '/');
 			ini_set('display_errors', '0');
 
+			// Config variables
 			$arr  = array();
 			$arr['dbserver'] = '';
 			$arr['dbname']   = '';
@@ -41,6 +48,7 @@
 			ini_set('display_errors', '1');
 			ini_set('error_reporting', E_ALL);
 
+			// Config variables
 			$arr  = array();
 			$arr['dbserver'] = '';
 			$arr['dbname']   = '';
@@ -58,6 +66,7 @@
 			ini_set('display_errors', '1');
 			ini_set('error_reporting', E_ALL);
 
+			// Config variables
 			$arr  = array();
 			$arr['dbserver'] = 'localhost';
 			$arr['dbname']   = '';

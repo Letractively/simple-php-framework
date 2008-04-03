@@ -50,7 +50,7 @@
 			if(!is_resource($this->db))
 				$this->connect();
 
-			// Optionally allow extra args which are escaped and inserted
+			// Optionally allow extra args which are escaped and inserted in place of ?
 			if(func_num_args() > 1)
 			{
 				$args = func_get_args();
