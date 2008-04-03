@@ -1,10 +1,10 @@
 <?PHP
 	class Database
 	{
-		public $onError   = "die"; // die, email, or leave blank to simply continue
-		public $errorTo   = "email@domain.com";
-		public $errorFrom = "errors@domain.com";
-		public $errorPage = "database-error.php";
+		public $onError;   // 'die', 'email', or '' to simply continue
+		public $errorTo;   // email@domain.com
+		public $errorFrom; // errors@domain.com
+		public $errorPage; // database-error.php
 
 		public $db = false;
 		public $dbname;
@@ -15,13 +15,26 @@
 		public $result;
 		public $redirect = false;
 
-		function __construct($host, $user, $password, $dbname = null, $on_error = null)
+		function __construct($dbserver = null, $dbuser = null, $dbpass = null, $dbname = null, $on_error = null)
 		{
-			$this->host     = $host;
-			$this->user     = $user;
-			$this->password = $password;
-			if(!is_null($dbname)) $this->dbname = $dbname;
-			if(!is_null($on_error)) $this->onError = $on_error;
+			// If no arguments are passed, attempt to pull from our global $Config variable
+			if((func_num_args() == 0) && isset($GLOBALS['Config']))
+			{
+				$this->host     = $GLOBALS['Config']->dbserver;
+				$this->user     = $GLOBALS['Config']->dbuser;
+				$this->password = $GLOBALS['Config']->dbpass;
+				$this->dbname   = $GLOBALS['Config']->dbname;
+				$this->onError  = $GLOBALS['Config']->dberror;
+			}
+			else
+			{
+				$this->host     = $dbserver;
+				$this->user     = $dbuser;
+				$this->password = $dbpass;
+				$this->dbname   = $dbname;
+				$this->onError  = $on_error;
+			}
+
 			$this->queries  = array();
 		}
 		
@@ -38,14 +51,12 @@
 				$this->connect();
 
 			// Optionally allow extra args which are escaped and inserted
-			// in place of their corresponding question mark placeholders.
-			// Surely there's a faster way than doing it this way, right?
 			if(func_num_args() > 1)
 			{
 				$args = func_get_args();
-				$sql = str_replace("?", "[[qmark]]", $sql);				
-				for($i = 1; $i < func_num_args(); $i++)
-					$sql = preg_replace('!\[\[qmark\]\]!', $this->quote($args[$i]), $sql, 1);
+				foreach($args as &$item)
+					$item = $this->quote($item);
+				$sql = vsprintf(str_replace('?', '%s', $sql), array_slice($args, 1));
 			}
 
 			$this->queries[] = $sql;
@@ -195,7 +206,7 @@
 
 			switch($this->onError)
 			{
-				case "die":
+				case 'die':
 					echo "<p style='border:5px solid red;background-color:#fff;padding:5px;'><strong>Database Error:</strong><br/>$err_msg</p>";
 					echo "<p style='border:5px solid red;background-color:#fff;padding:5px;'><strong>Last Query:</strong><br/>" . $this->lastQuery() . "</p>";
 					echo "<pre>";
@@ -204,7 +215,7 @@
 					die;
 					break;
 				
-				case "email":
+				case 'email':
 					$msg  = $_SERVER['PHP_SELF'] . " @ " . date("Y-m-d H:ia") . "\n";
 					$msg .= $err_msg . "\n\n";
 					$msg .= implode("\n", $this->queries) . "\n\n";

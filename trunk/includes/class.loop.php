@@ -36,7 +36,7 @@
 	}
 
 	// Example:
-	// $color = new Loop("white", "black");
+	// $color = new Loop('white', 'black');
 	// 
 	// echo "<tr color='$color'/>";
 	// echo "<tr color='$color'/>";

@@ -12,7 +12,7 @@
 		
 		function __tostring()
 		{
-			return $this->ul("warn");
+			return $this->ul('warn');
 		}
 
 		function ok()
@@ -22,7 +22,7 @@
 		
 		function add($id, $msg)
 		{
-			if($id != "")
+			if($id != '')
 			{
 				if(isset($this->errors[$id]) && !is_array($this->errors[$id]))
 					$this->errors[$id] = array($msg);
@@ -43,7 +43,7 @@
 		
 		function css($header = true)
 		{
-			$out = "";
+			$out = '';
 			if(count($this->errors) > 0)
 			{
 				if($header) $out .= '<style type="text/css" media="screen">';
@@ -53,9 +53,9 @@
 			echo $out;
 		}
 
-		function ul($class = "warn")
+		function ul($class = 'warn')
 		{
-			if(count($this->errors) == 0) return "";
+			if(count($this->errors) == 0) return '';
 
 			$out = "<ul class='$class'>";
 			foreach($this->errors as $error)
@@ -69,7 +69,7 @@
 		
 		function blank($val, $id, $name = null)
 		{
-			if(trim($val) == "")
+			if(trim($val) == '')
 			{
 				if(is_null($name)) $name = ucwords($id);
 				$this->add($id, "$name cannot be left blank.");
@@ -113,18 +113,18 @@
 		{
 			if($pass1 !== $pass2)
 			{
-				$this->add($id, "The passwords you entered do not match.");
+				$this->add($id, 'The passwords you entered do not match.');
 				return false;
 			}
 			
 			return true;
 		}
 		
-		function email($val, $id = "email")
+		function email($val, $id = 'email')
 		{
 			if(!eregi("^([_a-z0-9+-]+)(\.[_a-z0-9-]+)*@([a-z0-9-]+)(\.[a-z0-9-]+)*(\.[a-z]{2,4})$", $val))
 			{
-				$this->add($id, "The email address you entered is not valid.");
+				$this->add($id, 'The email address you entered is not valid.');
 				return false;
 			}
 			
@@ -135,7 +135,7 @@
 		{
 			if(strtotime($val) === false)
 			{
-				$this->add($id, "Please enter a valid date");
+				$this->add($id, 'Please enter a valid date');
 				return false;
 			}
 			
@@ -144,10 +144,10 @@
 
 		function phone($val, $id)
 		{
-			$val = preg_replace("/[^0-9]/", "", $val);
+			$val = preg_replace('/[^0-9]/', '', $val);
 			if(strlen($val) != 7 && strlen($val) != 10)
 			{
-				$this->add($id, "Please enter a valid 7 or 10 digit phone number.");
+				$this->add($id, 'Please enter a valid 7 or 10 digit phone number.');
 				return false;
 			}
 			
@@ -158,7 +158,7 @@
 		{
 			if(!is_uploaded_file($val['tmp_name']) || !is_readable($val['tmp_name']))
 			{
-				$this->add($id, "Your file was not uploaded successfully. Please try again.");
+				$this->add($id, 'Your file was not uploaded successfully. Please try again.');
 				return false;
 			}
 			
@@ -190,7 +190,7 @@
 		function url($val, $id, $name = null)
 		{
 			$info = @parse_url($val);
-			if(($info === false) || ($info['scheme'] != "http" && $info['scheme'] != "https") || ($info['host'] == ""))
+			if(($info === false) || ($info['scheme'] != 'http' && $info['scheme'] != 'https') || ($info['host'] == ''))
 			{
 				if(is_null($name)) $name = ucwords($id);
 				$this->add($id, "$name is not a valid URL.");

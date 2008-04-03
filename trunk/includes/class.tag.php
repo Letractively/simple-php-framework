@@ -7,7 +7,7 @@
 				parent::__construct('tags', 'id', array('name'), $id);
 			else
 			{
-				parent::__construct('tags', 'id', array('name'), "");
+				parent::__construct('tags', 'id', array('name'), '');
 				$this->select($id, 'name');
 				if($this->id == '')
 				{

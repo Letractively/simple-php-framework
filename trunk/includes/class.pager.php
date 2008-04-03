@@ -12,12 +12,12 @@
 		public $numPages; // ceil($count / $perPage)
 
 		// Prev/Next HTML when *not* linked
-		public $prevMark = "";
-		public $nextMark = "";
+		public $prevMark = '';
+		public $nextMark = '';
 
 		// Prev/Next HTML when linked
-		public $prevMarkLinked = "&#171; Previous";
-		public $nextMarkLinked = "Next &#187;";
+		public $prevMarkLinked = '&#171; Previous';
+		public $nextMarkLinked = 'Next &#187;';
 
 		// Number of pages to show to left and right of current
 		public $radius    = 5; 
@@ -119,8 +119,8 @@
 			}
 			else
 			{
-				$opening_tag = "";
-				$closing_tag = "";
+				$opening_tag = '';
+				$closing_tag = '';
 			}
 
 			$numbers = array();

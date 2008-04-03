@@ -6,7 +6,7 @@
 		public $password;
 		public $level;           // Admin, User, etc.
 		public $salt;            // Used to compute password hash
-		public $domain = "";     // Domain to set in cookie
+		public $domain = '';     // Domain to set in cookie
 		public $user;            // DBObject User class if available
 		public $useHash = false; // Are passwords hashed in the database?
 		
@@ -20,26 +20,19 @@
 			global $db;
 
 			$this->user_id  = 0;
-			$this->username = "Guest";
-			$this->salt     = AUTH_SALT; // Defined in master.inc.php
+			$this->username = 'Guest';
+			$this->salt     = $GLOBALS['Config']->auth_salt;
 
-			if(class_exists("User") && (get_parent_class("User") == "DBObject"))
+			// Load a User DBObject if possible
+			if(class_exists('User') && (get_parent_class('User') == 'DBObject'))
 				$this->user = new User();
 
 			// Allow login via user_id passed into constructor
-			if(!is_null($user_id) && ($seriously === true))
-			{
-				$db->query("SELECT * FROM users WHERE user_id = " . $db->quote($user_id));
-				if(mysql_num_rows($db->result) == 1)
-				{
-					$row = mysql_fetch_array($db->result, MYSQL_ASSOC);
-					$this->doLogin($row);
-					$this->storeSessionData($row['username'], $row['password']);
-				}
-			} // But normally we login via a session or cookie variable
-			elseif($this->checkSession())
+			if(ctype_digit($user_id) && ($seriously === true))
+				$this->impersonate($user_id);
+			elseif($this->checkSession()) // But normally we login via a session...
 				return true;
-			elseif($this->checkCookie())
+			elseif($this->checkCookie()) //  or cookie variable
 				return true;
 			else
 				return false;
@@ -65,8 +58,7 @@
 		private function check($username, $password)
 		{
 			global $db;
-
-			$db->query("SELECT * FROM users WHERE username = " . $db->quote($username));
+			$db->query("SELECT * FROM users WHERE username = ?", $username);
 			if(mysql_num_rows($db->result) == 1)
 			{
 				$row = mysql_fetch_array($db->result, MYSQL_ASSOC);
@@ -120,7 +112,7 @@
 			$this->level    = $row['level'];
 
 			// Load any additional user info if DBObject and User are available
-			if(class_exists("User") && (get_parent_class("User") == "DBObject"))
+			if(class_exists('User') && (get_parent_class('User') == 'DBObject'))
 			{
 				$this->user = new User();
 				$this->user->id = $this->user_id;
@@ -158,21 +150,21 @@
 		{
 			$_SESSION['auth_username'] = $username;
 			$_SESSION['auth_password'] = $this->useHash ? $password : sha1($password . $this->salt);
-			setcookie("auth_username", $_SESSION['auth_username'], time()+60*60*24*30, "/", $this->domain);
-			setcookie("auth_password", $_SESSION['auth_password'], time()+60*60*24*30, "/", $this->domain);
+			setcookie('auth_username', $_SESSION['auth_username'], time()+60*60*24*30, '/', $this->domain);
+			setcookie('auth_password', $_SESSION['auth_password'], time()+60*60*24*30, '/', $this->domain);
 		}
 
 		// Logout the user
 		public function logout()
 		{
 			$this->user_id = 0;
-			$this->username = "Guest";
+			$this->username = 'Guest';
 			$this->user = new User();
 
-			$_SESSION['auth_username'] = "";
-			$_SESSION['auth_password'] = "";
-			setcookie("auth_username", "", time() - 3600, "/", $this->domain);
-			setcookie("auth_password", "", time() - 3600, "/", $this->domain);
+			$_SESSION['auth_username'] = '';
+			$_SESSION['auth_password'] = '';
+			setcookie('auth_username', '', time() - 3600, '/', $this->domain);
+			setcookie('auth_password', '', time() - 3600, '/', $this->domain);
 
 			$this->loggedIn = false;
 		}
@@ -183,18 +175,18 @@
 			return $this->loggedIn;
 		}
 
-		// Helper function that redirects away from "admin only" pages
+		// Helper function that redirects away from 'admin only' pages
 		public function admin($url = null)
 		{
-			if(is_null($url)) $url = WEB_ROOT . "login/";
-			if($this->level != "admin")
+			if(is_null($url)) $url = WEB_ROOT . 'login/';
+			if($this->level != 'admin')
 				redirect($url);
 		}
 
-		// Helper function that redirects away from "member only" pages
+		// Helper function that redirects away from 'member only' pages
 		public function user($url = null)
 		{
-			if(is_null($url)) $url = WEB_ROOT . "login/";
+			if(is_null($url)) $url = WEB_ROOT . 'login/';
 			if($this->ok() === false)
 				redirect($url);
 		}

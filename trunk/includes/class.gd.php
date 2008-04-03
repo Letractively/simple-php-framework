@@ -10,7 +10,7 @@
 
 		function __construct($data = null, $ext = null)
 		{
-			if(is_resource($data) && get_resource_type($data) == "gd")
+			if(is_resource($data) && get_resource_type($data) == 'gd')
 				return $this->loadResource($data);
 			elseif(file_exists($data) && is_readable($data))
 				return $this->loadFile($data);
@@ -20,7 +20,7 @@
 
 		function loadResource($im)
 		{	
-			if(!is_resource($im) || !get_resource_type($im) == "gd") return false;
+			if(!is_resource($im) || !get_resource_type($im) == 'gd') return false;
 
 			$this->im     = $im;
 			$this->width  = imagesx($im);
@@ -39,45 +39,45 @@
 			$this->type   = image_type_to_extension($info[2], false);
 			$this->mime   = $info['mime'];
 			
-			if($this->type == "jpeg" && (imagetypes() & IMG_JPG))
+			if($this->type == 'jpeg' && (imagetypes() & IMG_JPG))
 				$im = imagecreatefromjpeg($filename);
-			elseif($this->type == "png" && (imagetypes() & IMG_PNG))
+			elseif($this->type == 'png' && (imagetypes() & IMG_PNG))
 				$im = imagecreatefrompng($filename);
-			elseif($this->type == "gif" && (imagetypes() & IMG_GIF))
+			elseif($this->type == 'gif' && (imagetypes() & IMG_GIF))
 				$im = imagecreatefromgif($filename);
 			else
 				return false;
 			return $this->loadResource($im);
 		}
 		
-		function saveAs($filename, $type = "jpg")
+		function saveAs($filename, $type = 'jpg')
 		{
-			if($type == "jpg" && (imagetypes() & IMG_JPG))
+			if($type == 'jpg' && (imagetypes() & IMG_JPG))
 				return imagejpeg($this->im, $filename);
-			elseif($type == "png" && (imagetypes() & IMG_PNG))
+			elseif($type == 'png' && (imagetypes() & IMG_PNG))
 				return imagepng($this->im, $filename);
-			elseif($type == "gif" && (imagetypes() & IMG_GIF))
+			elseif($type == 'gif' && (imagetypes() & IMG_GIF))
 				return imagegif($this->im, $filename);
 			else
 				return false;
 		}
 
 		// Output file to browser
-		function output($type = "jpg")
+		function output($type = 'jpg')
 		{
-			if($type == "jpg" && (imagetypes() & IMG_JPG))
+			if($type == 'jpg' && (imagetypes() & IMG_JPG))
 			{
 				header("Content-Type: image/jpeg");
 				imagejpeg($this->im);
 				return true;
 			}
-			elseif($type == "png" && (imagetypes() & IMG_PNG))
+			elseif($type == 'png' && (imagetypes() & IMG_PNG))
 			{
 				header("Content-Type: image/png");
 				imagepng($this->im);
 				return true;
 			}
-			elseif($type == "gif" && (imagetypes() & IMG_GIF))
+			elseif($type == 'gif' && (imagetypes() & IMG_GIF))
 			{
 				header("Content-Type: image/gif");
 				imagegif($this->im);
@@ -112,7 +112,7 @@
 		{
 			$dest = imagecreatetruecolor($new_width, $new_height);
 
-			// Transparency fix contributed by Google Code user "desfrenes"
+			// Transparency fix contributed by Google Code user 'desfrenes'
 			imagealphablending($dest, false);  
 			imagesavealpha($dest, true);
 

@@ -32,7 +32,7 @@
 		{
 			foreach($this->log as $log)
 			{
-				if($log['result'] == "fail")
+				if($log['result'] == 'fail')
 				{
 					echo "*** {$log['function']}\n";
 					echo "Test: {$log['test']}\n";
@@ -66,7 +66,7 @@
 			$bt              = debug_backtrace();
 			$arr             = array();
 			$arr['function'] = $bt[2]['function'];
-			$arr['result']   = "fail";
+			$arr['result']   = 'fail';
 			$arr['test']     = $bt[1]['function'];
 			$arr['args']     = $bt[1]['args'];
 			$this->log[]     = $arr;
@@ -78,7 +78,7 @@
 			$bt              = debug_backtrace();
 			$arr             = array();
 			$arr['function'] = $bt[2]['function'];
-			$arr['result']   = "pass";
+			$arr['result']   = 'pass';
 			$arr['test']     = $bt[1]['function'];
 			$arr['args']     = $bt[1]['args'];
 			$this->log[]     = $arr;

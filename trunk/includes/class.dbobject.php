@@ -10,7 +10,7 @@
 		private $tableName;
 		private $columns = array();
 
-		function __construct($table_name, $id_name, $columns, $id = "")
+		function __construct($table_name, $id_name, $columns, $id = '')
 		{
 			$this->tableName = $table_name;
 			$this->idName    = $id_name;
@@ -18,15 +18,15 @@
 			foreach($columns as $key)
 				$this->columns[$key] = null;
 
-			if($id != "")
+			if($id != '')
 				$this->select($id);
 
-			$this->tagCol = get_class($this) . "_id";
+			$this->tagCol = get_class($this) . '_id';
 		}
 
 		function __get($key)
 		{
-			if(substr($key, 0, 2) == "__")
+			if(substr($key, 0, 2) == '__')
 				return htmlspecialchars($this->columns[substr($key, 2)]);
 			else
 				return $this->columns[$key];
@@ -42,10 +42,10 @@
 			return false;
 		}
 
-		function select($id, $column = "")
+		function select($id, $column = '')
 		{
 			global $db;
-			if($column == "") $column = $this->idName;
+			if($column == '') $column = $this->idName;
 
 			$id = mysql_real_escape_string($id, $db->db);
 			$column = mysql_real_escape_string($column, $db->db);
@@ -64,10 +64,10 @@
 
 		function replace()
 		{
-			return $this->insert("REPLACE INTO");
+			return $this->insert('REPLACE INTO');
 		}
 
-		function insert($cmd = "INSERT INTO")
+		function insert($cmd = 'INSERT INTO')
 		{
 			global $db;
 
@@ -97,7 +97,7 @@
 
 			$id = mysql_real_escape_string($this->id, $db->db);
 
-			$db->query("UPDATE " . $this->tableName . " SET $stuff WHERE " . $this->idName . " = '" . $id . "'");
+			$db->query('UPDATE ' . $this->tableName . " SET $stuff WHERE " . $this->idName . " = '" . $id . "'");
 			return mysql_affected_rows($db->db); // Not always correct due to mysql update bug/feature
 		}
 
@@ -106,12 +106,12 @@
 			global $db;
 
 			$id = mysql_real_escape_string($this->id, $db->db);
-			$db->query("DELETE FROM " . $this->tableName . " WHERE `" . $this->idName . "` = '" . $id . "'");
+			$db->query('DELETE FROM ' . $this->tableName . " WHERE `" . $this->idName . "` = '" . $id . "'");
 			return mysql_affected_rows($db->db);
 		}
 
 		// Grab a large block of instantiated objects from the database using only one query.
-		function glob($sql = "")
+		function glob($sql = '')
 		{
 			global $db;
 
@@ -160,7 +160,7 @@
 		{
 			global $db;
 
-			if($this->id == "") return false;
+			if($this->id == '') return false;
 			$t = new Tag($name);
 			$db->query("INSERT IGNORE {$this->tableName}2tags ({$this->tagCol}, tag_id) VALUES (?, ?)", $this->id, $t->id);
 		}
@@ -168,7 +168,7 @@
 		function removeTag($name)
 		{
 			global $db;
-			if($this->id == "") return false;
+			if($this->id == '') return false;
 			$t = new Tag($name);
 			$db->query("DELETE FROM {$this->tableName}2tags WHERE {$this->tagCol} = ? AND tag_id = ?", $this->id, $t->id);
 		}
@@ -176,13 +176,13 @@
 		function tags()
 		{
 			global $db;
-			if($this->id == "") return false;
+			if($this->id == '') return false;
 			$rows = $db->getRows("SELECT * FROM {$this->tableName}2tags a LEFT JOIN tags t ON a.tag_id = t.id WHERE a.{$this->tagCol} = '{$this->id}'");
 			return $rows;
 		}
 
 		// Glob by tag name
-		function tagged($tag_name, $sql = "")
+		function tagged($tag_name, $sql = '')
 		{
 			global $db;
 

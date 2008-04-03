@@ -2,9 +2,9 @@
 
 	/* E X A M P L E -----------------------------------------------
 		$feed = new RSS();
-		$feed->title       = "RSS Feed Title";
+		$feed->title       = 'RSS Feed Title';
 		$feed->link        = "http://website.com";
-		$feed->description = "Recent articles on your website.";
+		$feed->description = 'Recent articles on your website.';
 
 		$db->query($query);
 		$result = $db->result;
@@ -30,7 +30,7 @@
 		public $title;
 		public $link;
 		public $description;
-		public $language = "en-us";
+		public $language = 'en-us';
 		public $pubDate;
 		public $items;
 		public $tags;
@@ -102,7 +102,7 @@
 			return $out;
 		}
 		
-		function serve($contentType = "application/xml")
+		function serve($contentType = 'application/xml')
 		{
 			$xml = $this->out();
 			header("Content-type: $contentType");
@@ -171,7 +171,7 @@
 			if(empty($this->guid)) $this->guid = $this->link;
 			$out .= "<guid>" . $this->guid . "</guid>\n";
 
-			if($this->attachment != "")
+			if($this->attachment != '')
 				$out .= "<enclosure url='{$this->attachment}' length='{$this->length}' type='{$this->type}' />\n";
 
 			foreach($this->tags as $key => $val) $out .= "<$key>$val</$key>\n";

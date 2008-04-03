@@ -5,7 +5,7 @@
 CREATE TABLE `sessions` (
   `id` varchar(255) collate utf8_unicode_ci NOT NULL,
   `data` text collate utf8_unicode_ci NOT NULL,
-  `expires_on` int(10) NOT NULL,
+  `updated_on` int(10) NOT NULL,
   PRIMARY KEY  (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
