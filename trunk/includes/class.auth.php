@@ -32,7 +32,7 @@
 
 			// Allow login via user_id passed into constructor
 			if(ctype_digit($user_id) && ($seriously === true))
-				$this->impersonate($user_id);
+				return $this->impersonate($user_id);
 			elseif($this->checkSession()) // But normally we login via a session...
 				return true;
 			elseif($this->checkCookie()) //  or cookie variable
