@@ -22,9 +22,9 @@
 
 			$this->user_id  = 0;
 			$this->username = 'Guest';
-			$this->salt     = $GLOBALS['Config']->auth_salt;
-			$this->domain   = isset($GLOBALS['Config']->auth_domain) ? $GLOBALS['Config']->auth_domain : '';
-			$this->useHash  = isset($GLOBALS['Config']->auth_hash) ? $GLOBALS['Config']->auth_hash : false;
+			$this->salt     = Config::$auth_salt;
+			$this->domain   = isset(Config::$auth_domain) ? Config::$auth_domain : '';
+			$this->useHash  = isset(Config::$auth_hash) ? Config::$auth_hash : false;
 
 			// Load a User DBObject if possible
 			if(class_exists('User') && (get_parent_class('User') == 'DBObject'))

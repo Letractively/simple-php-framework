@@ -18,13 +18,13 @@
 		function __construct($dbserver = null, $dbuser = null, $dbpass = null, $dbname = null, $on_error = null)
 		{
 			// If no arguments are passed, attempt to pull from our global $Config variable
-			if((func_num_args() == 0) && isset($GLOBALS['Config']))
+			if(func_num_args() == 0)
 			{
-				$this->host     = $GLOBALS['Config']->dbserver;
-				$this->user     = $GLOBALS['Config']->dbuser;
-				$this->password = $GLOBALS['Config']->dbpass;
-				$this->dbname   = $GLOBALS['Config']->dbname;
-				$this->onError  = $GLOBALS['Config']->dberror;
+				$this->host     = Config::$dbserver;
+				$this->user     = Config::$dbuser;
+				$this->password = Config::$dbpass;
+				$this->dbname   = Config::$dbname;
+				$this->onError  = Config::$dberror;
 			}
 			else
 			{

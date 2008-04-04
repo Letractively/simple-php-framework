@@ -2,104 +2,94 @@
 	class Config
 	{
 		// Add your server names to the appropriate arrays.
-		private $__productionServers = array('production.server.com');
-		private $__stagingServers    = array('staging.server.com');
-		private $__localServers      = array('local.server.site');
+		static private $__productionServers = array('production.server.com');
+		static private $__stagingServers    = array('staging.server.com');
+		static private $__localServers      = array('local.server.site');
+		
+		// Define any config settings you want to use here...
+		static public $useDBSessions;
 
-		// No need to mess with this
-		private $values = array();
+		static public $auth_salt;
+		static public $auth_hash;
+		static public $auth_domain;
+
+		static public $dbserver;
+		static public $dbname;
+		static public $dbuser;
+		static public $dbpass;
+		static public $dberror;
 
 		// Add code to be run on all servers
-		public function everywhere()
+		static public function everywhere()
 		{
-			$this->values['useDBSessions'] = false;
-			$this->values['auth_hash']     = false; // Stored hashed password in database? (versus plain-text)
-			$this->values['auth_domain']   = ''; // Domain to set in Auth cookie
-			$this->values['auth_salt']     = '^&ASDF5678dfsaghjdkfghkj~'; // Pick any random string of characters
+			self::$useDBSessions = false;
+			self::$auth_hash     = false; // Stored hashed password in database? (versus plain-text)
+			self::$auth_domain   = ''; // Domain to set in Auth cookie
+			self::$auth_salt     = '^&ASDF5678dfsaghjdkfghkj~'; // Pick any random string of characters
 		}
 
 		// Add code/variables to be run only on production servers
-		public function production()
+		static public function production()
 		{
 			define('WEB_ROOT', '/');
 			ini_set('display_errors', '0');
 
-			$this->values['dbserver'] = '';
-			$this->values['dbname']   = '';
-			$this->values['dbuser']   = '';
-			$this->values['dbpass']   = '';
-			$this->values['dberror']  = '';
+			self::$dbserver = '';
+			self::$dbname   = '';
+			self::$dbuser   = '';
+			self::$dbpass   = '';
+			self::$dberror  = '';
 		}
 
 		// Add code/variables to be run only on staging servers
-		public function staging()
+		static public function staging()
 		{
 			define('WEB_ROOT', '/');
 			ini_set('display_errors', '1');
 			ini_set('error_reporting', E_ALL);
 
-			$this->values['dbserver'] = '';
-			$this->values['dbname']   = '';
-			$this->values['dbuser']   = '';
-			$this->values['dbpass']   = '';
-			$this->values['dberror']  = 'die';
+			self::$dbserver = '';
+			self::$dbname   = '';
+			self::$dbuser   = '';
+			self::$dbpass   = '';
+			self::$dberror  = 'die';
 		}
 		
 		// Add code/variables to be run only on local (testing) servers
-		public function local()
+		static public function local()
 		{
 			define('WEB_ROOT', '/');
 			ini_set('display_errors', '1');
 			ini_set('error_reporting', E_ALL);
 
-			$this->values['dbserver'] = 'localhost';
-			$this->values['dbname']   = '';
-			$this->values['dbuser']   = '';
-			$this->values['dbpass']   = '';
-			$this->values['dberror']  = 'die';
+			self::$dbserver = 'localhost';
+			self::$dbname   = '';
+			self::$dbuser   = '';
+			self::$dbpass   = '';
+			self::$dberror  = 'die';
 		}
 
-		public function __construct()
+		static public function load()
 		{
-			$this->everywhere();
+			self::everywhere();
 			
-			if(in_array($_SERVER['SERVER_NAME'], $this->__productionServers))
-				$this->production();
-			elseif(in_array($_SERVER['SERVER_NAME'], $this->__stagingServers))
-				$this->staging();
-			elseif(in_array($_SERVER['SERVER_NAME'], $this->__localServers))
-				$this->local();
+			if(in_array($_SERVER['SERVER_NAME'], self::$__productionServers))
+				self::production();
+			elseif(in_array($_SERVER['SERVER_NAME'], self::$__stagingServers))
+				self::staging();
+			elseif(in_array($_SERVER['SERVER_NAME'], self::$__localServers))
+				self::local();
 			else
-				die('Where am I? (You need to setup your server names in class.config.php) You might want to read our <a href="_masters/overview.html">quick overview</a> to get started.');
+				die('Where am I? (You need to setup your server names in class.config.php)');
 		}
 		
-		public function __get($key)
+		static public function whereAmI()
 		{
-			return isset($this->values[$key]) ? $this->values[$key] : null;
-		}
-		
-		public function __set($key, $val)
-		{
-			return ($this->values[$key] = $val);
-		}
-		
-		public function __isset($key)
-		{
-			return isset($this->values[$key]);
-		}
-		
-		public function __unset($key)
-		{
-			unset($this->values[$key]);
-		}
-		
-		public function whereAmI()
-		{
-			if(in_array($_SERVER['SERVER_NAME'], $this->__productionServers))
+			if(in_array($_SERVER['SERVER_NAME'], self::$__productionServers))
 				return 'production';
-			elseif(in_array($_SERVER['SERVER_NAME'], $this->__stagingServers))
+			elseif(in_array($_SERVER['SERVER_NAME'], self::$__stagingServers))
 				return 'staging';
-			elseif(in_array($_SERVER['SERVER_NAME'], $this->__localServers))
+			elseif(in_array($_SERVER['SERVER_NAME'], self::$__localServers))
 				return 'local';
 		}
 	}

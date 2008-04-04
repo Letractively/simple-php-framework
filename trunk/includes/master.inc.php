@@ -7,13 +7,13 @@
 	require DOC_ROOT . '/includes/class.objects.php';
 	
 	// Load our config settings
-	$Config = new Config();
+	Config::load();
 
 	// Connect to database (does not actually open the connection until it's needed)
 	$db = new Database();
 
 	// Initialize our session...
-	if($Config->useDBSessions === true)
+	if(Config::$useDBSessions === true)
 		DBSession::register();
 	session_start();
 
