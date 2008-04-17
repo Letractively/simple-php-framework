@@ -12,3 +12,4 @@ The following websites are known to be using the Simple PHP Framework.
   * [http://iphonehaiku.com/ iPhoneHaiku.com] - iPhone Haikus
   * [http://www.styleinternet.com/ StyleInternet.com] - Style Net salon website hosting
   * [http://schmooze.tv Schmooze.TV] - Usenet TV show aggregator
+  * [http://www.namkenconstruction.com/] - Built a custom CMS using the Framework to manage a client website.
