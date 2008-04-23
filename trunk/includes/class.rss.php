@@ -89,6 +89,7 @@
 			$out .= "<description>" . $this->description . "</description>\n";
 			$out .= "<language>" . $this->language . "</language>\n";
 			$out .= "<pubDate>" . $this->getPubDate() . "</pubDate>\n";
+			$out .= '<atom:link href="' . $this->full_url() . '" rel="self" type="application/rss+xml" />' . "\n";
 
 			foreach($this->tags as $key => $val) $out .= "<$key>$val</$key>\n";
 			foreach($this->items as $item) $out .= $item->out();
@@ -96,8 +97,6 @@
 			$out .= "</channel>\n";
 			
 			$out .= $this->footer();
-
-			$out = str_replace("&", "&amp;", $out);
 
 			return $out;
 		}
@@ -112,13 +111,21 @@
 		function header()
 		{
 			$out  = '<?xml version="1.0" encoding="utf-8"?>' . "\n";
-			$out .= '<rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/">' . "\n";
+			$out .= '<rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:atom="http://www.w3.org/2005/Atom">' . "\n";
 			return $out;
 		}
 
 		function footer()
 		{
 			return '</rss>';
+		}
+		
+		function full_url()
+		{
+			$s = empty($_SERVER['HTTPS']) ? '' : ($_SERVER['HTTPS'] == 'on') ? 's' : '';
+			$protocol = substr(strtolower($_SERVER['SERVER_PROTOCOL']), 0, strpos(strtolower($_SERVER['SERVER_PROTOCOL']), '/')) . $s;
+			$port = ($_SERVER['SERVER_PORT'] == '80') ? '' : (":".$_SERVER['SERVER_PORT']);
+			return $protocol . "://" . $_SERVER['SERVER_NAME'] . $port . $_SERVER['REQUEST_URI'];
 		}
 	}
 
@@ -162,10 +169,16 @@
 
 		function out()
 		{
+			$bad = array('&', '<');
+			$good = array('&#x26;', '&#x3c;');
+			
+			$title = str_replace($bad, $good, $this->title);
+			$description = str_replace($bad, $good, $this->description);
+				
 			$out  = "<item>\n";
-			$out .= "<title>" . $this->title . "</title>\n";
+			$out .= "<title>" . $title . "</title>\n";
 			$out .= "<link>" . $this->link . "</link>\n";
-			$out .= "<description><![CDATA[ " . $this->description . " ]]></description>\n";
+			$out .= "<description>" . $description . "</description>\n";
 			$out .= "<pubDate>" . $this->getPubDate() . "</pubDate>\n";
 
 			if(empty($this->guid)) $this->guid = $this->link;
