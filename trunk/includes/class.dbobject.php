@@ -123,7 +123,7 @@
 				$o = new $class;
 				$o->load($row);
 				$o->id = $row[$this->idName];
-				$objs[] = $o;
+				$objs[$o->id] = $o;
 			}
 			return $objs;
 		}
