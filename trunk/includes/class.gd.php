@@ -129,6 +129,8 @@
 		
 		function crop($x, $y, $w, $h)
 		{
+			$dest = imagecreatetruecolor($w, $h);
+			
 			if(imagecopyresampled($dest, $this->im, 0, 0, $x, $y, $w, $h, $w, $h))
 			{
 				$this->im = $dest;
