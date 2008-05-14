@@ -16,7 +16,7 @@
 		$port = ($_SERVER['SERVER_PORT'] == '80') ? '' : (":".$_SERVER['SERVER_PORT']);
 		return $protocol . "://" . $_SERVER['SERVER_NAME'] . $port . $_SERVER['REQUEST_URI'];
 	}
-	
+
 	// Returns an English representation of a past date within the last month
 	// Graciously stolen from http://ejohn.org/files/pretty.js
 	function time2str($ts)
@@ -96,11 +96,11 @@
 
 	// Processes mod_rewrite URLs into key => value pairs
 	// See .htacess for more info.
-	function pick_off($grabFirst = false, $sep = '/')
+	function pick_off($grab_first = false, $sep = '/')
 	{
 		$ret = array();
 		$arr = explode($sep, trim($_SERVER['REQUEST_URI'], $sep));
-		if($grabFirst) $ret[0] = array_shift($arr);
+		if($grab_first) $ret[0] = array_shift($arr);
 		while(count($arr) > 0)
 			$ret[array_shift($arr)] = array_shift($arr);
 		return (count($ret) > 0) ? $ret : false;

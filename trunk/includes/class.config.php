@@ -6,26 +6,29 @@
 		static private $__stagingServers    = array('staging.server.com');
 		static private $__localServers      = array('local.server.site');
 		
-		// Define any config settings you want to use here...
-		static public $useDBSessions;
+		// Define any config settings you want to use here, and then set them in the appropriate
+		// location functions below (everywhere, production, staging, and local).
 
-		static public $auth_salt;
-		static public $auth_hash;
-		static public $auth_domain;
+		static public $auth_domain; // Domain to set for the cookie
+		static public $auth_hash;   // Store hashed passwords in database? (versus plain-text)
+		static public $auth_salt;   // Can be any random string of characters
 
-		static public $dbserver;
-		static public $dbname;
-		static public $dbuser;
-		static public $dbpass;
-		static public $dberror;
+		static public $dbserver; // Database server
+		static public $dbname;   // Database name
+		static public $dbuser;   // Database username
+		static public $dbpass;   // Database password
+		static public $dberror;  // What do do on a database error (see class.database.php for details)
+
+		static public $useDBSessions; // Set to true to store sessions in the database
+
 
 		// Add code to be run on all servers
 		static public function everywhere()
 		{
+			self::$auth_domain   = '';
+			self::$auth_hash     = false;
+			self::$auth_salt     = '6h67467859$%^&A2';
 			self::$useDBSessions = false;
-			self::$auth_hash     = false; // Stored hashed password in database? (versus plain-text)
-			self::$auth_domain   = ''; // Domain to set in Auth cookie
-			self::$auth_salt     = '^&ASDF5678dfsaghjdkfghkj~'; // Pick any random string of characters
 		}
 
 		// Add code/variables to be run only on production servers
@@ -80,7 +83,7 @@
 			elseif(in_array($_SERVER['SERVER_NAME'], self::$__localServers))
 				self::local();
 			else
-				die('Where am I? (You need to setup your server names in class.config.php)');
+				die('Where am I? (You need to setup your server names in class.config.php) $_SERVER[\'SERVER_NAME\'] reported: ' . $_SERVER['SERVER_NAME']);
 		}
 		
 		static public function whereAmI()

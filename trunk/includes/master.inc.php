@@ -4,6 +4,7 @@
 
 	// Global include files
 	require DOC_ROOT . '/includes/functions.inc.php'; // __autoload() is contained in this file
+	require DOC_ROOT . '/includes/class.dbobject.php';
 	require DOC_ROOT . '/includes/class.objects.php';
 	
 	// Load our config settings
@@ -12,9 +13,11 @@
 	// Connect to database (does not actually open the connection until it's needed)
 	$db = new Database();
 
-	// Initialize our session...
+	// Store session info in the database?
 	if(Config::$useDBSessions === true)
-		DBSession::register();
+		DBSession::register();	
+
+	// Initialize our session...
 	session_start();
 
 	// Initialize current user
