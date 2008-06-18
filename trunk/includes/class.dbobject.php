@@ -149,7 +149,10 @@
 
 			$vals = array();
 			foreach($this->columns  as $key => $val)
+			{
+				if(is_null($val)) $val = 'NULL';
 				$vals[$key] = $db->quote($val);
+			}
 			return $vals;
 		}
 	}
