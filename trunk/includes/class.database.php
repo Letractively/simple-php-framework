@@ -189,8 +189,11 @@
 		{
 			if(!is_resource($this->db))
 				$this->connect();
-
-			return "'" . mysql_real_escape_string($var, $this->db) . "'";
+			
+			if(is_null($val))
+				return 'NULL';
+			else
+				return "'" . mysql_real_escape_string($var, $this->db) . "'";
 		}
 
 		function quoteParam($var) { return $this->quote($_REQUEST[$var]); }
