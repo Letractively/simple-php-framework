@@ -245,6 +245,12 @@
 		return rtrim($str, '/') . '/';
 	}
 
+	// Ensures $str DOES NOT end with a /
+	function antislash($str)
+	{
+		return rtrim($str, '/');
+	}
+
 	function gimme($arr, $key = null)
 	{
 		$first_key = array_shift(array_keys($arr));
@@ -289,10 +295,10 @@
 	// Retrieves the filesize of a remote file.
 	function remote_filesize($url, $user = null, $pw = null)
 	{
-		ob_start();
 		$ch = curl_init($url);
 		curl_setopt($ch, CURLOPT_HEADER, 1);
 		curl_setopt($ch, CURLOPT_NOBODY, 1);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 
 		if(!is_null($user) && !is_null($pw))
 		{
@@ -300,10 +306,8 @@
 			curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
 		}
 
-		curl_exec($ch);
+		$head = curl_exec($ch);
 		curl_close($ch);
-		$head = ob_get_contents();
-		ob_end_clean();
 
 		$regex = '/Content-Length:\s([0-9].+?)\s/';
 		preg_match($regex, $head, $matches);
@@ -444,6 +448,7 @@
 		if(!isset($tmpfile) || ($tmpfile == '')) $tmpfile = tempnam('/tmp', 'FOO');
 	
 		$ch = curl_init($url);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 		curl_setopt($ch, CURLOPT_COOKIEFILE, $tmpfile);
 		curl_setopt($ch, CURLOPT_COOKIEJAR, $tmpfile);
 		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
@@ -452,16 +457,13 @@
 		// curl_setopt($ch, CURLOPT_VERBOSE, 1);
 
 		if($referer) curl_setopt($ch, CURLOPT_REFERER, $referer);
-		if($post)
+		if(!is_null($post))
 		{
 			curl_setopt($ch, CURLOPT_POST, true);
 			curl_setopt($ch, CURLOPT_POSTFIELDS, $post);
 		}
 
-		ob_start();
-		curl_exec($ch);
-		$html = ob_get_contents();
-		ob_end_clean();
+		$html = curl_exec($ch);
 	
 		$last_url = curl_getinfo($ch, CURLINFO_EFFECTIVE_URL);
 		return $html;
