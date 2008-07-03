@@ -422,18 +422,20 @@
 	}
 
 	// Returns the lat, long of an address via Google
-	function geocode($address, $key, $output = 'xml')
+	function geocode($address, $key, $output = 'csv')
 	{
 		$address = urlencode($address);
 		$key     = urlencode($key);
 		$data    = geturl("http://maps.google.com/maps/geo?q=$address&key=$key&output=$output");
 
-		if($output == 'xml')
+		if($output == 'csv')
+			return explode(',', $data); // HTTP status code, accuracy bit, latitude, longitude
+		elseif ($output == 'xml')
 		{
 			$xml = simplexml_load_string($data);
-			if($xml === false) return false;
-			if($xml->Response->Status->code != '200') return false;
-			return explode(",", (string) $xml->Response->Placemark->Point->coordinates);
+			if($xml === FALSE) return FALSE;
+			if($xml->Response->Status->code != '200') return FALSE;
+			return explode(',', (string) $xml->Response->Placemark->Point->coordinates); // latitude, longitude, ???
 		}
 		else
 			return $data;
@@ -476,6 +478,17 @@
 			if(!empty($arg))
 				return $arg;
 		return '';
+	}
+
+	// Secure a PHP script using basic HTTP authentication
+	function http_auth($un, $pw, $realm = "Secured Area")
+	{
+		if(!(isset($_SERVER['PHP_AUTH_USER']) && isset($_SERVER['PHP_AUTH_PW']) && $_SERVER['PHP_AUTH_USER'] == $un && $_SERVER['PHP_AUTH_PW'] == $pw))
+		{
+			header('WWW-Authenticate: Basic realm="$realm"');
+			header('Status: 401 Unauthorized');
+			exit(); //???
+		}
 	}
 
 	// This is easier than typing 'echo WEB_ROOT'
