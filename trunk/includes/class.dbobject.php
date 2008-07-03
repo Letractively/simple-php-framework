@@ -3,12 +3,9 @@
 	{
 		public $id;
 		public $searchCols;
-
-		protected $tagCol;
-
-		private $idName;
-		private $tableName;
-		private $columns = array();
+		protected $idName;
+		protected $tableName;
+		protected $columns = array();
 
 		function __construct($table_name, $id_name, $columns, $id = '')
 		{
@@ -20,8 +17,6 @@
 
 			if($id != '')
 				$this->select($id);
-
-			$this->tagCol = get_class($this) . '_id';
 		}
 
 		function __get($key)
@@ -156,6 +151,14 @@
 
 	class TaggableDBObject extends DBObject
 	{
+		private $tagCol;
+
+		function __construct($table_name, $id_name, $columns, $id = '')
+		{
+			parent::__construct($table_name, $id_name, $columns, $id);
+			$this->tagCol = get_class($this) . '_id';
+		}
+
 		function addTag($name)
 		{
 			global $db;
