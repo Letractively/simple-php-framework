@@ -246,7 +246,7 @@
 	}
 
 	// Ensures $str DOES NOT end with a /
-	function antislash($str)
+	function unslash($str)
 	{
 		return rtrim($str, '/');
 	}
