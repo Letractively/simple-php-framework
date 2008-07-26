@@ -96,11 +96,13 @@
 			return mysql_affected_rows($db->db); // Not always correct due to mysql update bug/feature
 		}
 
-		function delete()
+		function delete($id = null)
 		{
 			global $db;
 
-			$id = mysql_real_escape_string($this->id, $db->db);
+			if(is_null($id)) $id = $this->id;
+			
+			$id = mysql_real_escape_string($id, $db->db);
 			$db->query('DELETE FROM ' . $this->tableName . " WHERE `" . $this->idName . "` = '" . $id . "'");
 			return mysql_affected_rows($db->db);
 		}
