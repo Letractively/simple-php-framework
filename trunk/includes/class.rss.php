@@ -48,7 +48,7 @@
 
 		function setPubDate($when)
 		{
-			if(empty($when) || strtotime($when) == false)
+			if(empty($when) || ctype_digit($date) === true)
 				$this->pubDate = date("D, d M Y H:i:s O", $when);
 			else
 				$this->pubDate = date("D, d M Y H:i:s O", strtotime($when));
