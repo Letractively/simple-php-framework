@@ -4,7 +4,7 @@
 		// Add your server names to the appropriate arrays.
 		static private $__productionServers = array('production.server.com');
 		static private $__stagingServers    = array('staging.server.com');
-		static private $__localServers      = array('local.server.site');
+		static private $__localServers      = array('simple-php-framework.site');
 		
 		// Define any config settings you want to use here, and then set them in the appropriate
 		// location functions below (everywhere, production, staging, and local).
@@ -66,8 +66,8 @@
 			ini_set('error_reporting', E_ALL);
 
 			self::$dbserver = 'localhost';
-			self::$dbname   = '';
-			self::$dbuser   = '';
+			self::$dbname   = 'simple-php-framework';
+			self::$dbuser   = 'root';
 			self::$dbpass   = '';
 			self::$dberror  = 'die';
 		}

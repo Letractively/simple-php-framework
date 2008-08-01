@@ -17,7 +17,12 @@
 		if(isset($_POST['btnTables']))
 		{
 			$sql = file_get_contents("mysql.sql");
-			mysql_query($sql, $db) or die(mysql_error());
+		    $sql_pieces = explode(";\n", $sql);
+			foreach ($sql_pieces as $sqlp)
+			{
+				if ($sqlp!="")
+					mysql_query($sqlp,$db) or die(mysql_error());
+			}
 			echo "<p class='alert'>Tables installed!</p>";
 		}
 
