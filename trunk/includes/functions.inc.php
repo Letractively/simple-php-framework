@@ -256,7 +256,7 @@
 		$first_key = array_shift(array_keys($arr));
 		if(count($arr) == 0) return array();
 		if(is_null($key)) $key = array_shift(array_keys($arr[$first_key]));
-		if(!isset($arr[$first_key][$key])) return array();
+		// if(!isset($arr[$first_key][$key])) return array();
 		foreach($arr as $a) $ret[] = $a[$key];
 		return $ret;
 	}
@@ -441,7 +441,7 @@
 			return $data;
 	}
 
-	// Quick and dirty wrapper for curl
+	// Quick and dirty wrapper for curl scraping.
 	function curl($url, $referer = null, $post = null)
 	{
 		global $last_url;

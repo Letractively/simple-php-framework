@@ -25,51 +25,57 @@
 		// Add code to be run on all servers
 		static public function everywhere()
 		{
+			// Store sesions in the database?
+			self::$useDBSessions = false;
+
+			// Settings for the Auth class
 			self::$auth_domain   = '';
 			self::$auth_hash     = false;
 			self::$auth_salt     = '6h67467859$%^&A2';
-			self::$useDBSessions = false;
 		}
 
 		// Add code/variables to be run only on production servers
 		static public function production()
 		{
 			define('WEB_ROOT', '/');
-			ini_set('display_errors', '0');
 
 			self::$dbserver = '';
 			self::$dbname   = '';
 			self::$dbuser   = '';
 			self::$dbpass   = '';
 			self::$dberror  = '';
+
+			ini_set('display_errors', '0');
 		}
 
 		// Add code/variables to be run only on staging servers
 		static public function staging()
 		{
 			define('WEB_ROOT', '/');
-			ini_set('display_errors', '1');
-			ini_set('error_reporting', E_ALL);
 
 			self::$dbserver = '';
 			self::$dbname   = '';
 			self::$dbuser   = '';
 			self::$dbpass   = '';
 			self::$dberror  = 'die';
+
+			ini_set('display_errors', '1');
+			ini_set('error_reporting', E_ALL);
 		}
 		
 		// Add code/variables to be run only on local (testing) servers
 		static public function local()
 		{
 			define('WEB_ROOT', '/');
-			ini_set('display_errors', '1');
-			ini_set('error_reporting', E_ALL);
 
 			self::$dbserver = 'localhost';
 			self::$dbname   = 'simple-php-framework';
 			self::$dbuser   = 'root';
 			self::$dbpass   = '';
 			self::$dberror  = 'die';
+
+			ini_set('display_errors', '1');
+			ini_set('error_reporting', E_ALL);
 		}
 
 		static public function load()
@@ -94,5 +100,7 @@
 				return 'staging';
 			elseif(in_array($_SERVER['SERVER_NAME'], self::$__localServers))
 				return 'local';
+			else
+				return false;
 		}
 	}

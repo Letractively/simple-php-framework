@@ -35,7 +35,7 @@
 		{
 			unset($this->errors[$id]);
 		}
-		
+
 		function msg($id)
 		{
 			echo $this->errors[$id];
@@ -114,6 +114,17 @@
 			if($pass1 !== $pass2)
 			{
 				$this->add($id, 'The passwords you entered do not match.');
+				return false;
+			}
+			
+			return true;
+		}
+		
+		function regex($val, $regex, $id, $msg)
+		{
+			if(preg_match($regex, $val) === 0)
+			{
+				$this->add($id, $msg);
 				return false;
 			}
 			

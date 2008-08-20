@@ -1,38 +1,37 @@
 <?PHP
 	class Database
 	{
-		public $onError;   // 'die', 'email', or '' to simply continue
-		public $errorTo;   // email@domain.com
-		public $errorFrom; // errors@domain.com
-		public $errorPage; // database-error.php
-
 		public $db = false;
+
 		public $dbname;
 		public $host;
 		public $user;
 		public $password;
+
 		public $queries;
 		public $result;
+
+		public $dieOnError;
 		public $redirect = false;
 
-		function __construct($dbserver = null, $dbuser = null, $dbpass = null, $dbname = null, $on_error = null)
+		function __construct($dbserver = null, $dbuser = null, $dbpass = null, $dbname = null, $die_on_error = false)
 		{
 			// If no arguments are passed, attempt to pull from our global $Config variable
 			if(func_num_args() == 0)
 			{
-				$this->host     = Config::$dbserver;
-				$this->user     = Config::$dbuser;
-				$this->password = Config::$dbpass;
-				$this->dbname   = Config::$dbname;
-				$this->onError  = Config::$dberror;
+				$this->host       = Config::$dbserver;
+				$this->user       = Config::$dbuser;
+				$this->password   = Config::$dbpass;
+				$this->dbname     = Config::$dbname;
+				$this->dieOnError = Config::$dberror;
 			}
 			else
 			{
-				$this->host     = $dbserver;
-				$this->user     = $dbuser;
-				$this->password = $dbpass;
-				$this->dbname   = $dbname;
-				$this->onError  = $on_error;
+				$this->host       = $dbserver;
+				$this->user       = $dbuser;
+				$this->password   = $dbpass;
+				$this->dbname     = $dbname;
+				$this->dieOnError = $die_on_error;
 			}
 
 			$this->queries  = array();
@@ -55,7 +54,7 @@
 			{
 				$args = func_get_args();
 				foreach($args as &$item)
-					$item = $this->quote($item);
+					$item = $this->escape($item);
 				$sql = vsprintf(str_replace('?', '%s', $sql), array_slice($args, 1));
 			}
 
@@ -139,6 +138,31 @@
 		}
 
 		// You can pass in nothing, a string, or a db result
+		function getValues($arg = null)
+		{
+			if(is_null($arg) && $this->hasRows())
+				$result = $this->result;
+			elseif(is_resource($arg) && $this->hasRows($arg))
+				$result = $arg;
+			elseif(is_string($arg))
+			{
+				$this->query($arg);
+				if($this->hasRows())
+					$result = $this->result;
+				else
+					return array();
+			}
+			else
+				return array();
+
+			$rows = array();
+			mysql_data_seek($result, 0);
+			while($row = mysql_fetch_array($result, MYSQL_ASSOC))
+				$rows[] = array_pop($row);
+			return $rows;
+		}
+
+		// You can pass in nothing, a string, or a db result
 		function getObject($arg = null)
 		{
 			if(is_null($arg) && $this->hasRows())
@@ -187,7 +211,8 @@
 
 		function quote($var)
 		{
-			return is_null($var) ? 'NULL' : "'" . $this->escape($var) . "'";
+			if(!is_resource($this->db)) $this->connect();
+			return "'" . $this->escape($var) . "'";
 		}
 
 		function escape($var)
@@ -202,36 +227,22 @@
 
 		function notify()
 		{
-			global $auth;
-			
 			$err_msg = mysql_error($this->db);
 			error_log($err_msg);
 
-			switch($this->onError)
+			if($this->dieOnError === true)
 			{
-				case 'die':
-					echo "<p style='border:5px solid red;background-color:#fff;padding:5px;'><strong>Database Error:</strong><br/>$err_msg</p>";
-					echo "<p style='border:5px solid red;background-color:#fff;padding:5px;'><strong>Last Query:</strong><br/>" . $this->lastQuery() . "</p>";
-					echo "<pre>";
-					debug_print_backtrace();
-					echo "</pre>";
-					die;
-					break;
-				
-				case 'email':
-					$msg  = $_SERVER['PHP_SELF'] . " @ " . date("Y-m-d H:ia") . "\n";
-					$msg .= $err_msg . "\n\n";
-					$msg .= implode("\n", $this->queries) . "\n\n";
-					$msg .= "CURRENT USER\n============\n"     . var_export($auth, true)  . "\n" . $_SERVER['REMOTE_ADDR'] . "\n\n";
-					$msg .= "POST VARIABLES\n==============\n" . var_export($_POST, true) . "\n\n";
-					$msg .= "GET VARIABLES\n=============\n"   . var_export($_GET, true)  . "\n\n";
-					mail($this->errorTo, $_SERVER['PHP_SELF'], $msg, "From: {$this->errorFrom}");
-					break;
+				echo "<p style='border:5px solid red;background-color:#fff;padding:5px;'><strong>Database Error:</strong><br/>$err_msg</p>";
+				echo "<p style='border:5px solid red;background-color:#fff;padding:5px;'><strong>Last Query:</strong><br/>" . $this->lastQuery() . "</p>";
+				echo "<pre>";
+				debug_print_backtrace();
+				echo "</pre>";
+				exit;
 			}
 
-			if($this->redirect === true)
+			if(is_string($this->redirect))
 			{
-				header("Location: {$this->errorPage}");
+				header("Location: {$this->redirect}");
 				exit;
 			}			
 		}

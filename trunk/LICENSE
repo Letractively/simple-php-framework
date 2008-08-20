@@ -1,6 +1,9 @@
-* Copyright (c) 2006-2007, Simple PHP Framework <tylerhall@gmail.com>
+* Copyright (c) 2006-2008, Simple PHP Framework <tylerhall@gmail.com>
 * http://code.google.com/p/simple-php-framework/
 * All rights reserved.
+*
+* This software is released under the terms of the New BSD License.
+* http://www.opensource.org/licenses/bsd-license.php
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
@@ -13,7 +16,7 @@
 *       names of its contributors may be used to endorse or promote products
 *       derived from this software without specific prior written permission.
 *
-* THIS SOFTWARE IS PROVIDED BY Simple PHP Framework ``AS IS'' AND ANY
+* THIS SOFTWARE IS PROVIDED BY Simple PHP Framework "AS IS" AND ANY
 * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
 * DISCLAIMED. IN NO EVENT SHALL Simple PHP Framework OR ITS CONTRIBUTORS 

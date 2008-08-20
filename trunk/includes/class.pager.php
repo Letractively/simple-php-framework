@@ -1,163 +1,95 @@
 <?PHP
-	// The Pager class handles the (basic) display and logic for creating the paging HTML often found
-	// on a search results page or any record set that is broken up across multiple pages.
-	// Can output either a simple "Page 2 of 5" style message or a more complex " << 1 2 3 [4] 5 6 7 >>" one.
-	
-	class Pager
+	class Pager implements Iterator
 	{
-		// Insert [#] for page number placeholder
-		public $link = "index.php?page=[#]";
+		public $page;        // Current page (will be recalculated if outside valid range)
+		public $perPage;     // Number of records per page
+		public $numRecords;  // Total number of records
+		public $numPages;    // Number of pages to display $numRecords records
+		public $firstRecord; // Index of first record on current page
+		public $lastRecord;  // Index of last record on current page
 
-		public $perPage = 10; // Number of items per page
-		public $numPages; // ceil($count / $perPage)
+		private $records;    // Used when iterating over object
 
-		// Prev/Next HTML when *not* linked
-		public $prevMark = '';
-		public $nextMark = '';
-
-		// Prev/Next HTML when linked
-		public $prevMarkLinked = '&#171; Previous';
-		public $nextMarkLinked = 'Next &#187;';
-
-		// Number of pages to show to left and right of current
-		public $radius    = 5; 
-
-		// Tag to wrap page numbers with (advanced mode only)
-		// Use a complete tag such as "<span>" not just "span".
-		// This lets you do stuff like "<span class='foo'>"
-		public $wrapTag = "<span>";
-
-		// HTML between page numbers (advanced mode only)
-		public $seperator = " | ";
-
-		// You typically don't need to modify these
-		public $prev;
-		public $cur;
-		public $next;
-		public $count; // Total number of items (not pages!)
-		public $limit; // Limit value you should pass to your SELECT query
-
-		function __construct($cur, $count, $link = null, $per_page = null)
+		// Initialize the pager object with your settings and calculate the resultant values
+		public function __construct($page, $per_page, $num_records)
 		{
-			$this->cur = $cur;
-
-			if(is_numeric($count)) $this->count  = $count;
-			if(is_array($count)) $this->count    = count($count);
-			if(is_resource($count)) $this->count = mysql_num_rows($count);
-
-			if(!is_null($link)) $this->link        = $link;
-			if(!is_null($per_page)) $this->perPage = $per_page;
-		}
-
-		// If you set any variables after creating the Pager object,
-		// you can call this function to redo the math.
-		function calculate()
-		{
-			$this->numPages = ceil($this->count / $this->perPage);
-			if($this->numPages < 1) $this->numPages = 1;
-
-			if($this->cur < 1) $this->cur = 1;
-			if($this->cur > $this->numPages) $this->cur = $this->numPages;
-
-			$this->limit = ($this->cur - 1) * $this->perPage;
-
-			if($this->cur == 1)
-			{
-				$this->prev = 1;
-				$this->next = ($this->numPages > 1) ? 2 : 1;
-			}
-			elseif($this->cur == $this->numPages)
-			{
-				$this->prev = $this->cur - 1;
-				$this->next = $this->numPages;
-			}
-			else
-			{
-				$this->prev = $this->cur - 1;
-				$this->next = $this->cur + 1;
-			}
-		}
-
-		function simple()
-		{
+			$this->perPage = $per_page;
+			$this->numRecords = $num_records;
+			$this->page = $page;
 			$this->calculate();
-
-			if($this->cur == 1 && $this->numPages == 1)
-				return "{$this->prevMark} Page 1 of 1 {$this->nextMark}";
-			elseif($this->cur == 1 && $this->numPages > 1)
-			{
-				$href = $this->makeLink($this->next);
-				return "<span id='pager_prev'>{$this->prevMark}</span> Page 1 of {$this->numPages} <a href='$href' id='pager_next'>{$this->nextMarkLinked}</a>";
-			}
-			elseif($this->cur == $this->numPages)
-			{
-				$href = $this->makeLink($this->prev);
-				return "<a href='$href' id='pager_prev'>{$this->prevMarkLinked}</a> Page {$this->cur} of {$this->numPages} <span id='pager_next'>{$this->nextMark}</span>";
-			}
-			else
-			{
-				$href_prev = $this->makeLink($this->prev);
-				$href_next = $this->makeLink($this->next);
-				return "<a href='$href_prev' id='pager_prev'>{$this->prevMarkLinked}</a> Page {$this->cur} of {$this->numPages} <a href='$href_next' id='pager_next'>{$this->nextMarkLinked}</a>";
-			}
 		}
-	
-		function advanced()
+
+		// Do the math
+		public function calculate()
 		{
-			$this->calculate();
+			$this->numPages = ceil($this->numRecords / $this->perPage);
 
-			$start = $this->cur - $this->radius;
-			if($start < 1) $start = 1;
+			$this->page = intval($this->page);
+			if($this->page < 1) $this->page = 1;
+			if($this->page > $this->numPages) $this->page = $this->numPages;
 
-			$stop = $this->cur + $this->radius;
-			if($stop > $this->numPages) $stop = $this->numPages;
+			$this->firstRecord = (int) ($this->page - 1) * $this->perPage;
+			$this->lastRecord  = (int) $this->firstRecord + $this->perPage - 1;
+			if($this->lastRecord >= $this->numRecords) $this->lastRecord = $this->numRecords - 1;
 
-			if(preg_match('@<([a-zA-Z]+)@', $this->wrapTag, $matches) == 1)
-			{
-				$opening_tag = $this->wrapTag;
-				$closing_tag = "</{$matches[1]}>";
-			}
-			else
-			{
-				$opening_tag = '';
-				$closing_tag = '';
-			}
-
-			$numbers = array();
-			for($i = $start; $i <= $stop; $i++)
-			{
-				$href = $this->makeLink($i);
-			
-				if($i == $this->cur)
-					$numbers[] = "$opening_tag<a href='$href' class='pager_number pager_current'>$i</a>$closing_tag";
-				else
-					$numbers[] = "$opening_tag<a href='$href' class='pager_number'>$i</a>$closing_tag";
-			}
-		
-			$numbers = implode($this->seperator, $numbers);
-
-			if($this->cur == 1 && $this->numPages == 1)
-				return "{$this->prevMark} $numbers {$this->nextMark}";
-			elseif($this->cur == 1 && $this->numPages > 1)
-			{
-				$href = $this->makeLink($this->next);
-				return "<span class='pager_prev'>{$this->prevMark}</span> $numbers &#8212; <a href='$href' class='pager_next'>{$this->nextMarkLinked}</a>";
-			}
-			elseif($this->cur == $this->numPages)
-			{
-				$href = $this->makeLink($this->prev);
-				return "<a href='$href' class='pager_prev'>{$this->prevMarkLinked}</a> &#8212; $numbers <span class='pager_next'>{$this->nextMark}</span>";
-			}
-			else
-			{
-				$href_prev = $this->makeLink($this->prev);
-				$href_next = $this->makeLink($this->next);
-				return "<a href='$href_prev' class='pager_prev'>{$this->prevMarkLinked}</a> &#8212; $numbers &#8212; <a href='$href_next' class='pager_next'>{$this->nextMarkLinked}</a>";
-			}
+			$this->getRecords();
 		}
 
-		function makeLink($page_num)
+		// Will return current page if no previous page exists
+		public function prevPage()
 		{
-			return str_replace("[#]", $page_num, $this->link);
+			return max(1, $this->page - 1);
 		}
+
+		// Will return current page if no next page exists
+		public function nextPage()
+		{
+			return min($this->numPages, $this->page + 1);
+		}
+
+		// Is there a valid previous page?
+		public function hasPrevPage()
+		{
+			return $this->page > 1;
+		}
+
+		// Is there a valid next page?
+		public function hasNextPage()
+		{
+			return $this->page < $this->numPages;
+		}
+
+		// Returns an *inclusive* array of record indexes to be displayed on the current page
+		public function getRecords()
+		{
+			$this->records = array();
+			for($i = $this->firstRecord; $i <= $this->lastRecord; $i++)
+				$this->records[] = $i;
+			return $this->records;
+		}
+
+		public function rewind()
+		{
+			reset($this->records);
+	    }
+
+	    public function current()
+		{
+	    	return current($this->records);
+	    }
+
+	    public function key()
+		{
+	        return key($this->records);
+	    }
+
+	    public function next()
+		{
+			return next($this->records);
+	    }
+
+	    public function valid()
+		{
+			return $this->current() !== false;
+	    }
 	}

@@ -3,6 +3,7 @@
 	{
 		public $id;
 		public $searchCols;
+
 		protected $idName;
 		protected $tableName;
 		protected $columns = array();
@@ -13,7 +14,7 @@
 			$this->idName    = $id_name;
 
 			foreach($columns as $key)
-				$this->columns[$key] = null;
+				$this->columns[$key] = '';
 
 			if($id != '')
 				$this->select($id);
@@ -23,7 +24,7 @@
 		{
 			if(substr($key, 0, 2) == '__')
 				return htmlspecialchars($this->columns[substr($key, 2)]);
-			else
+			elseif(array_key_exists($key, $this->columns))
 				return $this->columns[$key];
 		}
 
@@ -45,7 +46,8 @@
 			$id = mysql_real_escape_string($id, $db->db);
 			$column = mysql_real_escape_string($column, $db->db);
 
-			$db->query("SELECT * FROM " . $this->tableName . " WHERE `$column` = '$id'");
+			$db->query("SELECT * FROM {$this->tableName} WHERE `$column` = '?'", $id);
+
 			if(mysql_num_rows($db->result) == 0)
 				return false;
 			else
@@ -108,12 +110,15 @@
 		}
 
 		// Grab a large block of instantiated objects from the database using only one query.
-		function glob($sql = '')
+		function glob($sql = null)
 		{
 			global $db;
 
+			if(is_null($sql))
+				$sql = "SELECT * FROM {$this->tableName}";
+
 			$objs = array();
-			$rows = $db->getRows("SELECT * FROM {$this->tableName} $sql");
+			$rows = $db->getRows($sql);
 			$class = get_class($this);
 			foreach($rows as $row)
 			{
@@ -146,19 +151,19 @@
 
 			$vals = array();
 			foreach($this->columns  as $key => $val)
-				$vals[$key] = $db->quote($val);
+				$vals[$key] = is_null($val) ? 'NULL' : $db->quote($val);
 			return $vals;
 		}
 	}
 
 	class TaggableDBObject extends DBObject
 	{
-		private $tagCol;
+		protected $tagCol;
 
 		function __construct($table_name, $id_name, $columns, $id = '')
 		{
 			parent::__construct($table_name, $id_name, $columns, $id);
-			$this->tagCol = get_class($this) . '_id';
+			$this->tagCol = strtolower(get_class($this) . '_id');
 		}
 
 		function addTag($name)
@@ -166,8 +171,11 @@
 			global $db;
 
 			if($this->id == '') return false;
+
+			if(preg_match('/^\s*$/', $name) > 0) return false;
+
 			$t = new Tag($name);
-			$db->query("INSERT IGNORE {$this->tableName}2tags ({$this->tagCol}, tag_id) VALUES (?, ?)", $this->id, $t->id);
+			$db->query("INSERT IGNORE {$this->tableName}2tags ({$this->tagCol}, tag_id) VALUES ('?', '?')", $this->id, $t->id);
 		}
 
 		function removeTag($name)
@@ -175,7 +183,14 @@
 			global $db;
 			if($this->id == '') return false;
 			$t = new Tag($name);
-			$db->query("DELETE FROM {$this->tableName}2tags WHERE {$this->tagCol} = ? AND tag_id = ?", $this->id, $t->id);
+			$db->query("DELETE FROM {$this->tableName}2tags WHERE {$this->tagCol} = '?' AND tag_id = '?'", $this->id, $t->id);
+		}
+		
+		function clearTags()
+		{
+			global $db;
+			if($this->id == '') return false;
+			$db->query("DELETE FROM {$this->tableName}2tags WHERE {$this->tagCol} = '?'", $this->id);
 		}
 
 		function tags()

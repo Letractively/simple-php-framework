@@ -10,6 +10,6 @@
 # RewriteEngine On
 # RewriteBase /
 
-# RewriteCond %{REQUEST_FILENAME} !-f
-# RewriteCond %{REQUEST_FILENAME} !-d
-# RewriteRule . /index.php [L]
+# RewriteCond %{REQUEST_FILENAME} !-f # If not a file...
+# RewriteCond %{REQUEST_FILENAME} !-d # and not a directory...
+# RewriteRule . /index.php [L]        # serve index.php
