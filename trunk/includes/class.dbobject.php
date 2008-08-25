@@ -8,7 +8,7 @@
 		protected $tableName;
 		protected $columns = array();
 
-		function __construct($table_name, $id_name, $columns, $id = '')
+		public function __construct($table_name, $id_name, $columns, $id = '')
 		{
 			$this->tableName = $table_name;
 			$this->idName    = $id_name;
@@ -20,7 +20,7 @@
 				$this->select($id);
 		}
 
-		function __get($key)
+		public function __get($key)
 		{
 			if(substr($key, 0, 2) == '__')
 				return htmlspecialchars($this->columns[substr($key, 2)]);
@@ -28,7 +28,7 @@
 				return $this->columns[$key];
 		}
 
-		function __set($key, $value)
+		public function __set($key, $value)
 		{
 			if(array_key_exists($key, $this->columns))
 			{
@@ -38,7 +38,7 @@
 			return false;
 		}
 
-		function select($id, $column = '')
+		public function select($id, $column = '')
 		{
 			global $db;
 			if($column == '') $column = $this->idName;
@@ -59,12 +59,12 @@
 			}
 		}
 
-		function replace()
+		public function replace()
 		{
 			return $this->insert('REPLACE INTO');
 		}
 
-		function insert($cmd = 'INSERT INTO')
+		public function insert($cmd = 'INSERT INTO')
 		{
 			global $db;
 
@@ -82,7 +82,7 @@
 			}
 		}
 
-		function update()
+		public function update()
 		{
 			global $db;
 
@@ -98,7 +98,7 @@
 			return mysql_affected_rows($db->db); // Not always correct due to mysql update bug/feature
 		}
 
-		function delete($id = null)
+		public function delete($id = null)
 		{
 			global $db;
 
@@ -110,7 +110,7 @@
 		}
 
 		// Grab a large block of instantiated objects from the database using only one query.
-		function glob($sql = null)
+		public function glob($sql = null)
 		{
 			global $db;
 
@@ -130,9 +130,9 @@
 			return $objs;
 		}
 
-		function postLoad() { $this->load($_POST); }
-		function getLoad()  { $this->load($_GET); }
-		function load($arr)
+		public function postLoad() { $this->load($_POST); }
+		public function getLoad()  { $this->load($_GET); }
+		public function load($arr)
 		{
 			if(is_array($arr))
 			{
@@ -145,7 +145,7 @@
 			return false;
 	 	}
 
-		function quoteColumnVals()
+		public function quoteColumnVals()
 		{
 			global $db;
 
@@ -154,19 +154,25 @@
 				$vals[$key] = is_null($val) ? 'NULL' : $db->quote($val);
 			return $vals;
 		}
+		
+		public function addColumn($key)
+		{
+			if(!in_array($key, array_keys($this->columns)))
+				$this->columns[$key] = '';
+		}
 	}
 
 	class TaggableDBObject extends DBObject
 	{
 		protected $tagCol;
 
-		function __construct($table_name, $id_name, $columns, $id = '')
+		public function __construct($table_name, $id_name, $columns, $id = '')
 		{
 			parent::__construct($table_name, $id_name, $columns, $id);
 			$this->tagCol = strtolower(get_class($this) . '_id');
 		}
 
-		function addTag($name)
+		public function addTag($name)
 		{
 			global $db;
 
@@ -178,7 +184,7 @@
 			$db->query("INSERT IGNORE {$this->tableName}2tags ({$this->tagCol}, tag_id) VALUES ('?', '?')", $this->id, $t->id);
 		}
 
-		function removeTag($name)
+		public function removeTag($name)
 		{
 			global $db;
 			if($this->id == '') return false;
@@ -186,14 +192,14 @@
 			$db->query("DELETE FROM {$this->tableName}2tags WHERE {$this->tagCol} = '?' AND tag_id = '?'", $this->id, $t->id);
 		}
 		
-		function clearTags()
+		public function clearTags()
 		{
 			global $db;
 			if($this->id == '') return false;
 			$db->query("DELETE FROM {$this->tableName}2tags WHERE {$this->tagCol} = '?'", $this->id);
 		}
 
-		function tags()
+		public function tags()
 		{
 			global $db;
 			if($this->id == '') return false;
@@ -202,7 +208,7 @@
 		}
 
 		// Glob by tag name
-		function tagged($tag_name, $sql = '')
+		public function tagged($tag_name, $sql = '')
 		{
 			global $db;
 
@@ -218,5 +224,5 @@
 				$objs[] = $o;
 			}
 			return $objs;
-		}
+		}		
 	}

@@ -270,13 +270,13 @@
 	}
 
 	// Returns the first $num words of $str
-	function max_words($str, $num)
+	function max_words($str, $num, $suffix = '')
 	{
 		$words = explode(' ', $str);
 		if(count($words) < $num)
 			return $str;
 		else
-			return implode(' ', array_slice($words, 0, $num));
+			return implode(' ', array_slice($words, 0, $num)) . $suffix;
 	}
 
 	// Serves an external document for download as an HTTP attachment.
