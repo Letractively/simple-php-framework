@@ -19,10 +19,14 @@
 			$this->calculate();
 		}
 
-		// Do the math
+		// Do the math.
+		// Note: Pager always calculates there to be *at least* 1 page. Even if there are 0 records, we still,
+		// by convention, assume it takes 1 page to display those 0 records. While mathematically stupid, it
+		// makes sense from a UI perspective.
 		public function calculate()
 		{
 			$this->numPages = ceil($this->numRecords / $this->perPage);
+			if($this->numPages == 0) $this->numPages = 1;
 
 			$this->page = intval($this->page);
 			if($this->page < 1) $this->page = 1;
