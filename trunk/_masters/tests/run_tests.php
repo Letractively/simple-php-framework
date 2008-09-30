@@ -1,3 +1,3 @@
 <?PHP
-	include 'test.class.loop.php';
-	include 'test.functions.inc.php';
+    include 'test.class.loop.php';
+    include 'test.functions.inc.php';

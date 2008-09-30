@@ -1,48 +1,48 @@
 <?PHP
-	class Loop
-	{
-		private $index;
-		private $elements;
-		private $numElements;
+    class Loop
+    {
+        private $index;
+        private $elements;
+        private $numElements;
 
-		function __construct()
-		{
-			$this->index       = 0;
-			$this->elements    = func_get_args();
-			$this->numElements = func_num_args();
-		}
+        function __construct()
+        {
+            $this->index       = 0;
+            $this->elements    = func_get_args();
+            $this->numElements = func_num_args();
+        }
 
-		function __tostring()
-		{
-			return (string) $this->get();
-		}
+        function __tostring()
+        {
+            return (string) $this->get();
+        }
 
-		function get()
-		{
-			if($this->numElements == 0) return null;
+        function get()
+        {
+            if($this->numElements == 0) return null;
 
-			$val = $this->elements[$this->index];
+            $val = $this->elements[$this->index];
 
-			if(++$this->index >= $this->numElements)
-				$this->index = 0;
+            if(++$this->index >= $this->numElements)
+                $this->index = 0;
 
-			return $val;
-		}
-		
-		function rand()
-		{
-			return $this->elements[array_rand($this->elements)];
-		}
-	}
+            return $val;
+        }
 
-	// Example:
-	// $color = new Loop('white', 'black');
-	// 
-	// echo "<tr color='$color'/>";
-	// echo "<tr color='$color'/>";
-	// echo "<tr color='$color'/>";
-	//
-	// Or
-	//
-	// while($row = mysql_fetch_array($result))
-	// 		echo "<tr color'$color'>the row colors will alternate</tr>";
+        function rand()
+        {
+            return $this->elements[array_rand($this->elements)];
+        }
+    }
+
+    // Example:
+    // $color = new Loop('white', 'black');
+    //
+    // echo "<tr color='$color'/>";
+    // echo "<tr color='$color'/>";
+    // echo "<tr color='$color'/>";
+    //
+    // Or
+    //
+    // while($row = mysql_fetch_array($result))
+    //      echo "<tr color'$color'>the row colors will alternate</tr>";

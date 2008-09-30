@@ -1,35 +1,35 @@
 <?PHP
-	// Determine our absolute document root
-	define('DOC_ROOT', realpath(dirname(__FILE__) . '/../'));
+    // Determine our absolute document root
+    define('DOC_ROOT', realpath(dirname(__FILE__) . '/../'));
 
-	// Global include files
-	require DOC_ROOT . '/includes/functions.inc.php'; // __autoload() is contained in this file
-	require DOC_ROOT . '/includes/class.dbobject.php';
-	require DOC_ROOT . '/includes/class.objects.php';
-	
-	// Load our config settings
-	Config::load();
+    // Global include files
+    require DOC_ROOT . '/includes/functions.inc.php'; // __autoload() is contained in this file
+    require DOC_ROOT . '/includes/class.dbobject.php';
+    require DOC_ROOT . '/includes/class.objects.php';
 
-	// Connect to database (does not actually open the connection until it's needed)
-	$db = new Database();
+    // Load our config settings
+    Config::load();
 
-	// Store session info in the database?
-	if(Config::$useDBSessions === true)
-		DBSession::register();	
+    // Connect to database (does not actually open the connection until it's needed)
+    $db = new Database();
 
-	// Initialize our session...
-	session_start();
+    // Store session info in the database?
+    if(Config::$useDBSessions === true)
+        DBSession::register();
 
-	// Initialize current user
-	$auth = new Auth();
+    // Initialize our session...
+    session_start();
 
-	// Object for tracking and displaying error messages
-	$Error = new Error();
+    // Initialize current user
+    $auth = new Auth();
 
-	// Fix magic quotes
-	if(get_magic_quotes_gpc())
-	{
-		$_POST    = fix_slashes($_POST);
-		$_GET     = fix_slashes($_GET);
-		$_REQUEST = fix_slashes($_REQUEST);
-	}
+    // Object for tracking and displaying error messages
+    $Error = new Error();
+
+    // Fix magic quotes
+    if(get_magic_quotes_gpc())
+    {
+        $_POST    = fix_slashes($_POST);
+        $_GET     = fix_slashes($_GET);
+        $_REQUEST = fix_slashes($_REQUEST);
+    }
