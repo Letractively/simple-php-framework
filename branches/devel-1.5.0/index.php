@@ -16,8 +16,8 @@
 <body>
     <h1>Simple PHP Framework</h1>
     <p>This is your home page.</p>
-    <?PHP if($auth->ok()) : ?>
-    <p>You are logged in as <?PHP echo $auth->username; ?>. <a href='<?PHP WEBROOT();?>logout/'>Logout</a>.</p>
+    <?PHP if($Auth->loggedIn()) : ?>
+    <p>You are logged in as <?PHP echo $Auth->username; ?>. <a href='<?PHP WEBROOT();?>logout/'>Logout</a>.</p>
     <?PHP else : ?>
     <p>You are not logged in. <a href='<?PHP WEBROOT();?>login/'>Login</a>.</p>
     <?PHP endif; ?>

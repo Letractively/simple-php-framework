@@ -16,7 +16,7 @@ CREATE TABLE `sessions` (
 -- 
 
 CREATE TABLE `users` (
-  `user_id` int(11) NOT NULL auto_increment,
+  `id` int(11) NOT NULL auto_increment,
   `username` varchar(65) collate utf8_unicode_ci NOT NULL,
   `password` varchar(65) collate utf8_unicode_ci NOT NULL,
   `level` enum('user','admin') collate utf8_unicode_ci NOT NULL,

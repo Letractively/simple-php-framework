@@ -1,61 +1,70 @@
 <?PHP
     class Database
     {
-        public $db = false;
-
-        public $dbname;
+		// Singleton object. Leave $me alone.
+		private static $me;
+		
+        public $db;
         public $host;
-        public $user;
+        public $name;
+        public $username;
         public $password;
-
+        public $dieOnError;
         public $queries;
         public $result;
 
-        public $dieOnError;
         public $redirect = false;
 
-        function __construct($dbserver = null, $dbuser = null, $dbpass = null, $dbname = null, $die_on_error = false)
+		// Singleton constructor
+        private function __construct($connect = false)
         {
-            // If no arguments are passed, attempt to pull from our global $Config variable
-            if(func_num_args() == 0)
-            {
-                $this->host       = Config::$dbserver;
-                $this->user       = Config::$dbuser;
-                $this->password   = Config::$dbpass;
-                $this->dbname     = Config::$dbname;
-                $this->dieOnError = Config::$dberror;
-            }
-            else
-            {
-                $this->host       = $dbserver;
-                $this->user       = $dbuser;
-                $this->password   = $dbpass;
-                $this->dbname     = $dbname;
-                $this->dieOnError = $die_on_error;
-            }
+			$Config = Config::getConfig();
+			
+            $this->host       = $Config->dbHost;
+            $this->name       = $Config->dbName;
+            $this->username   = $Config->dbUsername;
+            $this->password   = $Config->dbPassword;
+            $this->dieOnError = $Config->dbDieOnError;
 
-            $this->queries  = array();
+			$this->db = false;
+            $this->queries = array();
+
+			if($connect === true)
+				$this->connect();
         }
 
-        function connect()
+		// Get Singleton object
+		public static function getDatabase($connect = false)
+		{
+			if(is_null(self::$me))
+				self::$me = new Database($connect);
+			return self::$me;			
+		}
+		
+		public function isConnected()
+		{
+			return is_resource($this->db) && get_resource_type($this->db) == 'mysql link';
+		}
+
+        public function connect()
         {
-            $this->db = mysql_connect($this->host, $this->user, $this->password) or $this->notify();
+            $this->db = mysql_connect($this->host, $this->username, $this->password) or $this->notify();
             if($this->db === false) return false;
-            mysql_select_db($this->dbname, $this->db) or $this->notify();
+            mysql_select_db($this->name, $this->db) or $this->notify();
+			return $this->isConnected();
         }
 
-        function query($sql)
+        public function query($sql)
         {
-            if(!is_resource($this->db))
-                $this->connect();
+			if(!$this->isConnected()) $this->connect();
 
-            // Optionally allow extra args which are escaped and inserted in place of ?
+            // Optionally allow extra args which are escaped and inserted in place of '?'.
             if(func_num_args() > 1)
             {
-                $args = func_get_args();
-                foreach($args as &$item)
-                    $item = $this->escape($item);
-                $sql = vsprintf(str_replace('?', '%s', $sql), array_slice($args, 1));
+				$args = array_slice(func_get_args(), 1);
+				for($i = 0; $i < count($args); $i++)
+					$args[$i] = $this->escape($args[$i]);
+				$sql = vsprintf(str_replace('?', '%s', $sql), $args);
             }
 
             $this->queries[] = $sql;
@@ -63,8 +72,9 @@
             return $this->result;
         }
 
+		// Returns a single value.
         // You can pass in nothing, a string, or a db result
-        function getValue($arg = null)
+        public function getValue($arg = null)
         {
             if(is_null($arg) && $this->hasRows())
                 return mysql_result($this->result, 0, 0);
@@ -75,17 +85,17 @@
                 $this->query($arg);
                 if($this->hasRows())
                     return mysql_result($this->result, 0, 0);
-                else
-                    return false;
             }
             return false;
         }
 
-        function numRows($arg = null)
+		// Returns the number of rows.
+        // You can pass in nothing, a string, or a db result
+        public function numRows($arg = null)
         {
             if(is_null($arg) && is_resource($this->result))
                 return mysql_num_rows($this->result);
-            elseif(is_resource($arg) && is_resource($arg))
+            elseif(is_resource($arg))
                 return mysql_num_rows($arg);
             elseif(is_string($arg))
             {
@@ -96,8 +106,9 @@
             return false;
         }
 
+		// Returns the first row.
         // You can pass in nothing, a string, or a db result
-        function getRow($arg = null)
+        public function getRow($arg = null)
         {
             if(is_null($arg) && $this->hasRows())
                 return mysql_fetch_array($this->result, MYSQL_ASSOC);
@@ -112,8 +123,9 @@
             return false;
         }
 
+		// Returns an array of all the rows.
         // You can pass in nothing, a string, or a db result
-        function getRows($arg = null)
+        public function getRows($arg = null)
         {
             if(is_null($arg) && $this->hasRows())
                 $result = $this->result;
@@ -137,8 +149,9 @@
             return $rows;
         }
 
+		// Returns an array of the first value in each row.
         // You can pass in nothing, a string, or a db result
-        function getValues($arg = null)
+        public function getValues($arg = null)
         {
             if(is_null($arg) && $this->hasRows())
                 $result = $this->result;
@@ -155,75 +168,43 @@
             else
                 return array();
 
-            $rows = array();
+            $values = array();
             mysql_data_seek($result, 0);
             while($row = mysql_fetch_array($result, MYSQL_ASSOC))
-                $rows[] = array_pop($row);
-            return $rows;
+                $values[] = array_pop($row);
+            return $values;
         }
 
-        // You can pass in nothing, a string, or a db result
-        function getObject($arg = null)
-        {
-            if(is_null($arg) && $this->hasRows())
-                return mysql_fetch_object($this->result);
-            elseif(is_resource($arg) && $this->hasRows($arg))
-                return mysql_fetch_object($arg);
-            elseif(is_string($arg))
-            {
-                $this->query($arg);
-                if($this->hasRows())
-                    return mysql_fetch_object($this->result);
-            }
-            return false;
-        }
-
-        // You can pass in nothing, a string, or a db result
-        function getObjects($arg = null)
-        {
-            if(is_null($arg) && $this->hasRows())
-                $result = $this->result;
-            elseif(is_resource($arg) && $this->hasRows($arg))
-                $result = $arg;
-            elseif(is_string($arg))
-            {
-                $this->query($arg);
-                if($this->hasRows())
-                    $result = $this->result;
-                else
-                    return array();
-            }
-            else
-                return array();
-
-            $objects = array();
-            mysql_data_seek($result, 0);
-            while($object = mysql_fetch_object($result))
-                $objects[] = $object;
-            return $objects;
-        }
-
-        function hasRows($result = null)
+        public function hasRows($result = null)
         {
             if(is_null($result)) $result = $this->result;
             return is_resource($result) && (mysql_num_rows($result) > 0);
         }
 
-        function quote($var)
+		// Escapes a value and wraps it in single quotes.
+        public function quote($var)
         {
-            if(!is_resource($this->db)) $this->connect();
+            if(!$this->isConnected()) $this->connect();
             return "'" . $this->escape($var) . "'";
         }
 
-        function escape($var)
+		// Escapes a value.
+        public function escape($var)
         {
-            if(!is_resource($this->db)) $this->connect();
+            if(!$this->isConnected()) $this->connect();
             return mysql_real_escape_string($var, $this->db);
         }
 
         function quoteParam($var) { return $this->quote($_REQUEST[$var]); }
         function numQueries() { return count($this->queries); }
-        function lastQuery() { return $this->queries[count($this->queries) - 1]; }
+
+        function lastQuery()
+		{
+			if($this->numQueries() > 0)
+				return $this->queries[$this->numQueries() - 1];
+			else
+				return false;
+		}
 
         function notify()
         {

@@ -1,7 +1,7 @@
 <?PHP
     class DBSession
     {
-        private static $link = null;
+        private static $db = null;
 
         public static function register()
         {
@@ -11,54 +11,36 @@
 
         public static function open()
         {
-            if(is_null($GLOBALS['db']))
-                return false;
-
-            if(!is_resource($GLOBALS['db']->db))
-            {
-                // Attempt to connect...
-                $GLOBALS['db']->connect();
-                if(!is_resource($GLOBALS['db']->db))
-                    return false;
-            }
-
-            self::$link = $GLOBALS['db']->db;
-            return true;
+			self::$db = Database::getDatabase(true);
+			return self::$db->isConnected();
         }
 
         public static function close()
         {
-            self::$link = null;
             return true;
         }
 
         public static function read($id)
         {
-            $id = mysql_real_escape_string($id, self::$link);
-            $result = mysql_query("SELECT `data` FROM `sessions` WHERE `id` = '$id'", self::$link);
-            return (mysql_num_rows($result) > 0) ? mysql_result($result, 0, 0) : '';
+			self::$db->query("SELECT `data` FROM `sessions` WHERE `id` = '?'", $id);
+			return self::$db->hasRows() ? self::$db->getValue() : '';
         }
 
         public static function write($id, $data)
         {
-            $id   = mysql_real_escape_string($id, self::$link);
-            $data = mysql_real_escape_string($data, self::$link);
-            $time = time();
-            mysql_query("REPLACE INTO `sessions` (`id`, `data`, `updated_on`) VALUES ('$id', '$data', '$time')", self::$link);
-            return (mysql_affected_rows(self::$link) == 1);
+			self::$db->query("REPLACE INTO `sessions` (`id`, `data`, `updated_on`) VALUES ('?', '?', '?')", $id, $data, time());
+            return (mysql_affected_rows(self::$db->db) == 1);
         }
 
         public static function destroy($id)
         {
-            $id = mysql_real_escape_string($id, self::$link);
-            mysql_query("DELETE FROM `sessions` WHERE `id` = '$id'", self::$link);
-            return (mysql_affected_rows(self::$link) == 1);
+            self::$db->query("DELETE FROM `sessions` WHERE `id` = '?'", $id);
+            return (mysql_affected_rows(self::$db->db) == 1);
         }
 
         public static function gc($max)
         {
-            $time = time() - $max;
-            mysql_query("DELETE FROM `sessions` WHERE `updated_on` < '$time'", self::$link);
+            self::$db->query("DELETE FROM `sessions` WHERE `updated_on` < '?'", time() - $max);
             return true;
         }
     }

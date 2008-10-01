@@ -2,16 +2,16 @@
 	require '../includes/master.inc.php';
 
 	// Kick out user if already logged in.
-	if($auth->ok()) redirect(WEB_ROOT);
+	if($Auth->loggedIn()) redirect(WEB_ROOT);
 
 	// Try to log in...
 	if(!empty($_POST['username']))
 	{
-		$auth->login($_POST['username'], $_POST['password']);
-		if($auth->ok())
+		$Auth->login($_POST['username'], $_POST['password']);
+		if($Auth->loggedIn())
 			redirect(WEB_ROOT);
 		else
-			$Error->add("We're sorry, you have entered an incorrect username and password. Please try again.", 'username');
+			$Error->add('username', "We're sorry, you have entered an incorrect username and password. Please try again.");
 	}
 
 	$username = isset($_POST['username']) ? $_POST['username'] : "";
@@ -24,8 +24,8 @@
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 	<title>Login</title>
-	<!-- <link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/2.5.2/build/reset-fonts-grids/reset-fonts-grids.css"> -->
-	<!-- <link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/2.5.2/build/base/base-min.css"> -->
+	<link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/2.5.2/build/reset-fonts-grids/reset-fonts-grids.css">
+	<link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/2.5.2/build/base/base-min.css">
 	<link rel="stylesheet" href="<?PHP WEBROOT();?>styles/screen.css" type="text/css" media="screen" title="Screen" charset="utf-8" />
 	<?PHP $Error->css(); ?>
 </head>

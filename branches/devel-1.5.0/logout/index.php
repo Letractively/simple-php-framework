@@ -1,4 +1,4 @@
 <?PHP
 	require '../includes/master.inc.php';
-	$auth->logout();
+	$Auth->logout();
 	redirect(WEB_ROOT);
