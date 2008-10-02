@@ -8,7 +8,7 @@
         public $type   = null;
         public $mime   = null;
 
-        function __construct($data = null, $ext = null)
+        public function __construct($data = null, $ext = null)
         {
             if(is_resource($data) && get_resource_type($data) == 'gd')
                 return $this->loadResource($data);
@@ -18,7 +18,7 @@
                 return false;
         }
 
-        function loadResource($im)
+        public function loadResource($im)
         {
             if(!is_resource($im) || !get_resource_type($im) == 'gd') return false;
 
@@ -29,7 +29,7 @@
             return true;
         }
 
-        function loadFile($filename)
+        public function loadFile($filename)
         {
             if(!file_exists($filename) || !is_readable($filename)) return false;
 
@@ -40,20 +40,21 @@
             $this->mime   = $info['mime'];
 
             if($this->type == 'jpeg' && (imagetypes() & IMG_JPG))
-                $im = imagecreatefromjpeg($filename);
+                $this->im = imagecreatefromjpeg($filename);
             elseif($this->type == 'png' && (imagetypes() & IMG_PNG))
-                $im = imagecreatefrompng($filename);
+                $this->im = imagecreatefrompng($filename);
             elseif($this->type == 'gif' && (imagetypes() & IMG_GIF))
-                $im = imagecreatefromgif($filename);
+                $this->im = imagecreatefromgif($filename);
             else
                 return false;
-            return $this->loadResource($im);
+
+			return true;
         }
 
-        function saveAs($filename, $type = 'jpg')
+        public function saveAs($filename, $type = 'jpg', $quality = 75)
         {
             if($type == 'jpg' && (imagetypes() & IMG_JPG))
-                return imagejpeg($this->im, $filename);
+                return imagejpeg($this->im, $filename, $quality);
             elseif($type == 'png' && (imagetypes() & IMG_PNG))
                 return imagepng($this->im, $filename);
             elseif($type == 'gif' && (imagetypes() & IMG_GIF))
@@ -63,12 +64,12 @@
         }
 
         // Output file to browser
-        function output($type = 'jpg')
+        public function output($type = 'jpg', $quality = 75)
         {
             if($type == 'jpg' && (imagetypes() & IMG_JPG))
             {
                 header("Content-Type: image/jpeg");
-                imagejpeg($this->im);
+                imagejpeg($this->im, $quality);
                 return true;
             }
             elseif($type == 'png' && (imagetypes() & IMG_PNG))
@@ -88,7 +89,7 @@
         }
 
         // Resizes an image and maintains aspect ratio.
-        function scale($new_width = null, $new_height = null)
+        public function scale($new_width = null, $new_height = null)
         {
             if(!is_null($new_width) && is_null($new_height))
                 $new_height = $new_width * $this->height / $this->width;
@@ -108,7 +109,7 @@
         }
 
         // Resizes an image to an exact size
-        function resize($new_width, $new_height)
+        public function resize($new_width, $new_height)
         {
             $dest = imagecreatetruecolor($new_width, $new_height);
 
@@ -127,15 +128,15 @@
             return false;
         }
 
-        function crop($x, $y, $w, $h)
+        public function crop($x, $y, $w, $h)
         {
             $dest = imagecreatetruecolor($w, $h);
 
             if(imagecopyresampled($dest, $this->im, 0, 0, $x, $y, $w, $h, $w, $h))
             {
                 $this->im = $dest;
-                $this->width = imagesx($this->im);
-                $this->height = imagesy($this->im);
+                $this->width = $w;
+                $this->height = $h;
                 return true;
             }
 
