@@ -5,19 +5,19 @@
         private $elements;
         private $numElements;
 
-        function __construct()
+        public function __construct()
         {
             $this->index       = 0;
             $this->elements    = func_get_args();
             $this->numElements = func_num_args();
         }
 
-        function __tostring()
+        public function __tostring()
         {
             return (string) $this->get();
         }
 
-        function get()
+        public function get()
         {
             if($this->numElements == 0) return null;
 
@@ -29,7 +29,7 @@
             return $val;
         }
 
-        function rand()
+        public function rand()
         {
             return $this->elements[array_rand($this->elements)];
         }

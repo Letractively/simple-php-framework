@@ -14,7 +14,7 @@
         $s = empty($_SERVER['HTTPS']) ? '' : ($_SERVER['HTTPS'] == 'on') ? 's' : '';
         $protocol = substr(strtolower($_SERVER['SERVER_PROTOCOL']), 0, strpos(strtolower($_SERVER['SERVER_PROTOCOL']), '/')) . $s;
         $port = ($_SERVER['SERVER_PORT'] == '80') ? '' : (":".$_SERVER['SERVER_PORT']);
-        return $protocol . "://" . $_SERVER['SERVER_NAME'] . $port . $_SERVER['REQUEST_URI'];
+        return $protocol . "://" . $_SERVER['HTTP_HOST'] . $port . $_SERVER['REQUEST_URI'];
     }
 
     // Returns an English representation of a past date within the last month
@@ -133,7 +133,7 @@
     }
 
     // Converts a date/timestamp into the specified format
-    function dater($format = null, $date = null)
+    function dater($date = null, $format = null)
     {
         if(is_null($format))
             $format = "Y-m-d H:i:s";
@@ -309,10 +309,9 @@
         $head = curl_exec($ch);
         curl_close($ch);
 
-        $regex = '/Content-Length:\s([0-9].+?)\s/';
-        preg_match($regex, $head, $matches);
+        preg_match('/Content-Length:\s([0-9].+?)\s/', $head, $matches);
 
-        return isset($matches[1]) ? $matches[1] : 'unknown';
+        return isset($matches[1]) ? $matches[1] : false;
     }
 
     // Outputs a filesize in human readable format.
@@ -485,9 +484,9 @@
     {
         if(!(isset($_SERVER['PHP_AUTH_USER']) && isset($_SERVER['PHP_AUTH_PW']) && $_SERVER['PHP_AUTH_USER'] == $un && $_SERVER['PHP_AUTH_PW'] == $pw))
         {
-            header('WWW-Authenticate: Basic realm="$realm"');
+            header('WWW-Authenticate: Basic realm="' . $realm . '"');
             header('Status: 401 Unauthorized');
-            exit(); //???
+            exit();
         }
     }
 

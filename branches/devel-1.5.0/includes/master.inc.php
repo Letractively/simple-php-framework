@@ -33,4 +33,4 @@
     $Auth = Auth::getAuth();
 
     // Object for tracking and displaying error messages
-    $Error = new Error();
+    $Error = Error::getError();

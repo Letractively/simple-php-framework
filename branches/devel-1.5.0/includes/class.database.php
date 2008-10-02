@@ -40,10 +40,19 @@
 				self::$me = new Database($connect);
 			return self::$me;			
 		}
-		
+
+		// Do we have a valid database connection?
 		public function isConnected()
 		{
 			return is_resource($this->db) && get_resource_type($this->db) == 'mysql link';
+		}
+		
+		// Do we have a valid database connection and have we selected a database?
+		public function databaseSelected()
+		{
+			if(!$this->isConnected()) return false;
+			$result = mysql_list_tables($this->name, $this->db);
+			return is_resource($result);
 		}
 
         public function connect()
@@ -72,6 +81,29 @@
             return $this->result;
         }
 
+		// Returns the number of rows.
+        // You can pass in nothing, a string, or a db result
+        public function numRows($arg = null)
+        {
+            if(is_null($arg) && is_resource($this->result))
+                return mysql_num_rows($this->result);
+            elseif(is_resource($arg))
+                return mysql_num_rows($arg);
+            elseif(is_string($arg))
+            {
+                $this->query($arg);
+                if(is_resource($this->result))
+                    return mysql_num_rows($this->result);
+            }
+            return false;
+        }
+
+        public function hasRows($result = null)
+        {
+            if(is_null($result)) $result = $this->result;
+            return is_resource($result) && (mysql_num_rows($result) > 0);
+        }
+
 		// Returns a single value.
         // You can pass in nothing, a string, or a db result
         public function getValue($arg = null)
@@ -89,21 +121,30 @@
             return false;
         }
 
-		// Returns the number of rows.
+		// Returns an array of the first value in each row.
         // You can pass in nothing, a string, or a db result
-        public function numRows($arg = null)
+        public function getValues($arg = null)
         {
-            if(is_null($arg) && is_resource($this->result))
-                return mysql_num_rows($this->result);
-            elseif(is_resource($arg))
-                return mysql_num_rows($arg);
+            if(is_null($arg) && $this->hasRows())
+                $result = $this->result;
+            elseif(is_resource($arg) && $this->hasRows($arg))
+                $result = $arg;
             elseif(is_string($arg))
             {
                 $this->query($arg);
-                if(is_resource($this->result))
-                    return mysql_num_rows($this->result);
+                if($this->hasRows())
+                    $result = $this->result;
+                else
+                    return array();
             }
-            return false;
+            else
+                return array();
+
+            $values = array();
+            mysql_data_seek($result, 0);
+            while($row = mysql_fetch_array($result, MYSQL_ASSOC))
+                $values[] = array_pop($row);
+            return $values;
         }
 
 		// Returns the first row.
@@ -147,38 +188,6 @@
             while($row = mysql_fetch_array($result, MYSQL_ASSOC))
                 $rows[] = $row;
             return $rows;
-        }
-
-		// Returns an array of the first value in each row.
-        // You can pass in nothing, a string, or a db result
-        public function getValues($arg = null)
-        {
-            if(is_null($arg) && $this->hasRows())
-                $result = $this->result;
-            elseif(is_resource($arg) && $this->hasRows($arg))
-                $result = $arg;
-            elseif(is_string($arg))
-            {
-                $this->query($arg);
-                if($this->hasRows())
-                    $result = $this->result;
-                else
-                    return array();
-            }
-            else
-                return array();
-
-            $values = array();
-            mysql_data_seek($result, 0);
-            while($row = mysql_fetch_array($result, MYSQL_ASSOC))
-                $values[] = array_pop($row);
-            return $values;
-        }
-
-        public function hasRows($result = null)
-        {
-            if(is_null($result)) $result = $this->result;
-            return is_resource($result) && (mysql_num_rows($result) > 0);
         }
 
 		// Escapes a value and wraps it in single quotes.

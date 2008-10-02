@@ -1,10 +1,13 @@
 <?PHP
     class Pager implements Iterator
     {
+		// Stuff you set...
         public $page;        // Current page (will be recalculated if outside valid range)
         public $perPage;     // Number of records per page
         public $numRecords;  // Total number of records
-        public $numPages;    // Number of pages to display $numRecords records
+
+		// Stuff we calculate...
+        public $numPages;    // Number of pages required to display $numRecords records
         public $firstRecord; // Index of first record on current page
         public $lastRecord;  // Index of last record on current page
 
@@ -13,9 +16,9 @@
         // Initialize the pager object with your settings and calculate the resultant values
         public function __construct($page, $per_page, $num_records)
         {
+            $this->page = $page;
             $this->perPage = $per_page;
             $this->numRecords = $num_records;
-            $this->page = $page;
             $this->calculate();
         }
 
@@ -36,7 +39,7 @@
             $this->lastRecord  = (int) $this->firstRecord + $this->perPage - 1;
             if($this->lastRecord >= $this->numRecords) $this->lastRecord = $this->numRecords - 1;
 
-            $this->getRecords();
+			$this->records = range($this->firstRecord, $this->lastRecord, 1);
         }
 
         // Will return current page if no previous page exists
@@ -61,15 +64,6 @@
         public function hasNextPage()
         {
             return $this->page < $this->numPages;
-        }
-
-        // Returns an *inclusive* array of record indexes to be displayed on the current page
-        public function getRecords()
-        {
-            $this->records = array();
-            for($i = $this->firstRecord; $i <= $this->lastRecord; $i++)
-                $this->records[] = $i;
-            return $this->records;
         }
 
         public function rewind()

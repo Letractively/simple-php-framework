@@ -81,7 +81,7 @@
             $this->dbName       = '';
             $this->dbUsername   = '';
             $this->dbPassword   = '';
-            $this->dbDieOnError = true;
+            $this->dbDieOnError = false;
         }
 
         // Add code/variables to be run only on staging servers
@@ -90,13 +90,13 @@
             ini_set('display_errors', '1');
             ini_set('error_reporting', E_ALL);
 
-            define('WEB_ROOT', '/');
+            define('WEB_ROOT', '');
 
             $this->dbHost       = '';
             $this->dbName       = '';
             $this->dbUsername   = '';
             $this->dbPassword   = '';
-            $this->dbDieOnError = true;
+            $this->dbDieOnError = false;
         }
 
         // Add code/variables to be run only on local (testing) servers
@@ -105,7 +105,7 @@
             ini_set('display_errors', '1');
             ini_set('error_reporting', E_ALL);
 
-            define('WEB_ROOT', '/');
+            define('WEB_ROOT', '');
 
             $this->dbHost       = 'localhost';
             $this->dbName       = 'framework15';

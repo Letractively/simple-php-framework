@@ -48,13 +48,11 @@
         function testDater()
         {
             $ts = time();
-            $date = date("Y-m-d H:i:s", $ts);
+            $date = date('Y-m-d H:i:s', $ts);
 
-            $this->equals(dater("Y-m-d H:i:s", $ts), $date);
-            $this->equals(dater("Y-m-d H:i:s", $date), $date);
-            $this->equals(dater("Y-m-d H:i:s", strtotime($date)), $date);
-
-            // 1969-12-31 16:00:00
+            $this->equals(dater($ts, 'Y-m-d H:i:s'), $date);
+            $this->equals(dater($date, 'Y-m-d H:i:s'), $date);
+            $this->equals(dater(strtotime($date), 'Y-m-d H:i:s'), $date);
         }
 
         function testFormatPhone()
