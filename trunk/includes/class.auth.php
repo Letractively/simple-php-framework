@@ -91,7 +91,7 @@
             global $db;
 
             $db_password = $this->makePassword($password);
-            $db->query("SELECT * FROM users WHERE username = " . $db->quote($username) . " AND password = " . $db->quote($db_password));
+            $db->query("SELECT * FROM users WHERE username = " . $db->quote($username) . " AND password = BINARY " . $db->quote($db_password));
             if(mysql_num_rows($db->result) == 1)
             {
                 $row = mysql_fetch_array($db->result, MYSQL_ASSOC);
