@@ -35,18 +35,18 @@
         public $items;
         public $tags;
 
-        function __construct()
+        public function __construct()
         {
             $this->items = array();
             $this->tags  = array();
         }
 
-        function addItem($item)
+        public function addItem($item)
         {
             $this->items[] = $item;
         }
 
-        function setPubDate($when)
+        public function setPubDate($when)
         {
             if(empty($when) || ctype_digit($date) === true)
                 $this->pubDate = date("D, d M Y H:i:s O", $when);
@@ -54,7 +54,7 @@
                 $this->pubDate = date("D, d M Y H:i:s O", strtotime($when));
         }
 
-        function getPubDate()
+        public function getPubDate()
         {
             if(empty($this->pubDate))
                 return date("D, d M Y H:i:s O");
@@ -62,12 +62,12 @@
                 return $this->pubDate;
         }
 
-        function addTag($tag, $value)
+        public function addTag($tag, $value)
         {
             $this->tags[$tag] = $value;
         }
 
-        function loadRecordset($result, $title, $link, $description, $pub_date)
+        public function loadRecordset($result, $title, $link, $description, $pub_date)
         {
             while($row = mysql_fetch_array($result, MYSQL_ASSOC))
             {
@@ -80,7 +80,7 @@
             }
         }
 
-        function out()
+        public function out()
         {
             $out  = $this->header();
             $out .= "<channel>\n";
@@ -101,26 +101,26 @@
             return $out;
         }
 
-        function serve($contentType = 'application/xml')
+        public function serve($contentType = 'application/xml')
         {
             $xml = $this->out();
             header("Content-type: $contentType");
             echo $xml;
         }
 
-        function header()
+        public function header()
         {
             $out  = '<?xml version="1.0" encoding="utf-8"?>' . "\n";
             $out .= '<rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:atom="http://www.w3.org/2005/Atom">' . "\n";
             return $out;
         }
 
-        function footer()
+        public function footer()
         {
             return '</rss>';
         }
 
-        function full_url()
+        public function full_url()
         {
             $s = empty($_SERVER['HTTPS']) ? '' : ($_SERVER['HTTPS'] == 'on') ? 's' : '';
             $protocol = substr(strtolower($_SERVER['SERVER_PROTOCOL']), 0, strpos(strtolower($_SERVER['SERVER_PROTOCOL']), '/')) . $s;
@@ -141,12 +141,12 @@
         public $length;
         public $type;
 
-        function __construct()
+        public function __construct()
         {
             $this->tags = array();
         }
 
-        function setPubDate($when)
+        public function setPubDate($when)
         {
             if(empty($when) || strtotime($when) == false)
                 $this->pubDate = date("D, d M Y H:i:s O", $when);
@@ -154,7 +154,7 @@
                 $this->pubDate = date("D, d M Y H:i:s O", strtotime($when));
         }
 
-        function getPubDate()
+        public function getPubDate()
         {
             if(empty($this->pubDate))
                 return date("D, d M Y H:i:s O");
@@ -162,12 +162,12 @@
                 return $this->pubDate;
         }
 
-        function addTag($tag, $value)
+        public function addTag($tag, $value)
         {
             $this->tags[$tag] = $value;
         }
 
-        function out()
+        public function out()
         {
             $bad = array('&', '<');
             $good = array('&#x26;', '&#x3c;');
@@ -192,7 +192,7 @@
             return $out;
         }
 
-        function enclosure($url, $type, $length)
+        public function enclosure($url, $type, $length)
         {
             $this->attachment = $url;
             $this->type       = $type;

@@ -84,7 +84,7 @@
         // Helper function that redirects away from 'admin only' pages
         public function requireAdmin($url)
         {
-            if($this->level != 'admin')
+            if(!$this->loggedIn() || $this->level != 'admin')
                 redirect($url);
         }
 
@@ -105,7 +105,7 @@
 			if($Config->useHashedPasswords === true)
 				$pw = $this->createHashedPassword($pw);
 			
-			$db->query("SELECT COUNT(*) FROM users WHERE username = '?' AND password = '?'", $this->username, $pw);
+			$db->query("SELECT COUNT(*) FROM users WHERE username = '?' AND password = BINARY '?'", $this->username, $pw);
 			return $db->getValue() == 1;
 		}
 		
@@ -181,6 +181,7 @@
 			$db = Database::getDatabase();
 			$Config = Config::getConfig();			
 			
+			// We SELECT * so we can load the full user record into the user DBObject later
 			$row = $db->getRow('SELECT * FROM users WHERE username = ' . $db->quote($un));
 			if($row === false) return false;
 			

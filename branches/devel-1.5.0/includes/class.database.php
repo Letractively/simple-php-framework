@@ -204,10 +204,12 @@
             return mysql_real_escape_string($var, $this->db);
         }
 
-        function quoteParam($var) { return $this->quote($_REQUEST[$var]); }
-        function numQueries() { return count($this->queries); }
+        public function numQueries()
+		{
+			return count($this->queries);
+		}
 
-        function lastQuery()
+        public function lastQuery()
 		{
 			if($this->numQueries() > 0)
 				return $this->queries[$this->numQueries() - 1];
@@ -215,7 +217,7 @@
 				return false;
 		}
 
-        function notify()
+        private function notify()
         {
             $err_msg = mysql_error($this->db);
             error_log($err_msg);
