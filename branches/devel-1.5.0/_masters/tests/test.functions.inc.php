@@ -70,7 +70,7 @@
 
         function testRemoteFilesize()
         {
-            $this->equals(remote_filesize("http://s3.amazonaws.com/tylerhall/filesize-test.gif"), '48598');
+            $this->equals(remote_filesize("http://s3.amazonaws.com/amz.clickontyler.com/blog/105home.png"), '132729');
         }
 
         function testBytes2Str()
