@@ -79,6 +79,8 @@
 
 		public function update()
 		{
+			if(is_null($this->id)) return false;
+
 			$db = Database::getDatabase();
 			
 			if(count($this->columns) == 0) return;
@@ -88,16 +90,17 @@
 				$sql .= "`$k`=" . $db->quote($v) . ',';
 			$sql[strlen($sql) - 1] = ' ';
 			
-			$sql .= "WHERE `{$this->idColumnName}` = " . $this->quote($this->id);
+			$sql .= "WHERE `{$this->idColumnName}` = " . $db->quote($this->id);
 			$db->query($sql);
 			
 			return mysql_affected_rows($db->db);
 		}
 		
-		public function delete($id)
+		public function delete()
 		{
+			if(is_null($this->id)) return false;
 			$db = Database::getDatabase();
-			$db->query("DELETE FROM `{$this->tableName}` WHERE `{$this->idColumnName}` = '?' LIMIT 1", $id);
+			$db->query("DELETE FROM `{$this->tableName}` WHERE `{$this->idColumnName}` = '?' LIMIT 1", $this->id);
             return mysql_affected_rows($db->db);			
 		}
 		
@@ -113,14 +116,15 @@
 		}
 
         // Grabs a large block of instantiated objects from the database using only one query.		
-		public static function glob($sql)
+		public function glob($sql = null)
 		{
 			$db = Database::getDatabase();
 
-			// Should be able to remove this and allow calling glob() statically
-			// in PHP 5.3 with late static bindings :-)
 			$class = get_class($this);
-			
+
+			if(is_null($sql))
+				$sql = "SELECT * FROM `{$this->tableName}`";
+
 			$objs = array();
 			$rows = $db->getRows($sql);
 			foreach($rows as $row)

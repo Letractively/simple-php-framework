@@ -153,12 +153,11 @@
 	        $bad         = array('&', '<');
 	        $good        = array('&#x26;', '&#x3c;');
 	        $title       = str_replace($bad, $good, $this->title);
-	        $description = str_replace($bad, $good, $this->description);
 
 	        $out  = "<item>\n";
 	        $out .= "<title>" . $title . "</title>\n";
 	        $out .= "<link>" . $this->link . "</link>\n";
-	        $out .= "<description>" . $this->cdata($description) . "</description>\n";
+	        $out .= "<description>" . $this->cdata($this->description) . "</description>\n";
 	        $out .= "<pubDate>" . $this->pubDate . "</pubDate>\n";
 
 	        if(is_null($this->guid))

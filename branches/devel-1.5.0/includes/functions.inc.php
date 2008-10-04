@@ -239,7 +239,7 @@
         exit();
     }
 
-    // Ensures $str ends with a /
+    // Ensures $str ends with a single /
     function slash($str)
     {
         return rtrim($str, '/') . '/';
@@ -251,14 +251,17 @@
         return rtrim($str, '/');
     }
 
+	// Returns an array of the values of the specified column from a multi-dimensional array
     function gimme($arr, $key = null)
     {
-        $first_key = array_shift(array_keys($arr));
-        if(count($arr) == 0) return array();
-        if(is_null($key)) $key = array_shift(array_keys($arr[$first_key]));
-        // if(!isset($arr[$first_key][$key])) return array();
-        foreach($arr as $a) $ret[] = $a[$key];
-        return $ret;
+		if(is_null($key))
+			$key = array_shift(array_keys($arr));
+		
+		$out = array();
+		foreach($arr as $a)
+			$out[] = $a[$key];
+
+		return $out;
     }
 
     // Fixes MAGIC_QUOTES

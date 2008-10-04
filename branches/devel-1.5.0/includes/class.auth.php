@@ -74,6 +74,38 @@
             setcookie('s', '', time() - 3600, '/', $Config->authDomain);
         }
 
+		// Assumes you have already checked for duplicate usernames
+		public function changeUsername($new_username)
+		{
+			$db = Database::getDatabase();
+			$db->query("UPDATE users SET username = '?' WHERE id = '?'", $new_username, $this->id);
+			if(mysql_affected_rows($db->db) == 1)
+			{
+				$this->impersonate($this->id);
+				return true;
+			}
+			
+			return false;
+		}
+		
+		public function changePassword($new_password)
+		{
+			$db = Database::getDatabase();
+			$Config = Config::getConfig();
+
+			if($Config->useHashedPasswords === true)
+				$new_password = $this->createHashedPassword($new_password);
+			
+			$db->query("UPDATE users SET password = '?' WHERE id = '?'", $new_password, $this->id);
+			if(mysql_affected_rows($db->db) == 1)
+			{
+				$this->impersonate($this->id);
+				return true;
+			}
+			
+			return false;
+		}
+
 		// Is a user logged in? This was broken out into its own function
 		// in case extra logic is ever required beyond a simple bool value.
 		public function loggedIn()
@@ -119,9 +151,9 @@
 			$Config = Config::getConfig();
 			
 			if(ctype_digit($user_to_impersonate))
-                $row = $db->getRow("SELECT * FROM users WHERE id = '?'", $db->quote($user_to_impersonate));
+                $row = $db->getRow('SELECT * FROM users WHERE id = ' . $db->quote($user_to_impersonate));
             else
-                $row = $db->getRow("SELECT * FROM users WHERE username = '?'", $db->quote($user_to_impersonate));
+                $row = $db->getRow('SELECT * FROM users WHERE username = ', $db->quote($user_to_impersonate));
 
 			if(is_array($row))
 			{
@@ -140,7 +172,7 @@
 				if($Config->useHashedPasswords === false)
 					$row['password'] = $this->createHashedPassword($row['password']);
 
-				$this->storeSessionData($un, $row['password']);
+				$this->storeSessionData($this->username, $row['password']);
 				$this->loggedIn = true;
 				
 				return true;
