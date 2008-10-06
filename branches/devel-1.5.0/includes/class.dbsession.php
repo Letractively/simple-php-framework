@@ -1,8 +1,6 @@
 <?PHP
     class DBSession
     {
-        private static $db = null;
-
         public static function register()
         {
             ini_set('session.save_handler', 'user');
@@ -11,8 +9,8 @@
 
         public static function open()
         {
-			self::$db = Database::getDatabase(true);
-			return self::$db->isConnected();
+			$db = Database::getDatabase(true);
+			return $db->isConnected();
         }
 
         public static function close()
@@ -22,25 +20,29 @@
 
         public static function read($id)
         {
-			self::$db->query("SELECT `data` FROM `sessions` WHERE `id` = '?'", $id);
+			$db = Database::getDatabase(true);
+			$db->query("SELECT `data` FROM `sessions` WHERE `id` = '?'", $id);
 			return self::$db->hasRows() ? self::$db->getValue() : '';
         }
 
         public static function write($id, $data)
         {
-			self::$db->query("REPLACE INTO `sessions` (`id`, `data`, `updated_on`) VALUES ('?', '?', '?')", $id, $data, time());
-            return (mysql_affected_rows(self::$db->db) == 1);
+			$db = Database::getDatabase(true);
+			$db->query("REPLACE INTO `sessions` (`id`, `data`, `updated_on`) VALUES ('?', '?', '?')", $id, $data, time());
+            return ($db->affectedRows() == 1);
         }
 
         public static function destroy($id)
         {
-            self::$db->query("DELETE FROM `sessions` WHERE `id` = '?'", $id);
-            return (mysql_affected_rows(self::$db->db) == 1);
+			$db = Database::getDatabase(true);
+			$db->query("DELETE FROM `sessions` WHERE `id` = '?'", $id);
+            return ($db->affectedRows() == 1);
         }
 
         public static function gc($max)
         {
-            self::$db->query("DELETE FROM `sessions` WHERE `updated_on` < '?'", time() - $max);
+			$db = Database::getDatabase(true);
+			$db->query("DELETE FROM `sessions` WHERE `updated_on` < '?'", time() - $max);
             return true;
         }
     }

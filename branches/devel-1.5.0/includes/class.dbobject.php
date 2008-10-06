@@ -68,7 +68,7 @@
 			$values = implode(',', $data);
 
 			$db->query("$cmd `{$this->tableName}` ($columns) VALUES ($values)");
-			$this->id = mysql_insert_id($db->db);
+			$this->id = $db->insertId();
 			return $this->id;
 		}
 		
@@ -93,7 +93,7 @@
 			$sql .= "WHERE `{$this->idColumnName}` = " . $db->quote($this->id);
 			$db->query($sql);
 			
-			return mysql_affected_rows($db->db);
+			return $db->affectedRows();
 		}
 		
 		public function delete()
@@ -101,7 +101,7 @@
 			if(is_null($this->id)) return false;
 			$db = Database::getDatabase();
 			$db->query("DELETE FROM `{$this->tableName}` WHERE `{$this->idColumnName}` = '?' LIMIT 1", $this->id);
-            return mysql_affected_rows($db->db);			
+            return $db->affectedRows();
 		}
 		
 		public function load($row)
@@ -195,7 +195,8 @@
             if(is_null($this->id)) return false;
             $result = $db->query("SELECT t.id, t.name FROM {$this->tableName}2tags a LEFT JOIN tags t ON a.tag_id = t.id WHERE a.{$this->tagColumnName} = '{$this->id}'");
 			$tags = array();
-			while($row = mysql_fetch_array($result, MYSQL_ASSOC))
+			$rows = $db->getRows($result);
+			foreach($rows as $row)
 				$tags[$row['name']] = $row['id'];
 			return $tags;
         }

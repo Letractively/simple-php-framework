@@ -110,11 +110,11 @@
     // table name, column to use as value, column(s) to use as text, default value(s) to select (can accept an array of values), extra sql to limit results
     function get_options($table, $val, $text, $default = null, $sql = '')
     {
-        global $db;
+		$db = Database::getDatabase(true);
         $out = '';
 
-        $db->query("SELECT * FROM `$table` $sql");
-        while($row = mysql_fetch_array($db->result, MYSQL_ASSOC))
+		$rows = $db->getRows("SELECT * FROM `$table` $sql");
+		foreach($rows as $row)
         {
             $the_text = '';
             if(!is_array($text)) $text = array($text); // Allows you to concat multiple fields for display
