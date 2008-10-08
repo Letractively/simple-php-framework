@@ -2,8 +2,9 @@
     class DBObject
     {
         public $id;
-        protected $tableName;
-        protected $idColumnName;
+        public $tableName;
+        public $idColumnName;
+
         protected $columns = array();
 
         protected function __construct($table_name, $id_column_name, $columns, $id = null)
@@ -115,21 +116,24 @@
 			}
 		}
 
-        // Grabs a large block of instantiated objects from the database using only one query.		
-		public function glob($sql = null)
+        // Grabs a large block of instantiated $obj_type objects from the database using only one query.
+		public static function glob($obj_type, $sql = null)
 		{
 			$db = Database::getDatabase();
 
-			$class = get_class($this);
+			if(!class_exists($obj_type) || get_parent_class($obj_type) !== 'DBObject')
+				return false;
+
+			$tmp_obj = new $obj_type;
 
 			if(is_null($sql))
-				$sql = "SELECT * FROM `{$this->tableName}`";
+				$sql = "SELECT * FROM `{$tmp_obj->tableName}`";
 
 			$objs = array();
 			$rows = $db->getRows($sql);
 			foreach($rows as $row)
 			{
-			    $o = new $class;
+			    $o = new $obj_type;
 			    $o->load($row);
 			    $objs[$o->id] = $o;
 			}

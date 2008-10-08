@@ -446,7 +446,6 @@
     // Quick and dirty wrapper for curl scraping.
     function curl($url, $referer = null, $post = null)
     {
-        global $last_url;
         static $tmpfile;
 
         if(!isset($tmpfile) || ($tmpfile == '')) $tmpfile = tempnam('/tmp', 'FOO');
@@ -469,7 +468,7 @@
 
         $html = curl_exec($ch);
 
-        $last_url = curl_getinfo($ch, CURLINFO_EFFECTIVE_URL);
+        // $last_url = curl_getinfo($ch, CURLINFO_EFFECTIVE_URL);
         return $html;
     }
 
