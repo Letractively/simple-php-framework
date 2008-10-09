@@ -75,7 +75,7 @@
 		
         public function replace()
         {
-            return $this->insert('REPLACE INTO');
+			return $this->delete() && $this->insert();
         }
 
 		public function update()

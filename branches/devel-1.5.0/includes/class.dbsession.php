@@ -28,7 +28,8 @@
         public static function write($id, $data)
         {
 			$db = Database::getDatabase(true);
-			$db->query("REPLACE INTO `sessions` (`id`, `data`, `updated_on`) VALUES ('?', '?', '?')", $id, $data, time());
+			$db->query("DELETE FROM `sessions` WHERE `id` = '?'", $id);
+			$db->query("INSERT INTO `sessions` (`id`, `data`, `updated_on`) VALUES ('?', '?', '?')", $id, $data, time());
             return ($db->affectedRows() == 1);
         }
 
