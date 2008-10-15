@@ -8,15 +8,6 @@
     <link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/2.5.2/build/reset-fonts-grids/reset-fonts-grids.css">
     <link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/2.5.2/build/base/base-min.css">
     <link rel="stylesheet" href="styles/screen.css" type="text/css" media="screen" title="Screen" charset="utf-8" />
-	<style type="text/css" media="screen">
-		html, body { margin-top:0; padding-top:0; }
-		h1 { background-color:#225378; color:#fff; margin:0; padding:1em; font-size:167%; }
-		#main { text-align:left; margin:1em 2em; }
-		#main p { width:40em; }
-		.error { color:red; }
-		.legal { font-size:85%; color:#999; }
-		.legal a { color:#999; }
-	</style>
 </head>
 
 <body>

@@ -22,7 +22,7 @@
         {
 			$db = Database::getDatabase(true);
 			$db->query("SELECT `data` FROM `sessions` WHERE `id` = '?'", $id);
-			return self::$db->hasRows() ? self::$db->getValue() : '';
+			return $db->hasRows() ? $db->getValue() : '';
         }
 
         public static function write($id, $data)

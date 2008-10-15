@@ -115,7 +115,7 @@
         public function getValue($arg = null)
         {
 			$result = $this->resulter($arg);
-			return $this->hashRows($result) ? mysql_result($result, 0, 0) : false;
+			return $this->hasRows($result) ? mysql_result($result, 0, 0) : false;
         }
 
 		// Returns an array of the first value in each row.
