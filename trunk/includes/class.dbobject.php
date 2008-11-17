@@ -46,7 +46,7 @@
             $id = mysql_real_escape_string($id, $db->db);
             $column = mysql_real_escape_string($column, $db->db);
 
-            $db->query("SELECT * FROM {$this->tableName} WHERE `$column` = '?'", $id);
+            $db->query("SELECT * FROM {$this->tableName} WHERE `$column` = ?", $id);
 
             if(mysql_num_rows($db->result) == 0)
                 return false;

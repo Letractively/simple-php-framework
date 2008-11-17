@@ -54,7 +54,7 @@
             {
                 $args = func_get_args();
                 foreach($args as &$item)
-                    $item = $this->escape($item);
+                    $item = $this->quote($item);
                 $sql = vsprintf(str_replace('?', '%s', $sql), array_slice($args, 1));
             }
 

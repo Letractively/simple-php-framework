@@ -57,7 +57,7 @@
             self::$dbname   = '';
             self::$dbuser   = '';
             self::$dbpass   = '';
-            self::$dberror  = 'die';
+            self::$dberror  = true;
 
             ini_set('display_errors', '1');
             ini_set('error_reporting', E_ALL);
@@ -72,7 +72,7 @@
             self::$dbname   = 'simple-php-framework';
             self::$dbuser   = 'root';
             self::$dbpass   = '';
-            self::$dberror  = 'die';
+            self::$dberror  = true;
 
             ini_set('display_errors', '1');
             ini_set('error_reporting', E_ALL);
