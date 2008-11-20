@@ -68,19 +68,19 @@
         {
             if($type == 'jpg' && (imagetypes() & IMG_JPG))
             {
-                header("Content-Type: image/jpeg");
-                imagejpeg($this->im, $quality);
+                header('Content-Type: image/jpeg');
+                imagejpeg($this->im, null, $quality);
                 return true;
             }
             elseif($type == 'png' && (imagetypes() & IMG_PNG))
             {
-                header("Content-Type: image/png");
+                header('Content-Type: image/png');
                 imagepng($this->im);
                 return true;
             }
             elseif($type == 'gif' && (imagetypes() & IMG_GIF))
             {
-                header("Content-Type: image/gif");
+                header('Content-Type: image/gif');
                 imagegif($this->im);
                 return true;
             }
