@@ -107,7 +107,11 @@
         public function insertId()
         {
             if(!$this->isConnected()) return false;
-            return mysql_insert_id($this->db);
+            $id = mysql_insert_id($this->db);
+			if($id === 0 || $id === false)
+				return false;
+			else
+				return $id;
         }
 
         // Returns a single value.
