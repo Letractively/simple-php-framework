@@ -1,12 +1,12 @@
 <?PHP
     class Pager implements Iterator
     {
-		// Stuff you set...
+        // Stuff you set...
         public $page;        // Current page (will be recalculated if outside valid range)
         public $perPage;     // Number of records per page
         public $numRecords;  // Total number of records
 
-		// Stuff we calculate...
+        // Stuff we calculate...
         public $numPages;    // Number of pages required to display $numRecords records
         public $firstRecord; // Index of first record on current page
         public $lastRecord;  // Index of last record on current page
@@ -39,7 +39,7 @@
             $this->lastRecord  = (int) $this->firstRecord + $this->perPage - 1;
             if($this->lastRecord >= $this->numRecords) $this->lastRecord = $this->numRecords - 1;
 
-			$this->records = range($this->firstRecord, $this->lastRecord, 1);
+            $this->records = range($this->firstRecord, $this->lastRecord, 1);
         }
 
         // Will return current page if no previous page exists

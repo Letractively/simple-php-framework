@@ -9,8 +9,8 @@
 
         public static function open()
         {
-			$db = Database::getDatabase(true);
-			return $db->isConnected();
+            $db = Database::getDatabase(true);
+            return $db->isConnected();
         }
 
         public static function close()
@@ -20,30 +20,30 @@
 
         public static function read($id)
         {
-			$db = Database::getDatabase(true);
-			$db->query("SELECT `data` FROM `sessions` WHERE `id` = '?'", $id);
-			return $db->hasRows() ? $db->getValue() : '';
+            $db = Database::getDatabase(true);
+            $db->query("SELECT `data` FROM `sessions` WHERE `id` = '?'", $id);
+            return $db->hasRows() ? $db->getValue() : '';
         }
 
         public static function write($id, $data)
         {
-			$db = Database::getDatabase(true);
-			$db->query("DELETE FROM `sessions` WHERE `id` = '?'", $id);
-			$db->query("INSERT INTO `sessions` (`id`, `data`, `updated_on`) VALUES ('?', '?', '?')", $id, $data, time());
+            $db = Database::getDatabase(true);
+            $db->query("DELETE FROM `sessions` WHERE `id` = '?'", $id);
+            $db->query("INSERT INTO `sessions` (`id`, `data`, `updated_on`) VALUES ('?', '?', '?')", $id, $data, time());
             return ($db->affectedRows() == 1);
         }
 
         public static function destroy($id)
         {
-			$db = Database::getDatabase(true);
-			$db->query("DELETE FROM `sessions` WHERE `id` = '?'", $id);
+            $db = Database::getDatabase(true);
+            $db->query("DELETE FROM `sessions` WHERE `id` = '?'", $id);
             return ($db->affectedRows() == 1);
         }
 
         public static function gc($max)
         {
-			$db = Database::getDatabase(true);
-			$db->query("DELETE FROM `sessions` WHERE `updated_on` < '?'", time() - $max);
+            $db = Database::getDatabase(true);
+            $db->query("DELETE FROM `sessions` WHERE `updated_on` < '?'", time() - $max);
             return true;
         }
     }

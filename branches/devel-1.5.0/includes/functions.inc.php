@@ -110,11 +110,11 @@
     // table name, column to use as value, column(s) to use as text, default value(s) to select (can accept an array of values), extra sql to limit results
     function get_options($table, $val, $text, $default = null, $sql = '')
     {
-		$db = Database::getDatabase(true);
+        $db = Database::getDatabase(true);
         $out = '';
 
-		$rows = $db->getRows("SELECT * FROM `$table` $sql");
-		foreach($rows as $row)
+        $rows = $db->getRows("SELECT * FROM `$table` $sql");
+        foreach($rows as $row)
         {
             $the_text = '';
             if(!is_array($text)) $text = array($text); // Allows you to concat multiple fields for display
@@ -251,17 +251,17 @@
         return rtrim($str, '/');
     }
 
-	// Returns an array of the values of the specified column from a multi-dimensional array
+    // Returns an array of the values of the specified column from a multi-dimensional array
     function gimme($arr, $key = null)
     {
-		if(is_null($key))
-			$key = array_shift(array_keys($arr));
-		
-		$out = array();
-		foreach($arr as $a)
-			$out[] = $a[$key];
+        if(is_null($key))
+            $key = array_shift(array_keys($arr));
 
-		return $out;
+        $out = array();
+        foreach($arr as $a)
+            $out[] = $a[$key];
+
+        return $out;
     }
 
     // Fixes MAGIC_QUOTES

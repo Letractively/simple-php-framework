@@ -108,10 +108,10 @@
         {
             if(!$this->isConnected()) return false;
             $id = mysql_insert_id($this->db);
-			if($id === 0 || $id === false)
-				return false;
-			else
-				return $id;
+            if($id === 0 || $id === false)
+                return false;
+            else
+                return $id;
         }
 
         // Returns a single value.

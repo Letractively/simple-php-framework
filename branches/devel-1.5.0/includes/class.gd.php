@@ -48,7 +48,7 @@
             else
                 return false;
 
-			return true;
+            return true;
         }
 
         public function saveAs($filename, $type = 'jpg', $quality = 75)

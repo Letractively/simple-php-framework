@@ -1,6 +1,6 @@
 <?PHP
-	// Application flag
-	define('SPF', true);
+    // Application flag
+    define('SPF', true);
 
     // Determine our absolute document root
     define('DOC_ROOT', realpath(dirname(__FILE__) . '/../'));
