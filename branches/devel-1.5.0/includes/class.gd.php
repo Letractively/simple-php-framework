@@ -12,8 +12,10 @@
         {
             if(is_resource($data) && get_resource_type($data) == 'gd')
                 return $this->loadResource($data);
-            elseif(file_exists($data) && is_readable($data))
+            elseif(@file_exists($data) && is_readable($data))
                 return $this->loadFile($data);
+			elseif(is_string($data))
+				return $this->loadString($data);
             else
                 return false;
         }
@@ -48,8 +50,14 @@
             else
                 return false;
 
-            return true;
+			return true;
         }
+
+		public function loadString($str)
+		{
+			$im = imagecreatefromstring($str);
+			return ($im === false) ? false : $this->loadResource($im);
+		}
 
         public function saveAs($filename, $type = 'jpg', $quality = 75)
         {
@@ -68,25 +76,41 @@
         {
             if($type == 'jpg' && (imagetypes() & IMG_JPG))
             {
-                header('Content-Type: image/jpeg');
+                header("Content-Type: image/jpeg");
                 imagejpeg($this->im, null, $quality);
                 return true;
             }
             elseif($type == 'png' && (imagetypes() & IMG_PNG))
             {
-                header('Content-Type: image/png');
+                header("Content-Type: image/png");
                 imagepng($this->im);
                 return true;
             }
             elseif($type == 'gif' && (imagetypes() & IMG_GIF))
             {
-                header('Content-Type: image/gif');
+                header("Content-Type: image/gif");
                 imagegif($this->im);
                 return true;
             }
             else
                 return false;
         }
+
+		// Return image data as a string.
+		// Is there a way to do this without using output buffering?
+		public function __tostring($type = 'jpg', $quality = 75)
+		{
+			ob_start();
+
+            if($type == 'jpg' && (imagetypes() & IMG_JPG))
+                imagejpeg($this->im, null, $quality);
+            elseif($type == 'png' && (imagetypes() & IMG_PNG))
+                imagepng($this->im);
+            elseif($type == 'gif' && (imagetypes() & IMG_GIF))
+                imagegif($this->im);
+
+			return ob_get_clean();
+		}
 
         // Resizes an image and maintains aspect ratio.
         public function scale($new_width = null, $new_height = null)
@@ -97,7 +121,7 @@
                 $new_width = $this->width / $this->height * $new_height;
             elseif(!is_null($new_width) && !is_null($new_height))
             {
-                if($this->width > $this->height)
+                if($this->width < $this->height)
                     $new_width = $this->width / $this->height * $new_height;
                 else
                     $new_height = $new_width * $this->height / $this->width;
