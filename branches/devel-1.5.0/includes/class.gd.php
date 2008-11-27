@@ -14,8 +14,8 @@
                 return $this->loadResource($data);
             elseif(@file_exists($data) && is_readable($data))
                 return $this->loadFile($data);
-			elseif(is_string($data))
-				return $this->loadString($data);
+            elseif(is_string($data))
+                return $this->loadString($data);
             else
                 return false;
         }
@@ -50,14 +50,14 @@
             else
                 return false;
 
-			return true;
+            return true;
         }
 
-		public function loadString($str)
-		{
-			$im = imagecreatefromstring($str);
-			return ($im === false) ? false : $this->loadResource($im);
-		}
+        public function loadString($str)
+        {
+            $im = imagecreatefromstring($str);
+            return ($im === false) ? false : $this->loadResource($im);
+        }
 
         public function saveAs($filename, $type = 'jpg', $quality = 75)
         {
@@ -96,11 +96,11 @@
                 return false;
         }
 
-		// Return image data as a string.
-		// Is there a way to do this without using output buffering?
-		public function __tostring($type = 'jpg', $quality = 75)
-		{
-			ob_start();
+        // Return image data as a string.
+        // Is there a way to do this without using output buffering?
+        public function __tostring($type = 'jpg', $quality = 75)
+        {
+            ob_start();
 
             if($type == 'jpg' && (imagetypes() & IMG_JPG))
                 imagejpeg($this->im, null, $quality);
@@ -109,8 +109,8 @@
             elseif($type == 'gif' && (imagetypes() & IMG_GIF))
                 imagegif($this->im);
 
-			return ob_get_clean();
-		}
+            return ob_get_clean();
+        }
 
         // Resizes an image and maintains aspect ratio.
         public function scale($new_width = null, $new_height = null)
@@ -165,5 +165,16 @@
             }
 
             return false;
+        }
+
+        public function cropCentered($w, $h)
+        {
+            $cx = $this->width / 2;
+            $cy = $this->height / 2;
+            $x = $cx - $w / 2;
+            $y = $cy - $h / 2;
+            if($x < 0) $x = 0;
+            if($y < 0) $y = 0;
+            return $this->crop($x, $y, $w, $h);
         }
     }
