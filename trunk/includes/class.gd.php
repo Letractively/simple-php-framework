@@ -8,17 +8,19 @@
         public $type   = null;
         public $mime   = null;
 
-        function __construct($data = null, $ext = null)
+        public function __construct($data = null, $ext = null)
         {
             if(is_resource($data) && get_resource_type($data) == 'gd')
                 return $this->loadResource($data);
-            elseif(file_exists($data) && is_readable($data))
+            elseif(@file_exists($data) && is_readable($data))
                 return $this->loadFile($data);
+            elseif(is_string($data))
+                return $this->loadString($data);
             else
                 return false;
         }
 
-        function loadResource($im)
+        public function loadResource($im)
         {
             if(!is_resource($im) || !get_resource_type($im) == 'gd') return false;
 
@@ -29,7 +31,7 @@
             return true;
         }
 
-        function loadFile($filename)
+        public function loadFile($filename)
         {
             if(!file_exists($filename) || !is_readable($filename)) return false;
 
@@ -40,20 +42,27 @@
             $this->mime   = $info['mime'];
 
             if($this->type == 'jpeg' && (imagetypes() & IMG_JPG))
-                $im = imagecreatefromjpeg($filename);
+                $this->im = imagecreatefromjpeg($filename);
             elseif($this->type == 'png' && (imagetypes() & IMG_PNG))
-                $im = imagecreatefrompng($filename);
+                $this->im = imagecreatefrompng($filename);
             elseif($this->type == 'gif' && (imagetypes() & IMG_GIF))
-                $im = imagecreatefromgif($filename);
+                $this->im = imagecreatefromgif($filename);
             else
                 return false;
-            return $this->loadResource($im);
+
+            return true;
         }
 
-        function saveAs($filename, $type = 'jpg')
+        public function loadString($str)
+        {
+            $im = imagecreatefromstring($str);
+            return ($im === false) ? false : $this->loadResource($im);
+        }
+
+        public function saveAs($filename, $type = 'jpg', $quality = 75)
         {
             if($type == 'jpg' && (imagetypes() & IMG_JPG))
-                return imagejpeg($this->im, $filename);
+                return imagejpeg($this->im, $filename, $quality);
             elseif($type == 'png' && (imagetypes() & IMG_PNG))
                 return imagepng($this->im, $filename);
             elseif($type == 'gif' && (imagetypes() & IMG_GIF))
@@ -63,12 +72,12 @@
         }
 
         // Output file to browser
-        function output($type = 'jpg')
+        public function output($type = 'jpg', $quality = 75)
         {
             if($type == 'jpg' && (imagetypes() & IMG_JPG))
             {
                 header("Content-Type: image/jpeg");
-                imagejpeg($this->im);
+                imagejpeg($this->im, null, $quality);
                 return true;
             }
             elseif($type == 'png' && (imagetypes() & IMG_PNG))
@@ -87,8 +96,24 @@
                 return false;
         }
 
+        // Return image data as a string.
+        // Is there a way to do this without using output buffering?
+        public function __tostring($type = 'jpg', $quality = 75)
+        {
+            ob_start();
+
+            if($type == 'jpg' && (imagetypes() & IMG_JPG))
+                imagejpeg($this->im, null, $quality);
+            elseif($type == 'png' && (imagetypes() & IMG_PNG))
+                imagepng($this->im);
+            elseif($type == 'gif' && (imagetypes() & IMG_GIF))
+                imagegif($this->im);
+
+            return ob_get_clean();
+        }
+
         // Resizes an image and maintains aspect ratio.
-        function scale($new_width = null, $new_height = null)
+        public function scale($new_width = null, $new_height = null)
         {
             if(!is_null($new_width) && is_null($new_height))
                 $new_height = $new_width * $this->height / $this->width;
@@ -96,7 +121,7 @@
                 $new_width = $this->width / $this->height * $new_height;
             elseif(!is_null($new_width) && !is_null($new_height))
             {
-                if($this->width > $this->height)
+                if($this->width < $this->height)
                     $new_width = $this->width / $this->height * $new_height;
                 else
                     $new_height = $new_width * $this->height / $this->width;
@@ -108,7 +133,7 @@
         }
 
         // Resizes an image to an exact size
-        function resize($new_width, $new_height)
+        public function resize($new_width, $new_height)
         {
             $dest = imagecreatetruecolor($new_width, $new_height);
 
@@ -127,18 +152,29 @@
             return false;
         }
 
-        function crop($x, $y, $w, $h)
+        public function crop($x, $y, $w, $h)
         {
             $dest = imagecreatetruecolor($w, $h);
 
             if(imagecopyresampled($dest, $this->im, 0, 0, $x, $y, $w, $h, $w, $h))
             {
                 $this->im = $dest;
-                $this->width = imagesx($this->im);
-                $this->height = imagesy($this->im);
+                $this->width = $w;
+                $this->height = $h;
                 return true;
             }
 
             return false;
+        }
+
+        public function cropCentered($w, $h)
+        {
+            $cx = $this->width / 2;
+            $cy = $this->height / 2;
+            $x = $cx - $w / 2;
+            $y = $cy - $h / 2;
+            if($x < 0) $x = 0;
+            if($y < 0) $y = 0;
+            return $this->crop($x, $y, $w, $h);
         }
     }
