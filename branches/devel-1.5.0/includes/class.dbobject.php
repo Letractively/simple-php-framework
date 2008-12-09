@@ -117,14 +117,19 @@
         }
 
         // Grabs a large block of instantiated $obj_type objects from the database using only one query.
-        public static function glob($obj_type, $sql = null)
+        public static function glob($class_name, $sql = null)
         {
             $db = Database::getDatabase();
 
-            if(!class_exists($obj_type) || get_parent_class($obj_type) !== 'DBObject')
+			// Make sure the class exists before we instantiate it...
+            if(!class_exists($class_name))
                 return false;
 
-            $tmp_obj = new $obj_type;
+            $tmp_obj = new $class_name;
+
+			// Also, it needs to be a subclass of DBObject...
+			if(!is_subclass_of($tmp_obj, 'DBObject'))
+				return false;
 
             if(is_null($sql))
                 $sql = "SELECT * FROM `{$tmp_obj->tableName}`";
