@@ -21,6 +21,6 @@ CREATE TABLE `users` (
   `password` varchar(65) collate utf8_unicode_ci NOT NULL,
   `level` enum('user','admin') collate utf8_unicode_ci NOT NULL,
   `email` varchar(65) collate utf8_unicode_ci default NULL,
-  PRIMARY KEY  (`user_id`),
+  PRIMARY KEY  (`id`),
   UNIQUE KEY `username` (`username`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
