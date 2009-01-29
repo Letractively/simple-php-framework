@@ -116,20 +116,20 @@
             }
         }
 
-        // Grabs a large block of instantiated $obj_type objects from the database using only one query.
+        // Grabs a large block of instantiated $class_name objects from the database using only one query.
         public static function glob($class_name, $sql = null)
         {
             $db = Database::getDatabase();
 
-			// Make sure the class exists before we instantiate it...
+            // Make sure the class exists before we instantiate it...
             if(!class_exists($class_name))
                 return false;
 
             $tmp_obj = new $class_name;
 
-			// Also, it needs to be a subclass of DBObject...
-			if(!is_subclass_of($tmp_obj, 'DBObject'))
-				return false;
+            // Also, it needs to be a subclass of DBObject...
+            if(!is_subclass_of($tmp_obj, 'DBObject'))
+                return false;
 
             if(is_null($sql))
                 $sql = "SELECT * FROM `{$tmp_obj->tableName}`";
@@ -138,7 +138,7 @@
             $rows = $db->getRows($sql);
             foreach($rows as $row)
             {
-                $o = new $obj_type;
+                $o = new $class_name;
                 $o->load($row);
                 $objs[$o->id] = $o;
             }
