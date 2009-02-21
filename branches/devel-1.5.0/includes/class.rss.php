@@ -4,7 +4,7 @@
         public $title;
         public $link;
         public $description;
-        public $language = 'en-us';
+        public $language = 'en-US';
         public $pubDate;
         public $url;
         public $items;

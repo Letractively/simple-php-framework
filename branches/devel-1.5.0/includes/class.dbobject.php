@@ -117,7 +117,7 @@
         }
 
         // Grabs a large block of instantiated $class_name objects from the database using only one query.
-        public static function glob($class_name, $sql = null)
+        public static function glob($class_name, $sql = null, $extra_columns = array())
         {
             $db = Database::getDatabase();
 
@@ -141,6 +141,12 @@
                 $o = new $class_name;
                 $o->load($row);
                 $objs[$o->id] = $o;
+
+                foreach($extra_columns as $c)
+                {
+                    $o->addColumn($c);
+                    $o->$c = isset($row[$c]) ? $row[$c] : null;
+                }
             }
             return $objs;
         }
@@ -218,6 +224,6 @@
             $tag = new Tag($tag_name);
             if(is_null($tag->id)) return array();
 
-            return $this->glob("SELECT b.* FROM {$this->tableName}2tags a LEFT JOIN {$this->tableName} b ON a.{$this->tagColumnName} = b.{$this->idColumnName} WHERE a.tag_id = {$tag->id} $sql");
+            return DBObject::glob(get_class($this), "SELECT b.* FROM {$this->tableName}2tags a LEFT JOIN {$this->tableName} b ON a.{$this->tagColumnName} = b.{$this->idColumnName} WHERE a.tag_id = {$tag->id} $sql");
         }
     }

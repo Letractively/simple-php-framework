@@ -1,4 +1,16 @@
 <?PHP
+    // Formats a given number of seconds into proper mm:ss format
+    function format_time($seconds)
+    {
+        return floor($seconds / 60) . ':' . str_pad($seconds % 60, 2, '0');
+    }
+
+    // Given a string such as "comment_123" or "id_57", it returns the final, numeric id.
+    function split_id($str)
+    {
+        return match('/[_-]([0-9]+)$/', $str, 1);
+    }
+
     // Creates a friendly URL slug from a string
     function slugify($str)
     {
@@ -136,7 +148,7 @@
     function dater($date = null, $format = null)
     {
         if(is_null($format))
-            $format = "Y-m-d H:i:s";
+            $format = 'Y-m-d H:i:s';
 
         if(is_null($date))
             $date = time();
@@ -423,24 +435,21 @@
         }
     }
 
-    // Returns the lat, long of an address via Google
-    function geocode($address, $key, $output = 'csv')
+    // Returns the lat, long of an address via Yahoo!'s geocoding service.
+    // You'll need an App ID, which is available from here:
+    // http://developer.yahoo.com/maps/rest/V1/geocode.html
+    function geocode($location, $appid)
     {
-        $address = urlencode($address);
-        $key     = urlencode($key);
-        $data    = geturl("http://maps.google.com/maps/geo?q=$address&key=$key&output=$output");
+        $location = urlencode($location);
+        $appid    = urlencode($appid);
+        $data     = file_get_contents("http://local.yahooapis.com/MapsService/V1/geocode?output=php&appid=$appid&location=$location");
+        $data     = unserialize($data);
 
-        if($output == 'csv')
-            return explode(',', $data); // HTTP status code, accuracy bit, latitude, longitude
-        elseif ($output == 'xml')
-        {
-            $xml = simplexml_load_string($data);
-            if($xml === FALSE) return FALSE;
-            if($xml->Response->Status->code != '200') return FALSE;
-            return explode(',', (string) $xml->Response->Placemark->Point->coordinates); // latitude, longitude, ???
-        }
-        else
-            return $data;
+        if($data === false) return false;
+
+        $data = $data['ResultSet']['Result'];
+
+        return array('lat' => $data['Latitude'], 'lng' => $data['Longitude']);
     }
 
     // Quick and dirty wrapper for curl scraping.
